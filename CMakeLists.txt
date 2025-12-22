@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(CppProjectBase VERSION 0.0.1 LANGUAGES CXX)
+project(Landcraft VERSION 0.0.1 LANGUAGES CXX)
 
 # --- Runtime link selection ---
 if (NOT DEFINED RUNTIME_LINK)
@@ -69,7 +69,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
 
 # --- Executable setup ---
-set(MY_TARGET cpp_project_base)
+set(MY_TARGET landcraft)
 add_executable(${MY_TARGET} src/main.cpp)
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)
