@@ -10,7 +10,7 @@ class ConanProjectConan(ConanFile):
 
     settings = "os", "compiler", "build_type", "arch"
     requires = "sfml/2.6.2"
-    generators = "CMakeDeps", "CMakeToolchain"
+    # generators = "CMakeDeps", "CMakeToolchain"
     
     # Option to control shared/static linking of direct dependencies
     options = {
@@ -54,6 +54,11 @@ class ConanProjectConan(ConanFile):
         self.folders.generators = "build/generators"
 
     def generate(self):
+        tc = CMakeToolchain(self)
+        tc.generate()
+
+        deps = CMakeDeps(self)
+        deps.generate()
         """Copies dependency DLLs (like SFML) next to the final executable."""
         exe_dir = os.path.join(self.source_folder, "bin")
         os.makedirs(exe_dir, exist_ok=True)

@@ -17,15 +17,7 @@ if (MSVC)
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
         message(STATUS "Using dynamic runtime (/MD or /MDd)")
     endif()
-# elseif(UNIX AND NOT APPLE)
-#     set(CMAKE_SKIP_BUILD_RPATH FALSE)
-#     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-#     set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif()
-
-# if(UNIX AND NOT APPLE AND RUNTIME_LINK STREQUAL "static")
-#     set(BUILD_SHARED_LIBS FALSE)
-# endif()
 
 # --- Linux static and dynamic linkage settings
 if(UNIX AND NOT APPLE)
@@ -50,12 +42,8 @@ if(UNIX AND NOT APPLE)
         set(CMAKE_INSTALL_RPATH "$ORIGIN")
         set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 
-        # critical: disable RUNPATH
+        #  disable RUNPATH
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
-
-        # set(CMAKE_SKIP_RPATH FALSE)
-        # set(CMAKE_SKIP_INSTALL_RPATH FALSE)
-        # set(CMAKE_INSTALL_REMOVE_ENVIRONMENT_RPATH TRUE)
     endif()
 endif()
 
@@ -70,7 +58,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
 
 # --- Executable setup ---
 set(MY_TARGET landcraft)
-add_executable(${MY_TARGET} src/main.cpp
+add_executable(${MY_TARGET}
         src/main.cpp)
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)

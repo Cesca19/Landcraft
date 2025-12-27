@@ -5,5 +5,14 @@
     },
     "include": [
         "build/generators/CMakePresets.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "compile-commands",
+            "inherits": "conan-debug",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        }
     ]
 }
