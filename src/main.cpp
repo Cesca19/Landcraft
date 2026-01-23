@@ -3,9 +3,11 @@
 #include <vector>
 
 #define PI 3.14159265358979323846
-#define TILE_SIZE_X 64
-#define TILE_SIZE_Y 64
+#define TILE_SIZE_X 32
+#define TILE_SIZE_Y 32
 #define HEIGHT_SCALE 6 // => 64 / 8
+#define PROJECTION_ANGLE_X 45
+#define PROJECTION_ANGLE_Y 35 // 35.264 realistic isometric angle
 
 float radToDeg(float rad)
 {
@@ -19,8 +21,8 @@ float degToRad(float deg)
 
 sf::Vector2f project_iso_point(int x , int y, int z)
 {
-    float angleX = degToRad(45);
-    float angleY = degToRad(35);
+    float angleX = degToRad(PROJECTION_ANGLE_X);
+    float angleY = degToRad(PROJECTION_ANGLE_Y);
     sf::Vector2f point2d;
 
     point2d.x = std::cos(angleX) * x - std::cos(angleX) * y ;
@@ -57,13 +59,13 @@ std::vector<sf::Vector2f> getPointNeighbors(std::vector<std::vector<sf::Vector2f
 sf::VertexArray buildMap2d(std::vector<std::vector<sf::Vector2f>> map2d)
 {
     sf::VertexArray map(sf::Lines);
-    sf::Color vertexColor = sf::Color::White;
+    sf::Color vertexColor = sf::Color::Cyan;
     for (int y = 0; y < map2d.size(); y++) {
         for (int x = 0; x < map2d[y].size(); x++) {
             std::vector<sf::Vector2f> neighbors = getPointNeighbors(map2d, x, y);
             for (sf::Vector2f neighbor : neighbors) {
                 map.append(sf::Vertex(map2d[y][x], vertexColor));
-                map.append(sf::Vertex(neighbor, sf::Color::Green));
+                map.append(sf::Vertex(neighbor, vertexColor));
             }
         }
     }
@@ -73,14 +75,25 @@ sf::VertexArray buildMap2d(std::vector<std::vector<sf::Vector2f>> map2d)
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Landcraft");
     std::vector<std::vector<int>> map3d = {
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 5, 3, 0},
-        {0, 9, 0, 0, 0, 0},
-        {0, 7, 5, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0}
+        // {0,0,0,0,0,0},
+        // {0,0,0,0,0,0},
+        // {0,0,0,5,3,0},
+        // {0,0,0,0,0,0},
+        // {0,0,0,0,0,0},
+        // {0,0,0,0,0,0}
+        
+        {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
+        {0, 0, 0, 5, 3, 0, 0, 1, 1, 0},
+        {0, 9, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 7, 5, 0, 0, 0, 0, 1, 0, 0},
+        {0, 3, 6, 0, 0, 0, 0, 1, 1, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
     std::vector<std::vector<sf::Vector2f>> map2d = createMap2d(map3d, sf::Vector2f{400, 100});
     sf::VertexArray gameMap = buildMap2d(map2d);
