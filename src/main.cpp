@@ -109,13 +109,17 @@ std::vector<std::vector<Corner>> buildCornersMap(std::vector<std::vector<int>> i
     return cornersMap;
 }
 
-std::vector<sf::Vector2f> getPointNeighbors(std::vector<std::vector<Corner>> corners, int x, int y)
+std::vector<Corner> getPointNeighbors(std::vector<std::vector<Corner>> corners, int x, int y)
 {
-    std::vector<sf::Vector2f> neighbors;
-    if (x + 1 < corners[y].size())
-        neighbors.push_back(corners[y][x + 1].ScreenPosition);
-    if (y + 1 < corners.size())
-        neighbors.push_back(corners[y + 1][x].ScreenPosition);
+    std::vector<Corner> neighbors;
+        if (x + 1 < corners[y].size())
+    neighbors.push_back(corners[y][x + 1]);
+        if (y + 1 < corners.size())
+    neighbors.push_back(corners[y + 1][x]);
+    return neighbors;
+    //     neighbors.push_back( corners[y][x + 1].ScreenPosition);
+    // if (y + 1 < corners.size())
+    //     neighbors.push_back(corners[y + 1][x].ScreenPosition);
     return neighbors;
 }
 
@@ -124,10 +128,10 @@ sf::VertexArray createVertexArrayMap(std::vector<std::vector<Corner>> worldMap)
     sf::VertexArray map(sf::Lines);
     for (int y = 0; y < worldMap.size(); y++) {
         for (int x = 0; x < worldMap[y].size(); x++) {
-            std::vector<sf::Vector2f> neighbors = getPointNeighbors(worldMap, x, y);
-            for (sf::Vector2f neighbor : neighbors) {
+            std::vector<Corner> neighbors = getPointNeighbors(worldMap, x, y);
+            for (Corner neighbor : neighbors) {
                 map.append(sf::Vertex(worldMap[y][x].ScreenPosition, worldMap[y][x].Color));
-                map.append(sf::Vertex(neighbor, worldMap[y][x].Color));
+                map.append(sf::Vertex(neighbor.ScreenPosition, neighbor.Color));
             }
         }
     }
@@ -142,7 +146,7 @@ sf::Vector2i GetMouseWorldPosition(sf::RenderWindow& window, sf::Vector2f transl
     int tileX = (worldPosition.x) / TILE_SIZE_X;
     int tileY = (worldPosition.y) / TILE_SIZE_Y;
     // std::cout << "Mouse World Position: (" << worldPosition.x << ", " << worldPosition.y << ")\n";
-    std::cout << "Mouse Tile Position: (" << tileX << ", " << tileY << ")\n";
+    // std::cout << "Mouse Tile Position: (" << tileX << ", " << tileY << ")\n";
     return sf::Vector2i(tileX, tileY);
 }
 
@@ -159,7 +163,7 @@ std::vector<std::vector<Corner>> updateCornerMap(std::vector<std::vector<Corner>
             cornersMap[y][x].Color = sf::Color::Cyan;
         }
     }
-    cornersMap[mouseWorldPos.y][mouseWorldPos.x].Color = sf::Color::Yellow;
+    cornersMap[mouseWorldPos.y][mouseWorldPos.x].Color = sf::Color::Magenta;
     return cornersMap;
 }
 
@@ -181,8 +185,8 @@ int main()
         {0, 7, 5, 0, 0, 0, 0, 1, 0, 0},
         {0, 3, 6, 0, 0, 0, 0, 1, 1, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 1, 1, 1, 0, 0, 0, 0},
+        {0, 0, 0, 1, 1, 1, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
     //std::vector<std::vector<sf::Vector2f>> map2d = convertTo2dScreenMap(input3dMap, sf::Vector2f{400, 100});
