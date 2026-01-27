@@ -18,7 +18,6 @@
         {
             "name": "compile-commands",
             "description": "Configuration with compile commands",
-            "inherits": "default",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }

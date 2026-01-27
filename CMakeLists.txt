@@ -59,7 +59,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
 # --- Executable setup ---
 set(MY_TARGET landcraft)
 add_executable(${MY_TARGET}
-        src/main.cpp)
+        src/main.cpp
+        src/TileCorner.cpp
+        src/WorldMap.cpp
+        src/ScreenMap.cpp
+)
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)
 
