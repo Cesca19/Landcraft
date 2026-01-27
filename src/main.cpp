@@ -14,6 +14,7 @@ int main()
     WorldMap worldMap("");
     ScreenMap screenMap(TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, sf::Vector2f{400, 100}, 
                         PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y);
+    SelectionMode selectionMode = SelectionMode::TILE_CORNER;
 
     while (window.isOpen())
     {
@@ -23,9 +24,11 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            selectionMode = (selectionMode == SelectionMode::TILE) ? SelectionMode::TILE_CORNER : SelectionMode::TILE;
 
         window.clear();
-        worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window));
+        worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
         screenMap.updateScreenMap(worldMap.getMap());
         screenMap.draw(window);
         window.display();

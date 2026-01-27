@@ -36,7 +36,7 @@ const std::vector<std::vector<TileCorner>>& WorldMap::getMap()
     return m_map;
 }
 
-void WorldMap::updateTilesState(sf::Vector2f mouseWorldPos)
+void WorldMap::updateTilesState(sf::Vector2f mouseWorldPos, SelectionMode selectionMode)
 {
 
     for (int y = 0; y < m_map.size(); y++) {
@@ -48,7 +48,25 @@ void WorldMap::updateTilesState(sf::Vector2f mouseWorldPos)
         mouseWorldPos.y >= m_map.size() || 
         mouseWorldPos.x >= m_map[0].size())
         return;
-    m_map[mouseWorldPos.y][mouseWorldPos.x].Color = sf::Color::Magenta;
+
+    int minX  = std::floor(mouseWorldPos.x);
+    int minY  = std::floor(mouseWorldPos.y);
+    int maxX  = std::ceil(mouseWorldPos.x);
+    int maxY  = std::ceil(mouseWorldPos.y);
+    
+    m_selectedCorners.clear();
+    m_selectedCorners.push_back(m_map[minY][minX]);
+    if (selectionMode == SelectionMode::TILE)
+    {
+        if (maxX < m_map[0].size())
+            m_selectedCorners.push_back(m_map[minY][maxX]);
+        if (maxY < m_map.size())
+            m_selectedCorners.push_back(m_map[maxY][minX]);
+        if (maxX < m_map[0].size() && maxY < m_map.size())
+            m_selectedCorners.push_back(m_map[maxY][maxX]);
+    }
+    for (TileCorner& corner : m_selectedCorners)
+        m_map[corner.Position.y][corner.Position.x].Color = sf::Color::Magenta;
 }
 
 void WorldMap::onTileCornerHovered(float x, float y)

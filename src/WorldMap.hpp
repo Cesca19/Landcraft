@@ -1,6 +1,7 @@
 #ifndef WORLDMAP_HPP
 #define WORLDMAP_HPP
 
+#include <cmath>
 #include <vector>
 #include <string>
 #include "TileCorner.hpp"
@@ -11,7 +12,7 @@ public:
     WorldMap(std::string filepath);
     ~WorldMap();
     const std::vector<std::vector<TileCorner>>& getMap();
-    void updateTilesState(sf::Vector2f mouseWorldPos);
+    void updateTilesState(sf::Vector2f mouseWorldPos, SelectionMode mode = SelectionMode::TILE_CORNER);
 private:
     void onTileCornerHovered(float x, float y);
 

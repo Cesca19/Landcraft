@@ -3,6 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 
+enum class SelectionMode {
+    TILE,
+    TILE_CORNER
+};
+
 struct TileCorner {
     sf::Vector2f Position;
     int Height;
