@@ -1,5 +1,5 @@
 #ifndef TILE_CORNER_HPP
-#define TILECORNER_HPP
+#define TILE_CORNER_HPP
 
 #include <SFML/Graphics.hpp>
 

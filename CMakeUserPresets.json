@@ -8,16 +8,9 @@
     ],
     "configurePresets": [
         {
-            "name": "default",
-            "description": "Default configuration",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-            },
-            "binaryDir": "${sourceDir}/build"
-        },
-        {
             "name": "compile-commands",
             "description": "Configuration with compile commands",
+            "inherits": "conan-default",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             }
