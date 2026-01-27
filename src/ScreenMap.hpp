@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 
 #include <cmath>
+#include <iostream>
 #include <vector>
 #include "TileCorner.hpp"
 
@@ -13,9 +14,10 @@ public:
     ~ScreenMap();
     void updateScreenMap(const std::vector<std::vector<TileCorner>> &worldMap);
     void draw(sf::RenderWindow& window);
+    sf::Vector2f GetMouseWorldPosition(sf::RenderWindow& window);
 private:
     void createVertexArrayMap();
-    const std::vector<TileCorner> &getPointNeighbors(int x, int y);
+    std::vector<TileCorner> getPointNeighbors(int x, int y);
 
     float radToDeg(float rad);
     float degToRad(float deg);

@@ -38,15 +38,17 @@ const std::vector<std::vector<TileCorner>>& WorldMap::getMap()
 
 void WorldMap::updateTilesState(sf::Vector2f mouseWorldPos)
 {
-    int x = mouseWorldPos.x;
-    int y = mouseWorldPos.y;
 
     for (int y = 0; y < m_map.size(); y++) {
         for (int x = 0; x < m_map[y].size(); x++) {
             m_map[y][x].Color = sf::Color::Cyan;
         }
     }
-    m_map[y][x].Color = sf::Color::Magenta;
+    if (mouseWorldPos.x < 0 || mouseWorldPos.y < 0 || 
+        mouseWorldPos.y >= m_map.size() || 
+        mouseWorldPos.x >= m_map[0].size())
+        return;
+    m_map[mouseWorldPos.y][mouseWorldPos.x].Color = sf::Color::Magenta;
 }
 
 void WorldMap::onTileCornerHovered(float x, float y)

@@ -37,6 +37,16 @@ void ScreenMap::draw(sf::RenderWindow &window)
     window.draw(m_vertexArrayMap);
 }
 
+sf::Vector2f ScreenMap::GetMouseWorldPosition(sf::RenderWindow &window)
+{
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+    sf::Vector2f worldPosition = screen_to_world(mousePosition.x - m_translationOffset.x, mousePosition.y - m_translationOffset.y, 0);
+    float tileX = (worldPosition.x) / m_tileSizeX;
+    float tileY = (worldPosition.y) / m_tileSizeY;
+    return sf::Vector2f(tileX, tileY);
+}
+
 void ScreenMap::createVertexArrayMap()
 {
     m_vertexArrayMap.setPrimitiveType(sf::Lines);
@@ -52,7 +62,7 @@ void ScreenMap::createVertexArrayMap()
     }
 }
 
-const std::vector<TileCorner> &ScreenMap::getPointNeighbors(int x, int y)
+std::vector<TileCorner> ScreenMap::getPointNeighbors(int x, int y)
 {
     std::vector<TileCorner> neighbors;
     if (x + 1 < m_map[y].size())
