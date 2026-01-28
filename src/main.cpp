@@ -37,7 +37,12 @@ int main()
             }
         }
         window.clear();
-        worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
+        // worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
+        worldMap.removeSelectedTilesCorners();
+        screenMap.updateScreenMap(worldMap.getMap());
+        std::vector<sf::Vector2i> selectedTilesCorner = screenMap.getSelectedTilesCorner(window);
+        for (const sf::Vector2i& selectedTileCorner : selectedTilesCorner)
+            worldMap.onTileCornerHovered(selectedTileCorner.x, selectedTileCorner.y);
         screenMap.updateScreenMap(worldMap.getMap());
         screenMap.draw(window);
         window.display();

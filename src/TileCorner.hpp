@@ -9,7 +9,15 @@ enum class SelectionMode {
 };
 
 struct TileCorner {
-    sf::Vector2f Position;
+    sf::Vector2i Position;
+    int Height;
+    sf::Color Color;
+    // tiletype
+};
+
+struct ScreenTileCorner {
+    sf::Vector2f ScreenPosition;
+    sf::Vector2i WorldPosition;
     int Height;
     sf::Color Color;
     // tiletype

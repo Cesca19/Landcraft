@@ -19,12 +19,12 @@ void ScreenMap::updateScreenMap(const std::vector<std::vector<TileCorner>> & wor
 {
     m_map.clear();
     for (int y = 0; y < worldMap.size(); y++) {
-        std::vector<TileCorner> row;
+        std::vector<ScreenTileCorner> row;
         for (int x = 0; x < worldMap[y].size(); x++) {
             int worldX = worldMap[y][x].Position.x * m_tileSizeX;
             int worldY = worldMap[y][x].Position.y * m_tileSizeY;
             sf::Vector2f screenPos = world_to_screen(worldX, worldY, worldMap[y][x].Height) + m_translationOffset;
-            TileCorner corner = {screenPos, worldMap[y][x].Height * m_heightScale, worldMap[y][x].Color};
+            ScreenTileCorner corner = {screenPos, worldMap[y][x].Position, worldMap[y][x].Height * m_heightScale, worldMap[y][x].Color};
             row.push_back(corner);
         }
         m_map.push_back(row);
@@ -37,14 +37,16 @@ void ScreenMap::draw(sf::RenderWindow &window)
     window.draw(m_vertexArrayMap);
 }
 
-sf::Vector2f ScreenMap::GetMouseWorldPosition(sf::RenderWindow &window)
+std::vector<sf::Vector2i> ScreenMap::getSelectedTilesCorner(sf::RenderWindow &window)
 {
-    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+    sf::Vector2i mouseScreenPosition = sf::Mouse::getPosition(window);
+    sf::Vector2f tempPos = GetMouseWorldPosition(mouseScreenPosition);
+    sf::Vector2i mouseWorldPosition = {(int)std::round(tempPos.x), (int)std::round(tempPos.y)};
 
-    sf::Vector2f worldPosition = screen_to_world(mousePosition.x - m_translationOffset.x, mousePosition.y - m_translationOffset.y, 0);
-    float tileX = (worldPosition.x) / m_tileSizeX;
-    float tileY = (worldPosition.y) / m_tileSizeY;
-    return sf::Vector2f(tileX, tileY);
+    ScreenTileCorner closestCorner = getClosestNeighborInRadius(mouseWorldPosition.x, mouseWorldPosition.y, 2, sf::Vector2f(mouseScreenPosition));
+    if (closestCorner.WorldPosition.x == -1 && closestCorner.WorldPosition.y == -1)
+        return  {};
+    return { closestCorner.WorldPosition };
 }
 
 void ScreenMap::createVertexArrayMap()
@@ -53,23 +55,70 @@ void ScreenMap::createVertexArrayMap()
     m_vertexArrayMap.clear();
     for (int y = 0; y < m_map.size(); y++) {
         for (int x = 0; x < m_map[y].size(); x++) {
-            std::vector<TileCorner> neighbors = getPointNeighbors(x, y);
-            for (TileCorner neighbor : neighbors) {
-                m_vertexArrayMap.append(sf::Vertex(m_map[y][x].Position, m_map[y][x].Color));
-                m_vertexArrayMap.append(sf::Vertex(neighbor.Position, neighbor.Color));
+            std::vector<ScreenTileCorner> neighbors = getPointNeighbors(x, y);
+            for (ScreenTileCorner neighbor : neighbors) {
+                m_vertexArrayMap.append(sf::Vertex(m_map[y][x].ScreenPosition, m_map[y][x].Color));
+                m_vertexArrayMap.append(sf::Vertex(neighbor.ScreenPosition, neighbor.Color));
             }
         }
     }
 }
 
-std::vector<TileCorner> ScreenMap::getPointNeighbors(int x, int y)
+sf::Vector2f ScreenMap::GetMouseWorldPosition(sf::Vector2i mouseScreenPosition)
 {
-    std::vector<TileCorner> neighbors;
+    sf::Vector2f worldPosition = screen_to_world(mouseScreenPosition.x - m_translationOffset.x, mouseScreenPosition.y - m_translationOffset.y, 0);
+    float tileX = (worldPosition.x) / m_tileSizeX;
+    float tileY = (worldPosition.y) / m_tileSizeY;
+    return {tileX, tileY};
+}
+
+std::vector<ScreenTileCorner> ScreenMap::getPointNeighbors(int x, int y)
+{
+    std::vector<ScreenTileCorner> neighbors;
     if (x + 1 < m_map[y].size())
         neighbors.push_back(m_map[y][x + 1]);
     if (y + 1 < m_map.size())
         neighbors.push_back(m_map[y + 1][x]);
     return neighbors;
+}
+
+std::vector<ScreenTileCorner> ScreenMap::getPointNeighborsInRadius(int x, int y, int radius)
+{
+    std::vector<ScreenTileCorner> neighbors;
+    int startX = std::max(0, x - radius);
+    int endX = std::min((int)m_map[0].size(), x + radius);
+    int startY = std::max(0, y - radius);
+    int endY = std::min((int)m_map.size(), y + radius);
+
+    for (int j = startY; j < endY; j++)
+        for (int i = startX; i < endX; i++)
+            neighbors.push_back(m_map[j][i]);
+    return neighbors;
+}
+
+ScreenTileCorner ScreenMap::getClosestNeighborInRadius(int worldX, int worldY, int radius, sf::Vector2f referencePoint)
+{
+    std::vector<ScreenTileCorner> neighbors = getPointNeighborsInRadius(worldX, worldY, radius);
+    if (neighbors.empty())
+        return ScreenTileCorner{ sf::Vector2f(0,0), sf::Vector2i(-1,-1), 0, sf::Color::Black };
+    ScreenTileCorner closestNeighbor = neighbors[0];
+    float minDistance = distanceBetweenPoints(neighbors[0].ScreenPosition, referencePoint);
+
+    for(const ScreenTileCorner& neighbor : neighbors)
+    {
+        float dist = distanceBetweenPoints(neighbor.ScreenPosition, referencePoint);
+        if (dist < minDistance)
+        {
+            minDistance = dist;
+            closestNeighbor = neighbor;
+        }
+    }
+    return closestNeighbor;
+}
+
+float ScreenMap::distanceBetweenPoints(const sf::Vector2f &p1, const sf::Vector2f &p2)
+{
+    return std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
 }
 
 float ScreenMap::radToDeg(float rad)

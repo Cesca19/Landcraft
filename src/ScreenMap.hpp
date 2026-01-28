@@ -14,10 +14,14 @@ public:
     ~ScreenMap();
     void updateScreenMap(const std::vector<std::vector<TileCorner>> &worldMap);
     void draw(sf::RenderWindow& window);
-    sf::Vector2f GetMouseWorldPosition(sf::RenderWindow& window);
+    std::vector<sf::Vector2i> getSelectedTilesCorner(sf::RenderWindow& window);
 private:
     void createVertexArrayMap();
-    std::vector<TileCorner> getPointNeighbors(int x, int y);
+    sf::Vector2f GetMouseWorldPosition(sf::Vector2i mouseScreenPosition);
+    std::vector<ScreenTileCorner> getPointNeighbors(int x, int y);
+    std::vector<ScreenTileCorner> getPointNeighborsInRadius(int x, int y, int radius);
+    ScreenTileCorner getClosestNeighborInRadius(int worldX, int worldY, int radius, sf::Vector2f referencePoint);
+    float distanceBetweenPoints(const sf::Vector2f& p1, const sf::Vector2f& p2);
 
     float radToDeg(float rad);
     float degToRad(float deg);
@@ -30,7 +34,7 @@ private:
     int m_tileSizeY;
     int m_heightScale;
     sf::Vector2f m_translationOffset;
-    std::vector<std::vector<TileCorner>> m_map;
+    std::vector<std::vector<ScreenTileCorner>> m_map;
     sf::VertexArray m_vertexArrayMap;
 };
 

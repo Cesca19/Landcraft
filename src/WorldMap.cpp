@@ -18,7 +18,7 @@ WorldMap::WorldMap(std::string filepath)
     for (int y = 0; y < input3dMap.size(); y++) {
         std::vector<TileCorner> row;
         for (int x = 0; x < input3dMap[y].size(); x++) {
-            TileCorner tile = {sf::Vector2f(x, y), input3dMap[y][x], sf::Color::Cyan};
+            TileCorner tile = {sf::Vector2i(x, y), input3dMap[y][x], sf::Color::Cyan};
             row.push_back(tile);
         }
         m_map.push_back(row);
@@ -34,34 +34,25 @@ const std::vector<std::vector<TileCorner>> &WorldMap::getMap()
     return m_map;
 }
 
-void WorldMap::updateTilesState(sf::Vector2f mouseWorldPos, SelectionMode selectionMode)
+void WorldMap::onTileCornerHovered(float x, float y)
 {
-    int approxX = std::round(mouseWorldPos.x);
-    int approxY = std::round(mouseWorldPos.y);
-    if (approxX < 0 || approxY < 0 ||
-        approxY >= m_map.size() ||
-        approxX >= m_map[0].size())
+    if (x < 0 || y < 0 ||
+        y >= m_map.size() ||
+        x >= m_map[0].size())
         return;
+    m_selectedCorners.push_back(m_map[y][x]);
+    updateTiles();
+}
 
-    m_selectedCorners.clear();
-    if (selectionMode == SelectionMode::TILE) {
-        int minX = std::floor(mouseWorldPos.x);
-        int minY = std::floor(mouseWorldPos.y);
-        int maxX = std::ceil(mouseWorldPos.x);
-        int maxY = std::ceil(mouseWorldPos.y);
-
-        m_selectedCorners.push_back(m_map[minY][minX]);
-        if (maxX < m_map[0].size())
-            m_selectedCorners.push_back(m_map[minY][maxX]);
-        if (maxY < m_map.size())
-            m_selectedCorners.push_back(m_map[maxY][minX]);
-        if (maxX < m_map[0].size() && maxY < m_map.size())
-            m_selectedCorners.push_back(m_map[maxY][maxX]);
-    } else {
-        m_selectedCorners.push_back(m_map[approxY][approxX]);
-    }
+void WorldMap::updateTiles()
+{
     resetTilesColors();
-    setSelectedTileCornersColors(sf::Color::Magenta);
+    setSelectedTileCornersColors(m_selectedTilesColor);
+}
+
+void WorldMap::removeSelectedTilesCorners()
+{
+    m_selectedCorners.clear();
 }
 
 void WorldMap::setSelectedTilesCornersHeight(int heightOffset)
@@ -83,6 +74,4 @@ void WorldMap::setSelectedTileCornersColors(sf::Color color)
         m_map[corner.Position.y][corner.Position.x].Color = color;
 }
 
-void WorldMap::onTileCornerHovered(float x, float y)
-{
-}
+
