@@ -26,7 +26,7 @@ int main()
                 window.close();
             if (event.type == sf::Event::KeyReleased)
             {
-                if (event.key.code == sf::Keyboard::S)
+                if (event.key.code == sf::Keyboard::Space)
                     selectionMode = (selectionMode == SelectionMode::TILE) 
                                     ? SelectionMode::TILE_CORNER 
                                     : SelectionMode::TILE;
@@ -35,7 +35,7 @@ int main()
                 if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
                     worldMap.setSelectedTilesCornersHeight(-heightOffset);
             }
-        }// crash on height down
+        }
         window.clear();
         worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
         screenMap.updateScreenMap(worldMap.getMap());
