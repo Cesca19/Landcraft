@@ -15,6 +15,7 @@ int main()
     ScreenMap screenMap(TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, sf::Vector2f{400, 100}, 
                         PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y);
     SelectionMode selectionMode = SelectionMode::TILE_CORNER;
+    int heightOffset = 1;
 
     while (window.isOpen())
     {
@@ -23,10 +24,18 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            selectionMode = (selectionMode == SelectionMode::TILE) ? SelectionMode::TILE_CORNER : SelectionMode::TILE;
-
+            if (event.type == sf::Event::KeyReleased)
+            {
+                if (event.key.code == sf::Keyboard::S)
+                    selectionMode = (selectionMode == SelectionMode::TILE) 
+                                    ? SelectionMode::TILE_CORNER 
+                                    : SelectionMode::TILE;
+                if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
+                    worldMap.setSelectedTilesCornersHeight(heightOffset);
+                if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
+                    worldMap.setSelectedTilesCornersHeight(-heightOffset);
+            }
+        }// crash on height down
         window.clear();
         worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
         screenMap.updateScreenMap(worldMap.getMap());
