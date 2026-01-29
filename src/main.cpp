@@ -17,6 +17,7 @@ int main()
     SelectionMode selectionMode = SelectionMode::TILE_CORNER;
     int heightOffset = 1;
 
+    screenMap.buildScreenMap(worldMap.getMap());
     while (window.isOpen())
     {
         sf::Event event;
@@ -30,20 +31,19 @@ int main()
                     selectionMode = (selectionMode == SelectionMode::TILE) 
                                     ? SelectionMode::TILE_CORNER 
                                     : SelectionMode::TILE;
-                if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
-                    worldMap.setSelectedTilesCornersHeight(heightOffset);
-                if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
-                    worldMap.setSelectedTilesCornersHeight(-heightOffset);
+                // if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
+                //     worldMap.setSelectedTilesCornersHeight(heightOffset);
+                // if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
+                //     worldMap.setSelectedTilesCornersHeight(-heightOffset);
             }
         }
         window.clear();
+        screenMap.update(window);
         // worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
-        worldMap.removeSelectedTilesCorners();
-        screenMap.updateScreenMap(worldMap.getMap());
-        std::vector<sf::Vector2i> selectedTilesCorner = screenMap.getSelectedTilesCorner(window);
-        for (const sf::Vector2i& selectedTileCorner : selectedTilesCorner)
-            worldMap.onTileCornerHovered(selectedTileCorner.x, selectedTileCorner.y);
-        screenMap.updateScreenMap(worldMap.getMap());
+        // worldMap.removeSelectedTilesCorners();
+        // std::vector<sf::Vector2i> selectedTilesCorner = screenMap.getSelectedTilesCorner(window);
+        // for (const sf::Vector2i& selectedTileCorner : selectedTilesCorner)
+        //     worldMap.onTileCornerHovered(selectedTileCorner.x, selectedTileCorner.y);
         screenMap.draw(window);
         window.display();
     }

@@ -15,7 +15,14 @@ ScreenMap::~ScreenMap()
 {
 }
 
-void ScreenMap::updateScreenMap(const std::vector<std::vector<TileCorner>> & worldMap)
+void ScreenMap::update(sf::RenderWindow &window)
+{
+    getSelectedTilesCorner(window);
+    resetTilesCornerColors();
+    setSelectedTileCornersColors();
+}
+
+void ScreenMap::buildScreenMap(const std::vector<std::vector<TileCorner>> & worldMap)
 {
     m_map.clear();
     for (int y = 0; y < worldMap.size(); y++) {
@@ -35,18 +42,6 @@ void ScreenMap::draw(sf::RenderWindow &window)
 {
     createVertexArrayMap();
     window.draw(m_vertexArrayMap);
-}
-
-std::vector<sf::Vector2i> ScreenMap::getSelectedTilesCorner(sf::RenderWindow &window)
-{
-    sf::Vector2i mouseScreenPosition = sf::Mouse::getPosition(window);
-    sf::Vector2f tempPos = GetMouseWorldPosition(mouseScreenPosition);
-    sf::Vector2i mouseWorldPosition = {(int)std::round(tempPos.x), (int)std::round(tempPos.y)};
-
-    ScreenTileCorner closestCorner = getClosestNeighborInRadius(mouseWorldPosition.x, mouseWorldPosition.y, 2, sf::Vector2f(mouseScreenPosition));
-    if (closestCorner.WorldPosition.x == -1 && closestCorner.WorldPosition.y == -1)
-        return  {};
-    return { closestCorner.WorldPosition };
 }
 
 void ScreenMap::createVertexArrayMap()
@@ -114,6 +109,34 @@ ScreenTileCorner ScreenMap::getClosestNeighborInRadius(int worldX, int worldY, i
         }
     }
     return closestNeighbor;
+}
+
+void ScreenMap::getSelectedTilesCorner(sf::RenderWindow &window)
+{
+    m_selectedCorners.clear();
+    sf::Vector2i mouseScreenPosition = sf::Mouse::getPosition(window);
+    sf::Vector2f tempPos = GetMouseWorldPosition(mouseScreenPosition);
+    sf::Vector2i mouseWorldPosition = {(int)std::round(tempPos.x), (int)std::round(tempPos.y)};
+
+    ScreenTileCorner closestCorner = getClosestNeighborInRadius(mouseWorldPosition.x, mouseWorldPosition.y, 2, sf::Vector2f(mouseScreenPosition));
+    if (closestCorner.WorldPosition.x == -1 && closestCorner.WorldPosition.y == -1)
+        return;
+     m_selectedCorners.push_back(closestCorner);
+}
+
+void ScreenMap::resetTilesCornerColors()
+{
+    for (int y = 0; y < m_map.size(); y++)
+        for (int x = 0; x < m_map[y].size(); x++)
+            m_map[y][x].Color = m_defaultTilesColor;
+}
+
+void ScreenMap::setSelectedTileCornersColors()
+{
+    for (const ScreenTileCorner& corner : m_selectedCorners)
+    {
+        m_map[corner.WorldPosition.y][corner.WorldPosition.x].Color = m_selectedTilesColor;
+    }
 }
 
 float ScreenMap::distanceBetweenPoints(const sf::Vector2f &p1, const sf::Vector2f &p2)
