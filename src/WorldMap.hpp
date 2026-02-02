@@ -4,25 +4,20 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <SFML/Graphics.hpp>
+
 #include "TileCorner.hpp"
 
 class WorldMap
 {
 public:
-    WorldMap(std::string filepath);
+    WorldMap();
     ~WorldMap();
+    void init(const std::string &filePath);
     const std::vector<std::vector<TileCorner>>& getMap();
     void setTilesCornersHeight(int heightOffset, const std::vector<sf::Vector2i>& corners);
-    // void onTileCornerHovered(float x, float y);
-    // void updateTiles();
-    // void removeSelectedTilesCorners();
 private:
-    // void resetTilesColors();
-    // void setSelectedTileCornersColors(sf::Color color);
-    // sf::Color m_selectedTilesColor = sf::Color::Magenta;
-
     std::vector<std::vector<TileCorner>> m_map;
-    // std::vector<TileCorner> m_selectedCorners;
 };
 
 #endif // WORLDMAP_HPP

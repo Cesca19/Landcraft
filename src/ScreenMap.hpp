@@ -4,33 +4,44 @@
 
 #include <cmath>
 #include <iostream>
+#include <memory>
 #include <vector>
+
+#include "Tile.hpp"
 #include "TileCorner.hpp"
+#include "WorldMap.hpp"
 
 class ScreenMap
 {
 public:
     ScreenMap(int tileSizeX, int tileSizeY, int heightScale, sf::Vector2f translationOffset, int projectionAngleX, int projectionAngleY);
     ~ScreenMap();
-    void update(sf::RenderWindow& window);
-    void buildScreenMap(const std::vector<std::vector<TileCorner>> &worldMap);
+    void update(const sf::RenderWindow& window, SelectionMode selectionMode);
     void draw(sf::RenderWindow& window);
+    void init(const std::string &mapFilepath);
 private:
+    void initTilesCornersMap();
+    void initTilesMap();
+    void createTileFromTileCorner(int tileCornerX, int tileCornerY);
+
     void createVertexArrayMap();
-
     sf::Vector2f GetMouseWorldPosition(sf::Vector2i mouseScreenPosition);
+    void resetTilesCornerColors() const;
+    void setSelectedTileCornersColors() const;
 
-    std::vector<ScreenTileCorner> getPointNeighbors(int x, int y);
-    std::vector<ScreenTileCorner> getPointNeighborsInRadius(int x, int y, int radius);
-    float distanceBetweenPoints(const sf::Vector2f& p1, const sf::Vector2f& p2);
-    ScreenTileCorner getClosestNeighborInRadius(int worldX, int worldY, int radius, sf::Vector2f referencePoint);
-    void getSelectedTilesCorner(sf::RenderWindow& window);
+    std::vector<ScreenTileCorner*> getPointNeighbors(int x, int y) const;
+    std::vector<ScreenTileCorner*> getPointNeighborsInRadius(int x, int y, int radius) const;
+    ScreenTileCorner *getClosestNeighborCornerInRadius(sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius);
+    std::vector<Tile *> getClosestTilesInRadius(int x, int y, int radius) const;
+    Tile* getSelectedTileInRadius(sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius) const;
+    void getSelectedTiles(sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
+    void getSelectedTilesCorners(sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
+    void getSelectedCorners(const sf::RenderWindow& window, SelectionMode selectionMode);
 
-    void resetTilesCornerColors();
-    void setSelectedTileCornersColors();
 
     float radToDeg(float rad);
     float degToRad(float deg);
+    float distanceBetweenPoints(const sf::Vector2f& p1, const sf::Vector2f& p2);
     sf::Vector2f world_to_screen(int point3dX , int point3dY, int point3dZ);
     sf::Vector2f screen_to_world(int point2dX , int point2dY, int point2dZ);
    
@@ -39,12 +50,16 @@ private:
     int m_tileSizeX;
     int m_tileSizeY;
     int m_heightScale;
+    sf::Vector2f m_translationOffset;
+
     sf::Color m_selectedTilesColor = sf::Color::Magenta;
     sf::Color m_defaultTilesColor = sf::Color::Cyan;
-    sf::Vector2f m_translationOffset;
-    std::vector<std::vector<ScreenTileCorner>> m_map;
+
+    std::vector<std::vector<std::unique_ptr<ScreenTileCorner>>> m_map;
+    std::vector<ScreenTileCorner *> m_selectedCorners;
+    std::vector<std::vector<std::unique_ptr<Tile>>> m_tilesMap;
     sf::VertexArray m_vertexArrayMap;
-    std::vector<ScreenTileCorner> m_selectedCorners;
+    std::shared_ptr<WorldMap> m_worldMap;
 };
 
 #endif // SCREEN_MAP_HPP

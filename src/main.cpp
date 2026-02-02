@@ -1,23 +1,22 @@
-#include "WorldMap.hpp"
 #include "ScreenMap.hpp"
 
 #define PI 3.14159265358979323846
-#define TILE_SIZE_X 32
-#define TILE_SIZE_Y 32
+#define TILE_SIZE_X 64
+#define TILE_SIZE_Y 64
 #define HEIGHT_SCALE 6 // => 64 / 8
 #define PROJECTION_ANGLE_X 45
 #define PROJECTION_ANGLE_Y 35 // 35.264 realistic isometric angle
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Landcraft");
-    WorldMap worldMap("");
-    ScreenMap screenMap(TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, sf::Vector2f{400, 100}, 
+    sf::RenderWindow window(sf::VideoMode(1200, 800), "Landcraft");
+    // WorldMap worldMap("");
+    ScreenMap screenMap(TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, sf::Vector2f{600, 100},
                         PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y);
+    screenMap.init("");
     SelectionMode selectionMode = SelectionMode::TILE_CORNER;
     int heightOffset = 1;
 
-    screenMap.buildScreenMap(worldMap.getMap());
     while (window.isOpen())
     {
         sf::Event event;
@@ -38,12 +37,7 @@ int main()
             }
         }
         window.clear();
-        screenMap.update(window);
-        // worldMap.updateTilesState(screenMap.GetMouseWorldPosition(window), selectionMode);
-        // worldMap.removeSelectedTilesCorners();
-        // std::vector<sf::Vector2i> selectedTilesCorner = screenMap.getSelectedTilesCorner(window);
-        // for (const sf::Vector2i& selectedTileCorner : selectedTilesCorner)
-        //     worldMap.onTileCornerHovered(selectedTileCorner.x, selectedTileCorner.y);
+        screenMap.update(window, selectionMode);
         screenMap.draw(window);
         window.display();
     }

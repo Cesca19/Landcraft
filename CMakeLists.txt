@@ -63,6 +63,7 @@ add_executable(${MY_TARGET}
         src/TileCorner.cpp
         src/WorldMap.cpp
         src/ScreenMap.cpp
+        src/Tile.cpp
 )
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)

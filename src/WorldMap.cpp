@@ -1,7 +1,17 @@
 #include "WorldMap.hpp"
 
-WorldMap::WorldMap(std::string filepath)
+WorldMap::WorldMap()
 {
+
+}
+
+WorldMap::~WorldMap()
+{
+}
+
+void WorldMap::init(const std::string &filePath)
+{
+    m_map.clear();
     // ideally load from filepath
     std::vector<std::vector<int>> input3dMap = {
         {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
@@ -25,10 +35,6 @@ WorldMap::WorldMap(std::string filepath)
     }
 }
 
-WorldMap::~WorldMap()
-{
-}
-
 const std::vector<std::vector<TileCorner>> &WorldMap::getMap()
 {
     return m_map;
@@ -39,45 +45,3 @@ void WorldMap::setTilesCornersHeight(int heightOffset, const std::vector<sf::Vec
     for (const sf::Vector2i &cornerPos : corners)
         m_map[cornerPos.y][cornerPos.x].Height += heightOffset;
 }
-
-// void WorldMap::onTileCornerHovered(float x, float y)
-// {
-//     if (x < 0 || y < 0 ||
-//         y >= m_map.size() ||
-//         x >= m_map[0].size())
-//         return;
-//     m_selectedCorners.push_back(m_map[y][x]);
-//     updateTiles();
-// }
-
-// void WorldMap::updateTiles()
-// {
-//     resetTilesColors();
-//     setSelectedTileCornersColors(m_selectedTilesColor);
-// }
-
-// void WorldMap::removeSelectedTilesCorners()
-// {
-//     m_selectedCorners.clear();
-// }
-
-// void WorldMap::setSelectedTilesCornersHeight(int heightOffset)
-// {
-//     for (TileCorner &corner : m_selectedCorners)
-//         m_map[corner.Position.y][corner.Position.x].Height += heightOffset;
-// }
-
-// void WorldMap::resetTilesColors()
-// {
-//     for (int y = 0; y < m_map.size(); y++)
-//         for (int x = 0; x < m_map[y].size(); x++)
-//             m_map[y][x].Color = sf::Color::Cyan;
-// }
-
-// void WorldMap::setSelectedTileCornersColors(sf::Color color)
-// {
-//     for (TileCorner &corner : m_selectedCorners)
-//         m_map[corner.Position.y][corner.Position.x].Color = color;
-// }
-
-
