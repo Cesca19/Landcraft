@@ -17,15 +17,17 @@ struct TileCorner {
 
 struct ScreenTileCorner {
     ScreenTileCorner(const sf::Vector2f screenPosition, const sf::Vector2i worldPosition,
-                    const int height, const sf::Color color) {
+                    const int screenHeight, const int worldHeight, const sf::Color color) {
         ScreenPosition = screenPosition;
         WorldPosition = worldPosition;
-        Height = height;
+        ScreenHeight = screenHeight;
+        WorldHeight = worldHeight;
         Color = color;
     }
     sf::Vector2f ScreenPosition;
     sf::Vector2i WorldPosition;
-    int Height;
+    int ScreenHeight;
+    int WorldHeight;
     sf::Color Color;
     // tiletype
 };

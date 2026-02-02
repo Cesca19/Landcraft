@@ -2,8 +2,6 @@
 #define SCREEN_MAP_HPP
 #define _USE_MATH_DEFINES
 
-#include <cmath>
-#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -19,6 +17,7 @@ public:
     void update(const sf::RenderWindow& window, SelectionMode selectionMode);
     void draw(sf::RenderWindow& window);
     void init(const std::string &mapFilepath);
+    void setSelectedCornersHeight(int heightOffset);
 private:
     void initTilesCornersMap();
     void initTilesMap();
@@ -44,6 +43,7 @@ private:
     float distanceBetweenPoints(const sf::Vector2f& p1, const sf::Vector2f& p2);
     sf::Vector2f world_to_screen(int point3dX , int point3dY, int point3dZ);
     sf::Vector2f screen_to_world(int point2dX , int point2dY, int point2dZ);
+    sf::Vector2f getPointScreenPosition(sf::Vector2i worldPosition, int worldHeight);
    
     int m_projectionAngleX;
     int m_projectionAngleY;

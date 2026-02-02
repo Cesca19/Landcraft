@@ -15,6 +15,7 @@ public:
     ~WorldMap();
     void init(const std::string &filePath);
     const std::vector<std::vector<TileCorner>>& getMap();
+    void setCornerHeight(int heightOffset, const sf::Vector2i &corner);
     void setTilesCornersHeight(int heightOffset, const std::vector<sf::Vector2i>& corners);
 private:
     std::vector<std::vector<TileCorner>> m_map;

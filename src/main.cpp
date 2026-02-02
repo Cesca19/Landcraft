@@ -10,7 +10,6 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1200, 800), "Landcraft");
-    // WorldMap worldMap("");
     ScreenMap screenMap(TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, sf::Vector2f{600, 100},
                         PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y);
     screenMap.init("");
@@ -26,14 +25,16 @@ int main()
                 window.close();
             if (event.type == sf::Event::KeyReleased)
             {
+                if (event.key.code == sf::Keyboard::Escape)
+                    window.close();
                 if (event.key.code == sf::Keyboard::Space)
                     selectionMode = (selectionMode == SelectionMode::TILE) 
                                     ? SelectionMode::TILE_CORNER 
                                     : SelectionMode::TILE;
-                // if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
-                //     worldMap.setSelectedTilesCornersHeight(heightOffset);
-                // if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
-                //     worldMap.setSelectedTilesCornersHeight(-heightOffset);
+                if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
+                    screenMap.setSelectedCornersHeight(heightOffset);
+                if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
+                    screenMap.setSelectedCornersHeight(-heightOffset);
             }
         }
         window.clear();
@@ -41,6 +42,5 @@ int main()
         screenMap.draw(window);
         window.display();
     }
-
     return 0;
 }

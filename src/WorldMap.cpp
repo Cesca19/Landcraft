@@ -40,7 +40,12 @@ const std::vector<std::vector<TileCorner>> &WorldMap::getMap()
     return m_map;
 }
 
-void WorldMap::setTilesCornersHeight(int heightOffset, const std::vector<sf::Vector2i> &corners)
+void WorldMap::setCornerHeight(const int heightOffset, const sf::Vector2i &corner)
+{
+    m_map[corner.y][corner.x].Height += heightOffset;
+}
+
+void WorldMap::setTilesCornersHeight(const int heightOffset, const std::vector<sf::Vector2i> &corners)
 {
     for (const sf::Vector2i &cornerPos : corners)
         m_map[cornerPos.y][cornerPos.x].Height += heightOffset;

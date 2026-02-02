@@ -36,6 +36,16 @@ void ScreenMap::init(const std::string &mapFilepath)
     initTilesMap();
 }
 
+void ScreenMap::setSelectedCornersHeight(int heightOffset)
+{
+    for (ScreenTileCorner *corner : m_selectedCorners) {
+        m_worldMap->setCornerHeight(heightOffset, corner->WorldPosition);
+        corner->WorldHeight += heightOffset;
+        corner->ScreenHeight += (heightOffset * m_heightScale);
+        corner->ScreenPosition = getPointScreenPosition(corner->WorldPosition, corner->WorldHeight);
+    }
+}
+
 void ScreenMap::initTilesCornersMap()
 {
     const std::vector<std::vector<TileCorner>> worldMap = m_worldMap->getMap();
@@ -43,11 +53,14 @@ void ScreenMap::initTilesCornersMap()
     for (int y = 0; y < worldMap.size(); y++) {
         std::vector<std::unique_ptr<ScreenTileCorner>> row;
         for (int x = 0; x < worldMap[y].size(); x++) {
-            int worldX = worldMap[y][x].Position.x * m_tileSizeX;
+            /*int worldX = worldMap[y][x].Position.x * m_tileSizeX;
             int worldY = worldMap[y][x].Position.y * m_tileSizeY;
-            sf::Vector2f screenPos = world_to_screen(worldX, worldY, worldMap[y][x].Height) + m_translationOffset;
+            sf::Vector2f screenPos = world_to_screen(worldX, worldY, worldMap[y][x].Height) + m_translationOffset;*/
+            sf::Vector2f screenPos = getPointScreenPosition(worldMap[y][x].Position, worldMap[y][x].Height);
             std::unique_ptr<ScreenTileCorner> corner =
-                    std::make_unique<ScreenTileCorner>(screenPos, worldMap[y][x].Position, worldMap[y][x].Height * m_heightScale, worldMap[y][x].Color);
+                    std::make_unique<ScreenTileCorner>(screenPos, worldMap[y][x].Position,
+                                                    worldMap[y][x].Height * m_heightScale,
+                                                    worldMap[y][x].Height, worldMap[y][x].Color);
             row.push_back(std::move(corner));
         }
         m_map.push_back(std::move(row));
@@ -215,7 +228,8 @@ void ScreenMap::getSelectedTiles(const sf::Vector2i mouseWorldPosition, const sf
 
 void ScreenMap::getSelectedTilesCorners(const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
-    ScreenTileCorner* closestCorner = getClosestNeighborCornerInRadius(mouseWorldPosition, mouseScreenPosition, 2);
+    // TO DO : radius should be at least equal to the highest tile height (abs)
+    ScreenTileCorner* closestCorner = getClosestNeighborCornerInRadius(mouseWorldPosition, mouseScreenPosition, 3);
     if (closestCorner == nullptr)
         return;
     m_selectedCorners.push_back(closestCorner);
@@ -223,6 +237,7 @@ void ScreenMap::getSelectedTilesCorners(const sf::Vector2i mouseWorldPosition, c
 
 void ScreenMap::getSelectedCorners(const sf::RenderWindow &window, const SelectionMode selectionMode)
 {
+    // TO DO : radius should be at least equal to the highest tile height (abs)
     m_selectedCorners.clear();
     const sf::Vector2i mouseScreenPosition = sf::Mouse::getPosition(window);
     const sf::Vector2f tempPos = GetMouseWorldPosition(mouseScreenPosition);
@@ -269,4 +284,11 @@ sf::Vector2f ScreenMap::screen_to_world(int point2dX, int point2dY, int point2dZ
     point3d.x = 0.5f * ((point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
     point3d.y = 0.5f * (-(point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
     return point3d;
+}
+
+sf::Vector2f ScreenMap::getPointScreenPosition(sf::Vector2i worldPosition, int worldHeight)
+{
+    int scaledWorldX = worldPosition.x * m_tileSizeX;
+    int scaledWorldY = worldPosition.y * m_tileSizeY;
+    return world_to_screen(scaledWorldX, scaledWorldY, worldHeight) + m_translationOffset;
 }
