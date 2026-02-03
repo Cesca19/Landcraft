@@ -29,10 +29,15 @@ void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int t
 
 void WorldManager::update()
 {
+    sf::Clock clock;
+    float deltaTime = clock.restart().asSeconds();
     while (m_window.isOpen())
     {
         handleEvents();
         m_window.clear();
+
+        deltaTime = clock.restart().asSeconds();
+        m_worldView->update(deltaTime);
         m_screenMap->update(m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
         m_window.display();

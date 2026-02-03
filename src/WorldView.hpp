@@ -13,19 +13,26 @@ public:
     WorldView(sf::Vector2f origin, sf::Vector2f size);
     ~WorldView();
     void init(sf::RenderWindow & window);
+    void update(float deltaTime);
     void setSize(sf::Vector2f size);
     void setOrigin(sf::Vector2f origin);
     void zoom(int zoomDelta);
 private:
-    void update();
+    void updateWindowView();
 
     float m_minZoom;
     float m_maxZoom;
     float m_currentZoom;
+    float m_targetZoom;
     float m_zoomOffset;
+    float m_zoomSpeed;
+
     sf::Vector2f m_baseSize;
     sf::View m_view;
     sf::RenderWindow * m_window;
+
+    // makke it global
+    float m_epsilon = 0.01f;
 };
 
 

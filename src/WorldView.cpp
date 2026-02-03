@@ -8,7 +8,9 @@ WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     : m_minZoom(0.2)
     , m_maxZoom(2.5)
     , m_currentZoom(1)
+    , m_targetZoom(m_currentZoom)
     , m_zoomOffset(0.1)
+    , m_zoomSpeed(2.5)
     , m_baseSize(size)
     , m_view(origin, size)
     , m_window(nullptr)
@@ -25,30 +27,41 @@ void WorldView::init(sf::RenderWindow &window)
     m_window = &window;
 }
 
+void WorldView::update(float deltaTime)
+{
+    if (std::abs(m_targetZoom - m_currentZoom) > m_epsilon) {
+        m_currentZoom = m_currentZoom + (m_targetZoom - m_currentZoom) * deltaTime * m_zoomSpeed;
+        m_view.setSize(m_baseSize * m_currentZoom);
+    } else
+        m_view.setSize(m_baseSize * m_currentZoom);
+    updateWindowView();
+}
+
 void WorldView::setSize(sf::Vector2f size)
 {
     m_view.setSize(size);
     m_baseSize = size;
     m_currentZoom = 1;
-    update();
+    m_targetZoom = m_currentZoom;
+    updateWindowView();
 }
 
 void WorldView::setOrigin(sf::Vector2f origin)
 {
     m_view.setCenter(origin);
-    update();
+    updateWindowView();
 }
 
 void WorldView::zoom(const int zoomDelta)
 {
     // TO DO : zoom smooth interpolation
-    m_currentZoom += m_zoomOffset * zoomDelta;
-    m_currentZoom = std::clamp(m_currentZoom, m_minZoom, m_maxZoom);
-    m_view.setSize(m_baseSize * m_currentZoom);
-    update();
+    m_targetZoom += m_zoomOffset * zoomDelta;
+    m_targetZoom = std::clamp(m_targetZoom, m_minZoom, m_maxZoom);
+   /// m_view.setSize(m_baseSize * m_currentZoom);
+    //updateWindowView();
 }
 
-void WorldView::update()
+void WorldView::updateWindowView()
 {
     if (m_window != nullptr)
         m_window->setView(m_view);
