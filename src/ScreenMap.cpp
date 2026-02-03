@@ -46,6 +46,15 @@ void ScreenMap::setSelectedCornersHeight(int heightOffset)
     }
 }
 
+sf::Vector2f ScreenMap::getCenter() const
+{
+    int x = m_map[0].size() / 2;
+    int y = m_map.size() / 2;
+    x = std::clamp(x - 1, 0, static_cast<int>(m_map[0].size() - 1));
+    y = std::clamp(y - 1, 0, static_cast<int>(m_map.size() - 1));
+    return m_map[y][x]->ScreenPosition;
+}
+
 void ScreenMap::initTilesCornersMap()
 {
     const std::vector<std::vector<TileCorner>> worldMap = m_worldMap->getMap();
@@ -107,7 +116,7 @@ void ScreenMap::createVertexArrayMap()
     }
 }
 
-sf::Vector2f ScreenMap::GetMouseWorldPosition(sf::Vector2i mouseScreenPosition)
+sf::Vector2f ScreenMap::GetMouseWorldPosition(sf::Vector2f mouseScreenPosition)
 {
     sf::Vector2f worldPosition = screen_to_world(mouseScreenPosition.x - m_translationOffset.x, mouseScreenPosition.y - m_translationOffset.y, 0);
     float tileX = (worldPosition.x) / m_tileSizeX;
@@ -239,7 +248,11 @@ void ScreenMap::getSelectedCorners(const sf::RenderWindow &window, const Selecti
 {
     // TO DO : radius should be at least equal to the highest tile height (abs)
     m_selectedCorners.clear();
-    const sf::Vector2i mouseScreenPosition = sf::Mouse::getPosition(window);
+    // get the current mouse position in the window in pixels
+    const sf::Vector2i mousePixelScreenPosition = sf::Mouse::getPosition(window);
+    // get it's real coordinates in the current view
+    const sf::Vector2f mouseScreenPosition = window.mapPixelToCoords(mousePixelScreenPosition);
+    // convert screen-space → isometric world → tile coords
     const sf::Vector2f tempPos = GetMouseWorldPosition(mouseScreenPosition);
     const sf::Vector2i mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
 

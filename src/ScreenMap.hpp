@@ -18,13 +18,14 @@ public:
     void draw(sf::RenderWindow& window);
     void init(const std::string &mapFilepath);
     void setSelectedCornersHeight(int heightOffset);
+    sf::Vector2f getCenter() const;
 private:
     void initTilesCornersMap();
     void initTilesMap();
     void createTileFromTileCorner(int tileCornerX, int tileCornerY);
 
     void createVertexArrayMap();
-    sf::Vector2f GetMouseWorldPosition(sf::Vector2i mouseScreenPosition);
+    sf::Vector2f GetMouseWorldPosition(sf::Vector2f mouseScreenPosition);
     void resetTilesCornerColors() const;
     void setSelectedTileCornersColors() const;
 
