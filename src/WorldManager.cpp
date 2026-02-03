@@ -4,13 +4,13 @@
 
 #include "WorldManager.hpp"
 
-WorldManager::WorldManager(int width, int height, std::string windowTitle, sf::Vector2f viewSize)
+WorldManager::WorldManager(int width, int height, std::string windowTitle)
     : m_window(sf::VideoMode(width, height), windowTitle)
+    , m_worldView(std::make_unique<WorldView>(sf::Vector2f({0, 0}),
+        sf::Vector2f({static_cast<float>(width), float(height)})))
     , m_screenMap(nullptr)
-    , m_viewSize(viewSize)
-    , m_worldView({0, 0}, m_viewSize)
-    , m_heightOffset(1)
     , m_currentSelectionMode(SelectionMode::TILE_CORNER)
+    , m_heightOffset(1)
 {
 }
 
@@ -23,36 +23,54 @@ void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int t
 {
     m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, translationOffset, projectionAngleX, projectionAngleY);
     m_screenMap->init(worldMapFilePath);
-    m_worldView.setCenter(m_screenMap->getCenter());
-    m_window.setView(m_worldView);
+    m_worldView->init(m_window);
+    m_worldView->setOrigin(m_screenMap->getCenter());
 }
 
 void WorldManager::update()
 {
     while (m_window.isOpen())
     {
-        sf::Event event;
-        while (m_window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                m_window.close();
-            if (event.type == sf::Event::KeyReleased)
-            {
-                if (event.key.code == sf::Keyboard::Escape)
-                    m_window.close();
-                if (event.key.code == sf::Keyboard::Space)
-                    m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
-                                    ? SelectionMode::TILE_CORNER
-                                    : SelectionMode::TILE;
-                if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
-                    m_screenMap->setSelectedCornersHeight(m_heightOffset);
-                if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
-                    m_screenMap->setSelectedCornersHeight(- m_heightOffset);
-            }
-        }
+        handleEvents();
         m_window.clear();
         m_screenMap->update(m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
         m_window.display();
+    }
+}
+
+void WorldManager::handleEvents()
+{
+    sf::Event event;
+    while (m_window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+            m_window.close();
+        if (event.type == sf::Event::KeyReleased)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+                m_window.close();
+
+            // map editing event
+            if (event.key.code == sf::Keyboard::Space)
+                m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
+                                ? SelectionMode::TILE_CORNER
+                                : SelectionMode::TILE;
+            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Z)
+                m_screenMap->setSelectedCornersHeight(m_heightOffset);
+            if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::S)
+                m_screenMap->setSelectedCornersHeight(- m_heightOffset);
+
+            // cam events
+            if (event.key.code == sf::Keyboard::I)
+                m_worldView->zoom(-1);
+            if (event.key.code == sf::Keyboard::O)
+                m_worldView->zoom(1);
+        }
+        // camera events
+        if (event.type == sf::Event::MouseWheelScrolled) {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+                {m_worldView->zoom(event.mouseWheelScroll.delta);}
+        }
     }
 }

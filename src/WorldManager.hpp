@@ -6,20 +6,22 @@
 #define LANDCRAFT_WORLDMANAGER_H
 
 #include "ScreenMap.hpp"
+#include "WorldView.hpp"
+#include <iostream>
 
 class WorldManager
 {
 public:
-    WorldManager(int width, int height, std::string windowTitle, sf::Vector2f viewSize);
+    WorldManager(int width, int height, std::string windowTitle);
     ~WorldManager();
     void init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
         sf::Vector2f translationOffset, int projectionAngleX, int projectionAngleY);
     void update();
 private:
-    sf::Vector2f m_viewSize;
+    void handleEvents();
     sf::RenderWindow m_window;
-    sf::View m_worldView;
 
+    std::unique_ptr<WorldView> m_worldView;
     std::unique_ptr<ScreenMap> m_screenMap;
     SelectionMode m_currentSelectionMode;
     int m_heightOffset;

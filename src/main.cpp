@@ -8,7 +8,7 @@
 
 int main()
 {
-    WorldManager world_manager(800, 600, "Landcraft", sf::Vector2f(1200, 800));
+    WorldManager world_manager(1200, 800, "Landcraft");
     world_manager.init("", TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, sf::Vector2f{0,0},
                         PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y);
     world_manager.update();
