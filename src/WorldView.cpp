@@ -11,6 +11,7 @@ WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     , m_targetZoom(m_currentZoom)
     , m_zoomOffset(0.1)
     , m_zoomSpeed(2.5)
+    , m_rotationOffset(10)
     , m_baseSize(size)
     , m_view(origin, size)
     , m_window(nullptr)
@@ -27,7 +28,7 @@ void WorldView::init(sf::RenderWindow &window)
     m_window = &window;
 }
 
-void WorldView::update(float deltaTime)
+void WorldView::update(const float deltaTime)
 {
     if (std::abs(m_targetZoom - m_currentZoom) > m_epsilon) {
         m_currentZoom = m_currentZoom + (m_targetZoom - m_currentZoom) * deltaTime * m_zoomSpeed;
@@ -37,7 +38,7 @@ void WorldView::update(float deltaTime)
     updateWindowView();
 }
 
-void WorldView::setSize(sf::Vector2f size)
+void WorldView::setSize(const sf::Vector2f size)
 {
     m_view.setSize(size);
     m_baseSize = size;
@@ -46,7 +47,7 @@ void WorldView::setSize(sf::Vector2f size)
     updateWindowView();
 }
 
-void WorldView::setOrigin(sf::Vector2f origin)
+void WorldView::setOrigin(const sf::Vector2f origin)
 {
     m_view.setCenter(origin);
     updateWindowView();
@@ -54,11 +55,16 @@ void WorldView::setOrigin(sf::Vector2f origin)
 
 void WorldView::zoom(const int zoomDelta)
 {
-    // TO DO : zoom smooth interpolation
+    // TO DO : changing the pivot point(origin of the view) while zooming u
+    // so when the use is zooming smoothly translate the camera to the mouse pos while zooming there
     m_targetZoom += m_zoomOffset * zoomDelta;
     m_targetZoom = std::clamp(m_targetZoom, m_minZoom, m_maxZoom);
-   /// m_view.setSize(m_baseSize * m_currentZoom);
-    //updateWindowView();
+}
+
+void WorldView::rotate(int delta)
+{
+    m_view.rotate(delta * m_rotationOffset);
+    updateWindowView();
 }
 
 void WorldView::updateWindowView()

@@ -71,6 +71,11 @@ void WorldManager::handleEvents()
                 m_worldView->zoom(-1);
             if (event.key.code == sf::Keyboard::O)
                 m_worldView->zoom(1);
+
+            if (event.key.code == sf::Keyboard::A)
+                m_worldView->rotate(-1);
+            if (event.key.code == sf::Keyboard::E)
+                m_worldView->rotate(1);
         }
         // camera events
         if (event.type == sf::Event::MouseWheelScrolled) {
