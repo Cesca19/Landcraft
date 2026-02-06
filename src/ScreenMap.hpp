@@ -14,18 +14,23 @@ class ScreenMap
 public:
     ScreenMap(int tileSizeX, int tileSizeY, int heightScale, sf::Vector2f translationOffset, int projectionAngleX, int projectionAngleY);
     ~ScreenMap();
-    void update(const sf::RenderWindow& window, SelectionMode selectionMode);
+    void update(float deltaTime, const sf::RenderWindow& window, SelectionMode selectionMode);
     void draw(sf::RenderWindow& window);
     void init(const std::string &mapFilepath);
     void setSelectedCornersHeight(int heightOffset);
-    sf::Vector2f getCenter() const;
+    sf::Vector2f getScreenMapCenter() const;
+    void rotateAroundZAxis(float angle);
+    void resetZAxisRotation();
 private:
+    void rotateMapAroundZAxis(float angle);
+    void rotateCornerAroundZAxis(float angle, ScreenTileCorner *corner);
+
     void initTilesCornersMap();
     void initTilesMap();
     void createTileFromTileCorner(int tileCornerX, int tileCornerY);
 
     void createVertexArrayMap();
-    sf::Vector2f GetMouseWorldPosition(sf::Vector2f mouseScreenPosition);
+    sf::Vector2f getMouseWorldPosition(sf::Vector2f mouseScreenPosition);
     void resetTilesCornerColors() const;
     void setSelectedTileCornersColors() const;
 
@@ -38,20 +43,24 @@ private:
     void getSelectedTilesCorners(sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void getSelectedCorners(const sf::RenderWindow& window, SelectionMode selectionMode);
 
-
     float radToDeg(float rad);
     float degToRad(float deg);
     float distanceBetweenPoints(const sf::Vector2f& p1, const sf::Vector2f& p2);
-    sf::Vector2f world_to_screen(int point3dX , int point3dY, int point3dZ);
+    sf::Vector2f world_to_screen(float point3dX , float point3dY, float point3dZ);
     sf::Vector2f screen_to_world(int point2dX , int point2dY, int point2dZ);
-    sf::Vector2f getPointScreenPosition(sf::Vector2i worldPosition, int worldHeight);
-   
+    sf::Vector2f getPointScreenPosition(sf::Vector2f worldPosition, int worldHeight);
+    sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point);
+
+    float m_epsilon = 0.5f;
     int m_projectionAngleX;
     int m_projectionAngleY;
     int m_tileSizeX;
     int m_tileSizeY;
     int m_heightScale;
-    sf::Vector2f m_translationOffset;
+
+    float m_rotationSpeed;
+    float m_currentRotationAngle;
+    float m_targetRotationAngle;
 
     sf::Color m_selectedTilesColor = sf::Color::Magenta;
     sf::Color m_defaultTilesColor = sf::Color::Cyan;

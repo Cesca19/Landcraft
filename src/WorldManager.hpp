@@ -7,7 +7,6 @@
 
 #include "ScreenMap.hpp"
 #include "WorldView.hpp"
-#include <iostream>
 
 class WorldManager
 {

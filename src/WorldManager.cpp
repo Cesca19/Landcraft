@@ -24,7 +24,7 @@ void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int t
     m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, translationOffset, projectionAngleX, projectionAngleY);
     m_screenMap->init(worldMapFilePath);
     m_worldView->init(m_window);
-    m_worldView->setOrigin(m_screenMap->getCenter());
+    m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
 }
 
 void WorldManager::update()
@@ -38,7 +38,7 @@ void WorldManager::update()
 
         deltaTime = clock.restart().asSeconds();
         m_worldView->update(deltaTime);
-        m_screenMap->update(m_window, m_currentSelectionMode);
+        m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
         m_window.display();
     }
@@ -72,10 +72,10 @@ void WorldManager::handleEvents()
             if (event.key.code == sf::Keyboard::O)
                 m_worldView->zoom(1);
 
-            if (event.key.code == sf::Keyboard::A)
-                m_worldView->rotate(-1);
-            if (event.key.code == sf::Keyboard::E)
-                m_worldView->rotate(1);
+            if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Right)
+                m_screenMap->rotateAroundZAxis(90);
+            if (event.key.code == sf::Keyboard::E || event.key.code == sf::Keyboard::Left)
+                m_screenMap->rotateAroundZAxis(-90);
         }
         // camera events
         if (event.type == sf::Event::MouseWheelScrolled) {

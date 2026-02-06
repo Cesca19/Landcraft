@@ -17,8 +17,8 @@ public:
     void setSize(sf::Vector2f size);
     void setOrigin(sf::Vector2f origin);
     void zoom(int zoomDelta);
-    void rotate(int delta);
 private:
+    void rotate(int delta);
     void updateWindowView();
 
     float m_minZoom;

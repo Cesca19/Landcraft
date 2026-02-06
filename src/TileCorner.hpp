@@ -23,12 +23,14 @@ struct ScreenTileCorner {
         ScreenHeight = screenHeight;
         WorldHeight = worldHeight;
         Color = color;
+        RotatedWorldPosition = sf::Vector2f(worldPosition);
     }
     sf::Vector2f ScreenPosition;
     sf::Vector2i WorldPosition;
     int ScreenHeight;
     int WorldHeight;
     sf::Color Color;
+    sf::Vector2f RotatedWorldPosition;
     // tiletype
 };
 
