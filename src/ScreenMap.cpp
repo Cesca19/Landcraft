@@ -145,12 +145,14 @@ void ScreenMap::createVertexArrayMap()
     }
 }
 
-sf::Vector2f ScreenMap::getMouseWorldPosition(sf::Vector2f mouseScreenPosition)
+sf::Vector2f ScreenMap::getMouseWorldPosition(const sf::Vector2f mouseScreenPosition)
 {
-    sf::Vector2f worldPosition = screen_to_world(mouseScreenPosition.x /*- m_translationOffset.x*/, mouseScreenPosition.y /*- m_translationOffset.y*/, 0);
-    float tileX = (worldPosition.x) / m_tileSizeX;
-    float tileY = (worldPosition.y) / m_tileSizeY;
-    return {tileX, tileY};
+    const sf::Vector2f worldCenter = {static_cast<float>(m_map[0].size() -1.0f) / 2, static_cast<float>(m_map.size() - 1.0f) / 2 };
+    const sf::Vector2f worldPosition = screen_to_world(mouseScreenPosition.x, mouseScreenPosition.y, 0);
+
+    // inversed of the transformation applied to rotated points
+    const sf::Vector2f finalWorldPos = rotateAroundZAxis(-m_currentRotationAngle, worldPosition - worldCenter) + worldCenter;
+    return finalWorldPos;
 }
 
 void ScreenMap::resetTilesCornerColors() const
@@ -308,31 +310,33 @@ float ScreenMap::distanceBetweenPoints(const sf::Vector2f &p1, const sf::Vector2
 
 sf::Vector2f ScreenMap::world_to_screen(float point3dX, float point3dY, float point3dZ)
 {
-    float angleX = degToRad(m_projectionAngleX);
-    float angleY = degToRad(m_projectionAngleY);
+    const float scaledWorldX = point3dX * m_tileSizeX;
+    const float scaledWorldY = point3dY * m_tileSizeY;
+    const float angleX = degToRad(m_projectionAngleX);
+    const float angleY = degToRad(m_projectionAngleY);
     sf::Vector2f point2d;
 
-    point2d.x = std::cos(angleX) * point3dX - std::cos(angleX) * point3dY ;
-    point2d.y = std::sin(angleY) * point3dY + std::sin(angleY) * point3dX - point3dZ * m_heightScale;
+    point2d.x = std::cos(angleX) * scaledWorldX - std::cos(angleX) * scaledWorldY ;
+    point2d.y = std::sin(angleY) * scaledWorldY + std::sin(angleY) * scaledWorldX - point3dZ * m_heightScale;
     return point2d;
 }
 
-sf::Vector2f ScreenMap::screen_to_world(int point2dX, int point2dY, int point2dZ)
+sf::Vector2f ScreenMap::screen_to_world(const int point2dX, const int point2dY, const int point2dZ)
 {
-    float angleX = degToRad(m_projectionAngleX);
-    float angleY = degToRad(m_projectionAngleY);
-    sf::Vector2f point3d;
+    const float angleX = degToRad(m_projectionAngleX);
+    const float angleY = degToRad(m_projectionAngleY);
+    sf::Vector2f scaledPoint3d;
 
-    point3d.x = 0.5f * ((point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
-    point3d.y = 0.5f * (-(point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
-    return point3d;
+    scaledPoint3d.x = 0.5f * ((point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
+    scaledPoint3d.y = 0.5f * (-(point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
+    return {scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY};
 }
 
 sf::Vector2f ScreenMap::getPointScreenPosition(const sf::Vector2f worldPosition, const int worldHeight)
 {
-    const float scaledWorldX = worldPosition.x * m_tileSizeX;
-    const float scaledWorldY = worldPosition.y * m_tileSizeY;
-    return world_to_screen(scaledWorldX, scaledWorldY, worldHeight)/* + m_translationOffset*/;
+    // const float scaledWorldX = worldPosition.x * m_tileSizeX;
+    // const float scaledWorldY = worldPosition.y * m_tileSizeY;
+    return world_to_screen(worldPosition.x, worldPosition.y, worldHeight)/* + m_translationOffset*/;
 }
 
 sf::Vector2f ScreenMap::rotateAroundZAxis(const float angle, const sf::Vector2f point)

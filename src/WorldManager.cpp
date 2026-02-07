@@ -4,13 +4,15 @@
 
 #include "WorldManager.hpp"
 
-WorldManager::WorldManager(int width, int height, std::string windowTitle)
+WorldManager::WorldManager(const int width, const int height, const std::string &windowTitle)
     : m_window(sf::VideoMode(width, height), windowTitle)
     , m_worldView(std::make_unique<WorldView>(sf::Vector2f({0, 0}),
-        sf::Vector2f({static_cast<float>(width), float(height)})))
+        sf::Vector2f({static_cast<float>(width), static_cast<float>(height)})))
     , m_screenMap(nullptr)
     , m_currentSelectionMode(SelectionMode::TILE_CORNER)
     , m_heightOffset(1)
+    , m_zoomStep(1)
+    , m_rotationStep(90)
 {
 }
 
@@ -68,14 +70,14 @@ void WorldManager::handleEvents()
 
             // cam events
             if (event.key.code == sf::Keyboard::I)
-                m_worldView->zoom(-1);
+                m_worldView->zoom(-m_zoomStep);
             if (event.key.code == sf::Keyboard::O)
-                m_worldView->zoom(1);
+                m_worldView->zoom(m_zoomStep);
 
             if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Right)
-                m_screenMap->rotateAroundZAxis(90);
+                m_screenMap->rotateAroundZAxis(m_rotationStep);
             if (event.key.code == sf::Keyboard::E || event.key.code == sf::Keyboard::Left)
-                m_screenMap->rotateAroundZAxis(-90);
+                m_screenMap->rotateAroundZAxis(-m_rotationStep);
         }
         // camera events
         if (event.type == sf::Event::MouseWheelScrolled) {

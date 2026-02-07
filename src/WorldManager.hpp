@@ -11,7 +11,7 @@
 class WorldManager
 {
 public:
-    WorldManager(int width, int height, std::string windowTitle);
+    WorldManager(int width, int height, const std::string &windowTitle);
     ~WorldManager();
     void init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
         sf::Vector2f translationOffset, int projectionAngleX, int projectionAngleY);
@@ -24,6 +24,8 @@ private:
     std::unique_ptr<ScreenMap> m_screenMap;
     SelectionMode m_currentSelectionMode;
     int m_heightOffset;
+    int m_zoomStep;
+    int m_rotationStep;
 };
 
 
