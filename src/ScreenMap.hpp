@@ -1,6 +1,6 @@
 #ifndef SCREEN_MAP_HPP
 #define SCREEN_MAP_HPP
-#define _USE_MATH_DEFINES
+// #define _USE_MATH_DEFINES
 
 #include <memory>
 #include <vector>
@@ -8,10 +8,11 @@
 #include "Tile.hpp"
 #include "TileCorner.hpp"
 #include "WorldMap.hpp"
+#include "IsometricProjection.hpp"
 
 class ScreenMap {
 public:
-    ScreenMap(int tileSizeX, int tileSizeY, int heightScale, sf::Vector2f translationOffset, int projectionAngleX,
+    ScreenMap(int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX,
               int projectionAngleY);
 
     ~ScreenMap();
@@ -33,7 +34,7 @@ public:
 private:
     void rotateMapAroundZAxis(float angle);
 
-    void rotateCornerAroundZAxis(float angle, ScreenTileCorner *corner);
+    void rotateCornerAroundZAxis(float angle, ScreenTileCorner *corner) const;
 
     void initTilesCornersMap();
 
@@ -49,7 +50,7 @@ private:
      * @param mouseScreenPosition The mouse position relative to the window/view (pixels).
      * @return The coordinates of the tile under the mouse (e.g., x=4.0, y=5.0).
      */
-    sf::Vector2f getMouseWorldPosition(sf::Vector2f mouseScreenPosition);
+    sf::Vector2f getMouseWorldPosition(sf::Vector2f mouseScreenPosition) const;
 
     void resetTilesCornerColors() const;
 
@@ -60,7 +61,7 @@ private:
     std::vector<ScreenTileCorner *> getPointNeighborsInRadius(int x, int y, int radius) const;
 
     ScreenTileCorner *getClosestNeighborCornerInRadius(sf::Vector2i pointWorldPosition,
-                                                       sf::Vector2f pointScreenPosition, int radius);
+                                                       sf::Vector2f pointScreenPosition, int radius) const;
 
     std::vector<Tile *> getClosestTilesInRadius(int x, int y, int radius) const;
 
@@ -72,44 +73,12 @@ private:
 
     void getSelectedCorners(const sf::RenderWindow &window, SelectionMode selectionMode);
 
-    float radToDeg(float rad);
-
-    float degToRad(float deg);
-
-    float distanceBetweenPoints(const sf::Vector2f &p1, const sf::Vector2f &p2);
-
-    /**
-     * Projects a 3D point from World Space (Tile Grid) to 2D Screen Space (Pixels).
-     * Applies isometric projection, tile scaling, and height offset.
-     *
-     * @param point3dX The X index on the tile grid.
-     * @param point3dY The Y index on the tile grid.
-     * @param point3dZ The Z height/elevation of the tile.
-     * @return The corresponding 2D coordinates on the screen (in pixels).
-     */
-    sf::Vector2f world_to_screen(float point3dX, float point3dY, float point3dZ);
-
-    /**
-     * Un-projects a 2D point from Screen Space (Pixels) back to 3D World Space (Tile Grid).
-     * This is the inverse operation of world_to_screen.
-     *
-     * @param point2dX The X position on the screen (pixels).
-     * @param point2dY The Y position on the screen (pixels).
-     * @param point2dZ The assumed Z plane for the intersection (usually 0 for ground picking).
-     * @return The unscaled world coordinates (tile indices).
-     */
-    sf::Vector2f screen_to_world(int point2dX, int point2dY, int point2dZ);
-
-    sf::Vector2f getPointScreenPosition(sf::Vector2f worldPosition, int worldHeight);
-
-    sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point);
-
     float m_epsilon = 0.5f;
-    int m_projectionAngleX;
-    int m_projectionAngleY;
+
     int m_tileSizeX;
     int m_tileSizeY;
     int m_heightScale;
+    IsometricProjection m_isometricProjection;
 
     float m_rotationSpeed;
     float m_currentRotationAngle;

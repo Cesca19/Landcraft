@@ -66,6 +66,7 @@ add_executable(${MY_TARGET}
         src/Tile.cpp
         src/WorldManager.cpp
         src/WorldView.cpp
+        src/IsometricProjection.cpp
 )
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)

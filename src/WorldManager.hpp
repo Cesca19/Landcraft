@@ -14,7 +14,7 @@ public:
     WorldManager(int width, int height, const std::string &windowTitle);
     ~WorldManager();
     void init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
-        sf::Vector2f translationOffset, int projectionAngleX, int projectionAngleY);
+        int projectionAngleX, int projectionAngleY);
     void update();
 private:
     void handleEvents();

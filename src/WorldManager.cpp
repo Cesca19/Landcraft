@@ -20,10 +20,9 @@ WorldManager::~WorldManager()
 {
 }
 
-void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
-    sf::Vector2f translationOffset, int projectionAngleX, int projectionAngleY)
+void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX, int projectionAngleY)
 {
-    m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, translationOffset, projectionAngleX, projectionAngleY);
+    m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY);
     m_screenMap->init(worldMapFilePath);
     m_worldView->init(m_window);
     m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
