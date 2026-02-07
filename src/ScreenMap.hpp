@@ -41,7 +41,7 @@ private:
 
     void createTileFromTileCorner(int tileCornerX, int tileCornerY);
 
-    void createVertexArrayMap();
+    void buildVertexArrayMap();
 
     /**
      * Calculates the exact Tile Index under the mouse cursor, accounting for Map Rotation.
@@ -115,6 +115,7 @@ private:
     float m_currentRotationAngle;
     float m_targetRotationAngle;
 
+    bool m_doesNeedVertexUpdate;
     sf::Color m_selectedTilesColor = sf::Color::Magenta;
     sf::Color m_defaultTilesColor = sf::Color::Cyan;
 

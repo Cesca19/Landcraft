@@ -9,6 +9,7 @@ ScreenMap::ScreenMap(int tileSizeX, int tileSizeY, int heightScale, sf::Vector2f
     , m_rotationSpeed(10)
     , m_currentRotationAngle(0)
     , m_targetRotationAngle(0)
+    , m_doesNeedVertexUpdate(true)
     , m_vertexArrayMap(sf::Lines)
     , m_worldMap(std::make_shared<WorldMap>())
 {
@@ -21,9 +22,9 @@ ScreenMap::~ScreenMap()
 void ScreenMap::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode)
 {
     getSelectedCorners(window, selectionMode);
+    // TO DO : add a selection layer to handle selected tiles colors
     resetTilesCornerColors();
     setSelectedTileCornersColors();
-
     if (std::abs(m_targetRotationAngle - m_currentRotationAngle) > m_epsilon) {
         m_currentRotationAngle = m_currentRotationAngle + (m_targetRotationAngle - m_currentRotationAngle) * m_rotationSpeed * deltaTime;
         rotateMapAroundZAxis(m_currentRotationAngle);
@@ -37,7 +38,10 @@ void ScreenMap::update(float deltaTime, const sf::RenderWindow &window, const Se
 
 void ScreenMap::draw(sf::RenderWindow &window)
 {
-    createVertexArrayMap();
+    if (m_doesNeedVertexUpdate) {
+        buildVertexArrayMap();
+        m_doesNeedVertexUpdate = false;
+    }
     window.draw(m_vertexArrayMap);
 }
 
@@ -46,6 +50,7 @@ void ScreenMap::init(const std::string &mapFilepath)
     m_worldMap->init(mapFilepath);
     initTilesCornersMap();
     initTilesMap();
+    m_doesNeedVertexUpdate = true;
 }
 
 void ScreenMap::setSelectedCornersHeight(int heightOffset)
@@ -56,6 +61,7 @@ void ScreenMap::setSelectedCornersHeight(int heightOffset)
         corner->ScreenHeight += (heightOffset * m_heightScale);
         corner->ScreenPosition = getPointScreenPosition(corner->RotatedWorldPosition, corner->WorldHeight);
     }
+    m_doesNeedVertexUpdate = true;
 }
 
 sf::Vector2f ScreenMap::getScreenMapCenter() const
@@ -77,6 +83,7 @@ void ScreenMap::rotateMapAroundZAxis(const float angle)
     for (int y = 0; y < m_map.size(); y++)
         for (int x = 0; x < m_map[y].size(); x++)
             rotateCornerAroundZAxis(angle, m_map[y][x].get());
+    m_doesNeedVertexUpdate = true;
 }
 
 void ScreenMap::rotateCornerAroundZAxis(const float angle, ScreenTileCorner *corner)
@@ -130,7 +137,7 @@ void ScreenMap::createTileFromTileCorner(const int tileCornerX, const int tileCo
     m_tilesMap[tileCornerY].emplace_back(std::make_unique<Tile>(tileCorners));
 }
 
-void ScreenMap::createVertexArrayMap()
+void ScreenMap::buildVertexArrayMap()
 {
     m_vertexArrayMap.setPrimitiveType(sf::Lines);
     m_vertexArrayMap.clear();
@@ -291,6 +298,8 @@ void ScreenMap::getSelectedCorners(const sf::RenderWindow &window, const Selecti
         getSelectedTilesCorners(mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
     else
         getSelectedTiles(mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
+    if (!m_selectedCorners.empty())
+        m_doesNeedVertexUpdate = true;
 }
 
 float ScreenMap::radToDeg(float rad)
@@ -334,8 +343,6 @@ sf::Vector2f ScreenMap::screen_to_world(const int point2dX, const int point2dY, 
 
 sf::Vector2f ScreenMap::getPointScreenPosition(const sf::Vector2f worldPosition, const int worldHeight)
 {
-    // const float scaledWorldX = worldPosition.x * m_tileSizeX;
-    // const float scaledWorldY = worldPosition.y * m_tileSizeY;
     return world_to_screen(worldPosition.x, worldPosition.y, worldHeight)/* + m_translationOffset*/;
 }
 
