@@ -25,7 +25,8 @@ private:
     SelectionMode m_currentSelectionMode;
     int m_heightOffset;
     int m_zoomStep;
-    int m_rotationStep;
+    float m_yawRotationStep;
+    float m_pitchRotationStep;
 };
 
 

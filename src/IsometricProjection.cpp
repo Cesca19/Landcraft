@@ -72,3 +72,8 @@ sf::Vector2f IsometricProjection::rotateAroundZAxis(const float angle, const sf:
     rotatedPoint.y = point.x * std::sin(radAngle) + point.y * std::cos(radAngle);
     return rotatedPoint;
 }
+
+void IsometricProjection::rotateAroundXAxis(const int newProjectionAngleY)
+{
+    m_projectionAngleY = newProjectionAngleY;
+}

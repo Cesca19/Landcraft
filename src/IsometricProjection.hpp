@@ -61,12 +61,19 @@ public:
      * @brief Rotates a 2D point around the origin (0,0).
      * To rotate around a specific center, subtract the center before calling this,
      * then add it back to the result.
-     *
+     * This is the Yaw (lacet) rotation :  the rotation around the Z-axis (the vertical axis)
+     *      -> it's similar to turning the head left or right (rotating the map on itself).
      * @param angle The rotation angle in RADIANS.
      * @param point The point to rotate.
      * @return The new rotated coordinates.
      */
     static sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point);
+
+
+    // this is the Pitch (tangage) rotation : This is the rotation around the X axis.
+    //      -> This is what you will do: raise or lower the nose of the camera (look up or down).
+    // -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
+    void rotateAroundXAxis(int newProjectionAngleY);
 private:
     int m_projectionAngleX;
     int m_projectionAngleY;

@@ -34,7 +34,7 @@ private:
     sf::View m_view;
     sf::RenderWindow * m_window;
 
-    // makke it global
+    // make it global
     float m_epsilon = 0.01f;
 };
 

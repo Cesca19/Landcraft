@@ -5,9 +5,12 @@ ScreenMap::ScreenMap(const int tileSizeX, const int tileSizeY, const int heightS
     , m_tileSizeY(tileSizeY)
     , m_heightScale(heightScale)
     , m_isometricProjection(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY)
-    , m_rotationSpeed(10)
-    , m_currentRotationAngle(0)
-    , m_targetRotationAngle(0)
+    , m_yawRotationSpeed(10)
+    , m_currentYawRotationAngle(0)
+    , m_targetYawRotationAngle(0)
+    , m_pitchRotationSpeed(20)
+    , m_currentPitchRotationAngle(projectionAngleY)
+    , m_targetPitchRotationAngle(projectionAngleY)
     , m_doesNeedVertexUpdate(true)
     , m_vertexArrayMap(sf::Lines)
     , m_worldMap(std::make_shared<WorldMap>())
@@ -18,21 +21,31 @@ ScreenMap::~ScreenMap()
 {
 }
 
-void ScreenMap::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode)
+void ScreenMap::update(const float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode)
 {
     getSelectedCorners(window, selectionMode);
     // TO DO : add a selection layer to handle selected tiles colors
     resetTilesCornerColors();
     setSelectedTileCornersColors();
-    if (std::abs(m_targetRotationAngle - m_currentRotationAngle) > m_epsilon) {
-        m_currentRotationAngle = m_currentRotationAngle + (m_targetRotationAngle - m_currentRotationAngle) * m_rotationSpeed * deltaTime;
-        rotateMapAroundZAxis(m_currentRotationAngle);
+    // upd yaw rotation
+    if (std::abs(m_targetYawRotationAngle - m_currentYawRotationAngle) > m_epsilon) {
+        m_currentYawRotationAngle = m_currentYawRotationAngle + (m_targetYawRotationAngle - m_currentYawRotationAngle) * m_yawRotationSpeed * deltaTime;
+        rotateMapAroundZAxis(m_currentYawRotationAngle);
     } else
-        if (m_currentRotationAngle != m_targetRotationAngle) {
-            m_currentRotationAngle = m_targetRotationAngle;
-            rotateMapAroundZAxis(m_currentRotationAngle);
+        if (m_currentYawRotationAngle != m_targetYawRotationAngle) {
+            m_currentYawRotationAngle = m_targetYawRotationAngle;
+            rotateMapAroundZAxis(m_currentYawRotationAngle);
         }
 
+    //upd pitch rotation
+    if (std::abs(m_targetPitchRotationAngle - m_currentPitchRotationAngle) > m_epsilon) {
+        m_currentPitchRotationAngle = m_currentPitchRotationAngle + (m_targetPitchRotationAngle - m_currentPitchRotationAngle) * m_pitchRotationSpeed * deltaTime;
+        rotateMapAroundXAxis(m_currentPitchRotationAngle);
+    } else
+        if (m_currentPitchRotationAngle != m_targetPitchRotationAngle) {
+            m_currentPitchRotationAngle = m_targetPitchRotationAngle;
+            rotateMapAroundXAxis(m_currentPitchRotationAngle);
+        }
 }
 
 void ScreenMap::draw(sf::RenderWindow &window)
@@ -52,7 +65,7 @@ void ScreenMap::init(const std::string &mapFilepath)
     m_doesNeedVertexUpdate = true;
 }
 
-void ScreenMap::setSelectedCornersHeight(int heightOffset)
+void ScreenMap::setSelectedCornersHeight(const int heightOffset)
 {
     for (ScreenTileCorner *corner : m_selectedCorners) {
         m_worldMap->setCornerHeight(heightOffset, corner->WorldPosition);
@@ -65,16 +78,21 @@ void ScreenMap::setSelectedCornersHeight(int heightOffset)
 
 sf::Vector2f ScreenMap::getScreenMapCenter() const
 {
-    int x = m_map[0].size() / 2;
-    int y = m_map.size() / 2;
-    x = std::clamp(x - 1, 0, static_cast<int>(m_map[0].size() - 1));
-    y = std::clamp(y - 1, 0, static_cast<int>(m_map.size() - 1));
-    return m_map[y][x]->ScreenPosition;
+    const float centerX = (static_cast<float>(m_map[0].size()) - 1.0f) / 2.0f;
+    const float centerY = (static_cast<float>(m_map.size()) - 1.0f) / 2.0f;
+
+    // convert that point into screen space coordinates
+    return m_isometricProjection.getPointScreenPosition({std::round(centerX), std::round(centerY)}, 0);
 }
 
 void ScreenMap::rotateAroundZAxis(const float angle)
 {
-    m_targetRotationAngle += angle;
+    m_targetYawRotationAngle += angle;
+}
+
+void ScreenMap::rotateAroundXAxis(const float angle)
+{
+    m_targetPitchRotationAngle += angle;
 }
 
 void ScreenMap::rotateMapAroundZAxis(const float angle)
@@ -91,6 +109,21 @@ void ScreenMap::rotateCornerAroundZAxis(const float angle, ScreenTileCorner *cor
     // translate the point to rotate around the maps center
     // then cancel this translation to avoid the gap
     corner->RotatedWorldPosition = IsometricProjection::rotateAroundZAxis(angle, sf::Vector2f(corner->WorldPosition) - worldCenter) + worldCenter;
+    corner->ScreenPosition = m_isometricProjection.getPointScreenPosition(corner->RotatedWorldPosition, corner->WorldHeight);
+}
+
+void ScreenMap::rotateMapAroundXAxis(const float angle)
+{
+    m_isometricProjection.rotateAroundXAxis(angle);
+
+    for (int y = 0; y < m_map.size(); y++)
+        for (int x = 0; x < m_map[y].size(); x++)
+            rotateCornerAroundXAxis(angle, m_map[y][x].get());
+    m_doesNeedVertexUpdate = true;
+}
+
+void ScreenMap::rotateCornerAroundXAxis(float angle, ScreenTileCorner *corner) const
+{
     corner->ScreenPosition = m_isometricProjection.getPointScreenPosition(corner->RotatedWorldPosition, corner->WorldHeight);
 }
 
@@ -157,7 +190,7 @@ sf::Vector2f ScreenMap::getMouseWorldPosition(const sf::Vector2f mouseScreenPosi
     const sf::Vector2f worldPosition = m_isometricProjection.screen_to_world(mouseScreenPosition.x, mouseScreenPosition.y, 0);
 
     // inversed of the transformation applied to rotated points
-    const sf::Vector2f finalWorldPos = IsometricProjection::rotateAroundZAxis(-m_currentRotationAngle, worldPosition - worldCenter) + worldCenter;
+    const sf::Vector2f finalWorldPos = IsometricProjection::rotateAroundZAxis(-m_currentYawRotationAngle, worldPosition - worldCenter) + worldCenter;
     return finalWorldPos;
 }
 

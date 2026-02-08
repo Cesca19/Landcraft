@@ -27,19 +27,22 @@ public:
 
     sf::Vector2f getScreenMapCenter() const;
 
+    // yaw rotation
     void rotateAroundZAxis(float angle);
-
-    void resetZAxisRotation();
+    // pitch rotation
+    void rotateAroundXAxis(float angle);
 
 private:
+    // yaw rotation
     void rotateMapAroundZAxis(float angle);
-
     void rotateCornerAroundZAxis(float angle, ScreenTileCorner *corner) const;
 
+    // pitch rotation
+    void rotateMapAroundXAxis(float angle);
+    void rotateCornerAroundXAxis(float angle, ScreenTileCorner *corner) const;
+
     void initTilesCornersMap();
-
     void initTilesMap();
-
     void createTileFromTileCorner(int tileCornerX, int tileCornerY);
 
     void buildVertexArrayMap();
@@ -53,24 +56,17 @@ private:
     sf::Vector2f getMouseWorldPosition(sf::Vector2f mouseScreenPosition) const;
 
     void resetTilesCornerColors() const;
-
     void setSelectedTileCornersColors() const;
 
     std::vector<ScreenTileCorner *> getPointNeighbors(int x, int y) const;
-
     std::vector<ScreenTileCorner *> getPointNeighborsInRadius(int x, int y, int radius) const;
-
     ScreenTileCorner *getClosestNeighborCornerInRadius(sf::Vector2i pointWorldPosition,
                                                        sf::Vector2f pointScreenPosition, int radius) const;
-
     std::vector<Tile *> getClosestTilesInRadius(int x, int y, int radius) const;
-
     Tile *getSelectedTileInRadius(sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius) const;
 
     void getSelectedTiles(sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
-
     void getSelectedTilesCorners(sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
-
     void getSelectedCorners(const sf::RenderWindow &window, SelectionMode selectionMode);
 
     float m_epsilon = 0.5f;
@@ -80,9 +76,13 @@ private:
     int m_heightScale;
     IsometricProjection m_isometricProjection;
 
-    float m_rotationSpeed;
-    float m_currentRotationAngle;
-    float m_targetRotationAngle;
+    float m_yawRotationSpeed;
+    float m_currentYawRotationAngle;
+    float m_targetYawRotationAngle;
+
+    float m_pitchRotationSpeed;
+    float m_currentPitchRotationAngle;
+    float m_targetPitchRotationAngle;
 
     bool m_doesNeedVertexUpdate;
     sf::Color m_selectedTilesColor = sf::Color::Magenta;
