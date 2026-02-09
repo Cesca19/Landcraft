@@ -59,7 +59,7 @@ sf::Vector2f IsometricProjection::screen_to_world(const int point2dX, const int 
 
 sf::Vector2f IsometricProjection::getPointScreenPosition(const sf::Vector2f worldPosition, const int worldHeight) const
 {
-    return world_to_screen(worldPosition.x, worldPosition.y, worldHeight);/* + m_translationOffset*/
+    return world_to_screen(worldPosition.x, worldPosition.y, worldHeight);
 }
 
 sf::Vector2f IsometricProjection::rotateAroundZAxis(const float angle, const sf::Vector2f point)

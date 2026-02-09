@@ -14,6 +14,7 @@ WorldManager::WorldManager(const int width, const int height, const std::string 
     , m_zoomStep(1)
     , m_yawRotationStep(90)
     , m_pitchRotationStep(5)
+    , m_movementStep(5)
 {
 }
 
@@ -27,6 +28,7 @@ void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int t
     m_screenMap->init(worldMapFilePath);
     m_worldView->init(m_window);
     m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
+    // m_movementStep *= std::max(tileSizeX, tileSizeY);
 }
 
 void WorldManager::update()
@@ -40,7 +42,7 @@ void WorldManager::update()
         m_window.clear();
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
-        m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
+        // m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
         m_screenMap->draw(m_window);
         m_window.display();
     }
@@ -63,27 +65,42 @@ void WorldManager::handleEvents()
                 m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
                                 ? SelectionMode::TILE_CORNER
                                 : SelectionMode::TILE;
-            if (event.key.code == sf::Keyboard::Z)
+            if (event.key.code == sf::Keyboard::Add)
                 m_screenMap->setSelectedCornersHeight(m_heightOffset);
-            if (event.key.code == sf::Keyboard::S)
+            if (event.key.code == sf::Keyboard::Subtract)
                 m_screenMap->setSelectedCornersHeight(- m_heightOffset);
 
             // cam events
+            // zoom
             if (event.key.code == sf::Keyboard::I)
                 m_worldView->zoom(-m_zoomStep);
             if (event.key.code == sf::Keyboard::O)
                 m_worldView->zoom(m_zoomStep);
-
+            // yaw
             if ( event.key.code == sf::Keyboard::Right)
                 m_screenMap->rotateAroundZAxis(m_yawRotationStep);
             if (event.key.code == sf::Keyboard::Left)
                 m_screenMap->rotateAroundZAxis(-m_yawRotationStep);
-
+            // pitch
             if (event.key.code == sf::Keyboard::Up)
                 m_screenMap->rotateAroundXAxis(m_pitchRotationStep);
             if (event.key.code == sf::Keyboard::Down)
                 m_screenMap->rotateAroundXAxis(-m_pitchRotationStep);
         }
+
+        // move events
+        sf::Vector2f moveVector(0.f, 0.f);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+            moveVector.x += 1.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            moveVector.x -= 1.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+            moveVector.y += 1.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            moveVector.y -= 1.f;
+        if (moveVector.x != 0 || moveVector.y != 0)
+            m_worldView->translate(moveVector * m_movementStep);
+
         // camera events
         if (event.type == sf::Event::MouseWheelScrolled) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)

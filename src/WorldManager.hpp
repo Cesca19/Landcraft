@@ -23,10 +23,17 @@ private:
     std::unique_ptr<WorldView> m_worldView;
     std::unique_ptr<ScreenMap> m_screenMap;
     SelectionMode m_currentSelectionMode;
+    // used te define the amount of height to add in WorldSpace coordinates (tiles grid)
     int m_heightOffset;
+
+    // used to define the dir of the zoom
     int m_zoomStep;
+
+    // rotation angle to add to the current rotation
     float m_yawRotationStep;
     float m_pitchRotationStep;
+    // used to define the dir off the movement
+    float m_movementStep;
 };
 
 

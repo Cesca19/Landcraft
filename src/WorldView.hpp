@@ -17,8 +17,9 @@ public:
     void setSize(sf::Vector2f size);
     void setOrigin(sf::Vector2f origin);
     void zoom(int zoomDelta);
+    void translate(sf::Vector2f translationVector);
 private:
-    void rotate(int delta);
+    void setCenter(sf::Vector2f center);
     void updateWindowView();
 
     float m_minZoom;
@@ -28,11 +29,13 @@ private:
     float m_zoomOffset;
     float m_zoomSpeed;
 
-    int m_rotationOffset;
-
     sf::Vector2f m_baseSize;
     sf::View m_view;
     sf::RenderWindow * m_window;
+
+    float m_movementSpeed;
+    sf::Vector2f m_currentOrigin;
+    sf::Vector2f m_targetOrigin;
 
     // make it global
     float m_epsilon = 0.01f;
