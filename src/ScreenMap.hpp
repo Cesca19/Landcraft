@@ -29,6 +29,8 @@ public:
 
     // yaw rotation
     void rotateAroundZAxis(float angle);
+    float getCurrentYawRotation() const { return m_currentYawRotationAngle; }
+    
     // pitch rotation
     void rotateAroundXAxis(float angle);
 
