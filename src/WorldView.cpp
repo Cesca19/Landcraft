@@ -1,12 +1,9 @@
+
 //
 // Created by fran on 03/02/2026.
 //
 
 #include "WorldView.hpp"
-
-#include <iostream>
-
-#include "IsometricProjection.hpp"
 
 WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     : m_minZoom(0.2)
@@ -15,10 +12,10 @@ WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     , m_targetZoom(m_currentZoom)
     , m_zoomOffset(0.1)
     , m_zoomSpeed(5)
+    , m_rotationOffset(10)
     , m_baseSize(size)
     , m_view(origin, size)
     , m_window(nullptr)
-    , m_movementSpeed(1)
 {
 }
 
@@ -37,22 +34,9 @@ void WorldView::update(const float deltaTime)
     if (std::abs(m_targetZoom - m_currentZoom) > m_epsilon) {
         m_currentZoom = m_currentZoom + (m_targetZoom - m_currentZoom) * deltaTime * m_zoomSpeed;
         m_view.setSize(m_baseSize * m_currentZoom);
-        updateWindowView();
     } else
-        if (m_currentZoom != m_targetZoom) {
-            m_currentZoom = m_targetZoom;
-            m_view.setSize(m_baseSize * m_currentZoom);
-            updateWindowView();
-        }
-    if (std::abs(IsometricProjection::distanceBetweenPoints(m_currentOrigin, m_targetOrigin)) > m_epsilon) {
-        m_currentOrigin = m_currentOrigin + (m_targetOrigin - m_currentOrigin) * deltaTime * m_movementSpeed;
-        setCenter(m_currentOrigin);
-    } else
-        if (m_currentOrigin != m_targetOrigin) {
-            m_currentOrigin = m_targetOrigin;
-            setCenter(m_currentOrigin);
-        }
-
+        m_view.setSize(m_baseSize * m_currentZoom);
+    updateWindowView();
 }
 
 void WorldView::setSize(const sf::Vector2f size)
@@ -66,9 +50,8 @@ void WorldView::setSize(const sf::Vector2f size)
 
 void WorldView::setOrigin(const sf::Vector2f origin)
 {
-    setCenter(origin);
-    m_currentOrigin = origin;
-    m_targetOrigin = origin;
+    m_view.setCenter(origin);
+    updateWindowView();
 }
 
 void WorldView::zoom(const int zoomDelta)
@@ -79,14 +62,9 @@ void WorldView::zoom(const int zoomDelta)
     m_targetZoom = std::clamp(m_targetZoom, m_minZoom, m_maxZoom);
 }
 
-void WorldView::translate(const sf::Vector2f translationVector)
+void WorldView::rotate(int delta)
 {
-    m_targetOrigin += translationVector;
-}
-
-void WorldView::setCenter(const sf::Vector2f center)
-{
-    m_view.setCenter(center);
+    m_view.rotate(delta * m_rotationOffset);
     updateWindowView();
 }
 

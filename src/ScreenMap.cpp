@@ -319,6 +319,7 @@ void ScreenMap::getSelectedTilesCorners(const sf::Vector2i mouseWorldPosition, c
 void ScreenMap::getSelectedCorners(const sf::RenderWindow &window, const SelectionMode selectionMode)
 {
     // TO DO : radius should be at least equal to the highest tile height (abs)
+    
     m_selectedCorners.clear();
     // get the current mouse position in the window in pixels
     const sf::Vector2i mousePixelScreenPosition = sf::Mouse::getPosition(window);

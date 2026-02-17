@@ -19,10 +19,7 @@ public:
     void update();
 private:
     void handleEvents();
-    
-    // Convertit un mouvement 3D intentionnel en vecteur 2D écran pour navigation isométrique
-    sf::Vector2f get3DMovementVector(float forward, float right) const;
-    
+
     sf::RenderWindow m_window;
 
     std::unique_ptr<WorldView> m_worldView;
@@ -39,10 +36,6 @@ private:
     float m_pitchRotationStep;
     // used to define the dir off the movement
     float m_movementStep;
-    
-    // Angles de projection pour calculer les vecteurs de mouvement
-    int m_projectionAngleX;
-    int m_projectionAngleY;
 };
 
 
