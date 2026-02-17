@@ -28,7 +28,7 @@ void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int t
     m_screenMap->init(worldMapFilePath);
     m_worldView->init(m_window);
     m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
-    // m_movementStep *= std::max(tileSizeX, tileSizeY);
+    m_worldView->zoom(m_zoomStep * 10); // zoom out a bit to see more of the map at the start
 }
 
 void WorldManager::update()
@@ -42,7 +42,6 @@ void WorldManager::update()
         m_window.clear();
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
-        m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
         m_screenMap->draw(m_window);
         m_window.display();
     }
@@ -88,10 +87,26 @@ void WorldManager::handleEvents()
                 m_screenMap->rotateAroundXAxis(-m_pitchRotationStep);
         }
 
-        // camera events
+        /* camera events */
+
+        // zoom with mouse wheel at mouse position
+        // Note: We handle this separately from the keyboard zoom to allow for zooming at the mouse position.
         if (event.type == sf::Event::MouseWheelScrolled) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-                {m_worldView->zoom(event.mouseWheelScroll.delta);}
+                {
+                    // m_worldView->zoom(event.mouseWheelScroll.delta);
+                    m_worldView->zoomAtMouse(event.mouseWheelScroll.delta, sf::Mouse::getPosition(m_window));
+                }
         }
+
+        //  drag and drop with middle mouse button 
+        if (event.type == sf::Event::MouseButtonPressed)
+            if (event.mouseButton.button == sf::Mouse::Left)
+                m_worldView->startDragging(sf::Mouse::getPosition(m_window));
+        if (event.type == sf::Event::MouseButtonReleased)
+            if (event.mouseButton.button == sf::Mouse::Left)
+                m_worldView->stopDragging();
+        if (event.type == sf::Event::MouseMoved)
+            m_worldView->updateDragging(sf::Mouse::getPosition(m_window));
     }
 }

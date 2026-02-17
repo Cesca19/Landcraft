@@ -7,6 +7,7 @@
 #define LANDCRAFT_WORLDVIEW_H
 
 #include <SFML/Graphics.hpp>
+#include "IsometricProjection.hpp"
 
 class WorldView
 {
@@ -18,8 +19,12 @@ public:
     void setSize(sf::Vector2f size);
     void setOrigin(sf::Vector2f origin);
     void zoom(int zoomDelta);
+    void zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos);
+    void startDragging(sf::Vector2i mousePos);
+    void updateDragging(sf::Vector2i mousePos);
+    void stopDragging();
 private:
-    void rotate(int delta);
+    void setCenter(const sf::Vector2f center);
     void updateWindowView();
 
     float m_minZoom;
@@ -29,14 +34,21 @@ private:
     float m_zoomOffset;
     float m_zoomSpeed;
 
-    int m_rotationOffset;
+    sf::Vector2f m_currentOrigin;
+    sf::Vector2f m_targetOrigin;
+    float m_movementSpeed;
+
+    sf::Vector2f m_dragStartWorldPos;
+    bool m_isDragging;
+
 
     sf::Vector2f m_baseSize;
     sf::View m_view;
-    sf::RenderWindow * m_window;
+    sf::RenderWindow *m_window;
 
     // make it global
-    float m_epsilon = 0.01f;
+    float m_zoomEpsilon = 0.001f;
+    float m_movementEpsilon = 0.1f;
 };
 
 

@@ -25,7 +25,7 @@ private:
     std::unique_ptr<WorldView> m_worldView;
     std::unique_ptr<ScreenMap> m_screenMap;
     SelectionMode m_currentSelectionMode;
-    // used te define the amount of height to add in WorldSpace coordinates (tiles grid)
+    // used to define the amount of height to add in WorldSpace coordinates (tiles grid)
     int m_heightOffset;
 
     // used to define the dir of the zoom
