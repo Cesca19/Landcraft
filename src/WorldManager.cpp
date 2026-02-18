@@ -40,6 +40,7 @@ void WorldManager::update()
         deltaTime = clock.restart().asSeconds();
         handleEvents();
         m_window.clear();
+        drawBackground();
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
@@ -109,4 +110,29 @@ void WorldManager::handleEvents()
         if (event.type == sf::Event::MouseMoved)
             m_worldView->updateDragging(sf::Mouse::getPosition(m_window));
     }
+}
+
+void WorldManager::drawBackground()
+{
+    // may be create a shader and add some particles for night or day
+    sf::View previousView = m_window.getView();
+    sf::VertexArray background(sf::Quads, 4);
+    // sf::Color bottomColor(120, 72, 153);   // purple
+    // sf::Color topColor(255, 179, 193);  // pink
+    sf::Color bottomColor(255, 179, 193);  // pink
+    sf::Color topColor(196, 218, 242);
+    sf::Vector2u windowSize = m_window.getSize();
+
+    background[0].position = sf::Vector2f(0, 0);
+    background[0].color = topColor;
+    background[1].position = sf::Vector2f(windowSize.x, 0);
+    background[1].color = topColor;
+    background[2].position = sf::Vector2f(windowSize.x, windowSize.y);
+    background[2].color = bottomColor;
+    background[3].position = sf::Vector2f(0, windowSize.y);
+    background[3].color = bottomColor;
+
+    m_window.setView(m_window.getDefaultView());
+    m_window.draw(background);
+    m_window.setView(previousView);
 }

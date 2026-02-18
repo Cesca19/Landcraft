@@ -86,7 +86,7 @@ private:
 
     bool m_doesNeedVertexUpdate;
     sf::Color m_selectedTilesColor = sf::Color::Magenta;
-    sf::Color m_defaultTilesColor = sf::Color::Cyan;
+    sf::Color m_defaultTilesColor = sf::Color::White;
 
     std::vector<std::vector<std::unique_ptr<ScreenTileCorner> > > m_map;
     std::vector<ScreenTileCorner *> m_selectedCorners;

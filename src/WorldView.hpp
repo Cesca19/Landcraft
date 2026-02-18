@@ -23,6 +23,9 @@ public:
     void startDragging(sf::Vector2i mousePos);
     void updateDragging(sf::Vector2i mousePos);
     void stopDragging();
+    // to do handle window resizing event;
+    // might ave to create a base view class to do that
+    // so the bacground view and this one could handle it automaticlly
 private:
     void setCenter(const sf::Vector2f center);
     void updateWindowView();
