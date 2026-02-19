@@ -12,7 +12,7 @@ WorldManager::WorldManager(const int width, const int height, const std::string 
     , m_currentSelectionMode(SelectionMode::TILE_CORNER)
     , m_heightOffset(1)
     , m_zoomStep(1)
-    , m_yawRotationStep(90)
+    , m_yawRotationStep(22.5)
     , m_pitchRotationStep(5)
     , m_movementStep(5)
 {
@@ -44,6 +44,8 @@ void WorldManager::update()
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
+        sf::Vector2f gizmoPos(m_window.getSize().x - 50.0f, 50.0f);
+        m_screenMap->drawGizmo(m_window, gizmoPos, 40.0f);
         m_window.display();
     }
 }

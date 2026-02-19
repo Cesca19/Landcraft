@@ -32,6 +32,7 @@ public:
     // pitch rotation
     void rotateAroundXAxis(float angle);
 
+    void drawGizmo(sf::RenderWindow& window, const sf::Vector2f& uiPosition, float size);
 private:
     // yaw rotation
     void rotateMapAroundZAxis(float angle);

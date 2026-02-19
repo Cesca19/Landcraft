@@ -95,6 +95,47 @@ void ScreenMap::rotateAroundXAxis(const float angle)
     m_targetPitchRotationAngle += angle;
 }
 
+void ScreenMap::drawGizmo(sf::RenderWindow &window, const sf::Vector2f &uiPosition, float size)
+{
+    sf::Vector2f worldX(1.0f, 0.0f);
+    sf::Vector2f worldY(0.0f, 1.0f);
+    sf::Vector2f rotatedX = IsometricProjection::rotateAroundZAxis(m_currentYawRotationAngle, worldX);
+    sf::Vector2f rotatedY = IsometricProjection::rotateAroundZAxis(m_currentYawRotationAngle, worldY);
+
+    // projected origin point
+    sf::Vector2f center = m_isometricProjection.getPointScreenPosition(sf::Vector2f(0, 0), 0);
+    sf::Vector2f pX = m_isometricProjection.getPointScreenPosition(rotatedX, 0);
+    sf::Vector2f pY = m_isometricProjection.getPointScreenPosition(rotatedY, 0);
+    // Z axis isn't rotated
+    sf::Vector2f pZ = m_isometricProjection.getPointScreenPosition(sf::Vector2f(0, 0), 1.0f);
+
+    // direction vectors
+    sf::Vector2f dirX = pX - center;
+    sf::Vector2f dirY = pY - center;
+    sf::Vector2f dirZ = pZ - center;
+
+    auto normalize = [](sf::Vector2f v) { float l = std::hypot(v.x, v.y); return (l>0)? v/l : v; };
+    dirX = normalize(dirX) * size;
+    dirY = normalize(dirY) * size;
+    dirZ = normalize(dirZ) * size;
+
+    sf::Vertex lines[] = {
+        // AXE X (Rouge)
+        sf::Vertex(uiPosition, sf::Color::Red),
+        sf::Vertex(uiPosition + dirX, sf::Color::Red),
+
+        // AXE Y (Vert)
+        sf::Vertex(uiPosition, sf::Color::Green),
+        sf::Vertex(uiPosition + dirY, sf::Color::Green),
+
+        // AXE Z (Bleu - Vertical/Hauteur)
+        sf::Vertex(uiPosition, sf::Color::Blue),
+        sf::Vertex(uiPosition + dirZ, sf::Color::Blue)
+    };
+
+    window.draw(lines, 6, sf::Lines);
+}
+
 void ScreenMap::rotateMapAroundZAxis(const float angle)
 {
     for (int y = 0; y < m_map.size(); y++)
