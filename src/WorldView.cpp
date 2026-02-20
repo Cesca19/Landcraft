@@ -13,7 +13,7 @@ WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     , m_zoomSpeed(10.0f)
     , m_movementSpeed(10.0f)
     , m_baseSize(size)
-    , m_view(origin, size)
+    , m_view({origin}, size)
     , m_window(nullptr)
     , m_currentOrigin(origin)
     , m_targetOrigin(origin)
@@ -76,7 +76,7 @@ void WorldView::setSize(const sf::Vector2f size)
     updateWindowView();
 }
 
-void WorldView::setOrigin(const sf::Vector2f origin)
+void WorldView::resetCenter(const sf::Vector2f origin)
 {
     m_currentOrigin = origin;
     m_targetOrigin = origin;
@@ -152,6 +152,16 @@ void WorldView::updateDragging(sf::Vector2i mousePos)
 void WorldView::stopDragging()
 {
     m_isDragging = false;
+}
+
+sf::Vector2f WorldView::getCenter() const
+{
+    return m_view.getCenter();
+}
+
+sf::Vector2f WorldView::getSize() const
+{
+    return m_view.getSize();
 }
 
 void WorldView::setCenter(const sf::Vector2f center)

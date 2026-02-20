@@ -17,12 +17,14 @@ public:
     void init(sf::RenderWindow & window);
     void update(float deltaTime);
     void setSize(sf::Vector2f size);
-    void setOrigin(sf::Vector2f origin);
+    void resetCenter(sf::Vector2f origin);
     void zoom(int zoomDelta);
     void zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos);
     void startDragging(sf::Vector2i mousePos);
     void updateDragging(sf::Vector2i mousePos);
     void stopDragging();
+    sf::Vector2f getCenter() const;
+    sf::Vector2f getSize() const;
     // to do handle window resizing event;
     // might ave to create a base view class to do that
     // so the bacground view and this one could handle it automaticlly

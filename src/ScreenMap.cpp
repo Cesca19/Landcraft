@@ -62,6 +62,12 @@ void ScreenMap::init(const std::string &mapFilepath)
     m_worldMap->init(mapFilepath);
     initTilesCornersMap();
     initTilesMap();
+
+    // by modifying the word pivot like that I make sure that the center of the map
+    // which world coordinates are (mapWidth/2, mapHeight/2) in world space,
+    // and which is the point around which I want to rotate the map,
+    // is at the center of the view,an then will have {0, 0} 
+    setWorldPivot(getScreenMapCenter());
     m_doesNeedVertexUpdate = true;
 }
 
@@ -136,6 +142,25 @@ void ScreenMap::drawGizmo(sf::RenderWindow &window, const sf::Vector2f &uiPositi
     window.draw(lines, 6, sf::Lines);
 }
 
+void ScreenMap::setWorldPivot(sf::Vector2f worldPivotScreenPosition)
+{
+    m_isometricProjection.setWorldPivot(worldPivotScreenPosition);
+    updateMap();
+}
+
+void ScreenMap::updateMap()
+{
+    for (int y = 0; y < m_map.size(); y++)
+        for (int x = 0; x < m_map[y].size(); x++)
+            updateCorner(m_map[y][x].get());
+    m_doesNeedVertexUpdate = true;
+}
+
+void ScreenMap::updateCorner(ScreenTileCorner *corner) const
+{
+    corner->ScreenPosition = m_isometricProjection.getPointScreenPosition(corner->RotatedWorldPosition, corner->WorldHeight);
+}
+
 void ScreenMap::rotateMapAroundZAxis(const float angle)
 {
     for (int y = 0; y < m_map.size(); y++)
@@ -156,16 +181,7 @@ void ScreenMap::rotateCornerAroundZAxis(const float angle, ScreenTileCorner *cor
 void ScreenMap::rotateMapAroundXAxis(const float angle)
 {
     m_isometricProjection.rotateAroundXAxis(angle);
-
-    for (int y = 0; y < m_map.size(); y++)
-        for (int x = 0; x < m_map[y].size(); x++)
-            rotateCornerAroundXAxis(angle, m_map[y][x].get());
-    m_doesNeedVertexUpdate = true;
-}
-
-void ScreenMap::rotateCornerAroundXAxis(float angle, ScreenTileCorner *corner) const
-{
-    corner->ScreenPosition = m_isometricProjection.getPointScreenPosition(corner->RotatedWorldPosition, corner->WorldHeight);
+    updateMap();
 }
 
 void ScreenMap::initTilesCornersMap()

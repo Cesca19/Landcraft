@@ -20,6 +20,7 @@ public:
 private:
     void handleEvents();
     void drawBackground();
+
     sf::RenderWindow m_window;
 
     std::unique_ptr<WorldView> m_worldView;

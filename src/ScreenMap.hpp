@@ -14,17 +14,11 @@ class ScreenMap {
 public:
     ScreenMap(int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX,
               int projectionAngleY);
-
     ~ScreenMap();
-
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode);
-
     void draw(sf::RenderWindow &window);
-
     void init(const std::string &mapFilepath);
-
     void setSelectedCornersHeight(int heightOffset);
-
     sf::Vector2f getScreenMapCenter() const;
 
     // yaw rotation
@@ -33,14 +27,22 @@ public:
     void rotateAroundXAxis(float angle);
 
     void drawGizmo(sf::RenderWindow& window, const sf::Vector2f& uiPosition, float size);
+    /*
+     * Sets the world pivot point in screen coordinates.
+     * This is used to define a reference point for camera movement and rotation.
+     * @param worldPivotScreenPosition The screen coordinates of the pivot point.
+     */
+    void setWorldPivot(sf::Vector2f worldPivotScreenPosition);
 private:
+    void updateMap();
+    void updateCorner(ScreenTileCorner *corner) const;
+
     // yaw rotation
     void rotateMapAroundZAxis(float angle);
     void rotateCornerAroundZAxis(float angle, ScreenTileCorner *corner) const;
 
     // pitch rotation
     void rotateMapAroundXAxis(float angle);
-    void rotateCornerAroundXAxis(float angle, ScreenTileCorner *corner) const;
 
     void initTilesCornersMap();
     void initTilesMap();

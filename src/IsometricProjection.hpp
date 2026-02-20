@@ -28,9 +28,7 @@ public:
     ~IsometricProjection();
 
     static float radToDeg(float rad);
-
     static float degToRad(float deg);
-
     static float distanceBetweenPoints(const sf::Vector2f &p1, const sf::Vector2f &p2);
 
     /**
@@ -55,6 +53,12 @@ public:
      */
     sf::Vector2f screen_to_world(int point2dX, int point2dY, int point2dZ) const;
 
+    /**
+     * @brief Gets the screen position of a world point with a given height.
+     * @param worldPosition The X and Y tile indices in world space.
+     * @param worldHeight The Z height/elevation of the tile.
+     * @return The corresponding 2D coordinates on the screen (in pixels).
+     */
     sf::Vector2f getPointScreenPosition(sf::Vector2f worldPosition, int worldHeight) const;
 
     /**
@@ -69,17 +73,34 @@ public:
      */
     static sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point);
 
-
-    // this is the Pitch (tangage) rotation : This is the rotation around the X axis.
-    //      -> This is what you will do: raise or lower the nose of the camera (look up or down).
-    // -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
+    /**
+     * @brief Rotates the map around the X axis by changing the projection angle.
+     * It simulates a pitch rotation by altering the vertical projection of the tiles.
+     *  this is the Pitch (tangage) rotation : This is the rotation around the X axis.
+     *      -> This is what you will do: raise or lower the nose of the camera (look up or down).
+     *      -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
+     */
     void rotateAroundXAxis(int newProjectionAngleY);
+
+    /*
+     * Sets the world pivot point in screen coordinates.
+     * This is used to define a reference point for camera movement and rotation.
+     * @param worldPivotScreenPosition The screen coordinates of the pivot point.
+     */
+    void setWorldPivot(sf::Vector2f worldPivotScreenPosition);
+
+    /** 
+     * @brief Returns the current world pivot in world coordinates. 
+     * @return The world pivot point in tile grid (world) coordinates.
+     */
+    sf::Vector2f getWorldPivotInWorldCoordinates() const;
 private:
     int m_projectionAngleX;
     int m_projectionAngleY;
     int m_tileSizeX;
     int m_tileSizeY;
     int m_heightScale;
+    sf::Vector2f m_worldPivot;
 };
 
 

@@ -11,6 +11,7 @@ IsometricProjection::IsometricProjection(const int tileSizeX, const int tileSize
     , m_tileSizeX(tileSizeX)
     , m_tileSizeY(tileSizeY)
     , m_heightScale(heightScale)
+    , m_worldPivot({0, 0})
 {
 }
 
@@ -35,8 +36,10 @@ float IsometricProjection::distanceBetweenPoints(const sf::Vector2f &p1, const s
 
 sf::Vector2f IsometricProjection::world_to_screen(const float point3dX, const float point3dY, const float point3dZ) const
 {
-    const float scaledWorldX = point3dX * m_tileSizeX;
-    const float scaledWorldY = point3dY * m_tileSizeY;
+    const float centeredWorldX = point3dX - m_worldPivot.x;
+    const float centeredWorldY = point3dY - m_worldPivot.y;
+    const float scaledWorldX = centeredWorldX * m_tileSizeX;
+    const float scaledWorldY = centeredWorldY * m_tileSizeY;
     const float angleX = degToRad(m_projectionAngleX);
     const float angleY = degToRad(m_projectionAngleY);
     sf::Vector2f point2d;
@@ -54,7 +57,7 @@ sf::Vector2f IsometricProjection::screen_to_world(const int point2dX, const int 
 
     scaledPoint3d.x = 0.5f * ((point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
     scaledPoint3d.y = 0.5f * (-(point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
-    return {scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY};
+    return sf::Vector2f(scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY) + m_worldPivot;
 }
 
 sf::Vector2f IsometricProjection::getPointScreenPosition(const sf::Vector2f worldPosition, const int worldHeight) const
@@ -76,4 +79,14 @@ sf::Vector2f IsometricProjection::rotateAroundZAxis(const float angle, const sf:
 void IsometricProjection::rotateAroundXAxis(const int newProjectionAngleY)
 {
     m_projectionAngleY = newProjectionAngleY;
+}
+
+void IsometricProjection::setWorldPivot(sf::Vector2f worldPivotScreenPosition)
+{
+    m_worldPivot = screen_to_world(worldPivotScreenPosition.x, worldPivotScreenPosition.y, 0);
+}
+
+sf::Vector2f IsometricProjection::getWorldPivotInWorldCoordinates() const
+{
+    return m_worldPivot;
 }

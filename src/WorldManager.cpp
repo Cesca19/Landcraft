@@ -3,6 +3,7 @@
 //
 
 #include "WorldManager.hpp"
+#include <iostream>
 
 WorldManager::WorldManager(const int width, const int height, const std::string &windowTitle)
     : m_window(sf::VideoMode(width, height), windowTitle)
@@ -27,7 +28,6 @@ void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int t
     m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY);
     m_screenMap->init(worldMapFilePath);
     m_worldView->init(m_window);
-    m_worldView->setOrigin(m_screenMap->getScreenMapCenter());
     m_worldView->zoom(m_zoomStep * 10); // zoom out a bit to see more of the map at the start
 }
 
@@ -35,6 +35,7 @@ void WorldManager::update()
 {
     sf::Clock clock;
     float deltaTime = 0;
+
     while (m_window.isOpen())
     {
         deltaTime = clock.restart().asSeconds();
@@ -44,8 +45,6 @@ void WorldManager::update()
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
-        sf::Vector2f gizmoPos(m_window.getSize().x - 50.0f, 50.0f);
-        m_screenMap->drawGizmo(m_window, gizmoPos, 40.0f);
         m_window.display();
     }
 }
@@ -136,5 +135,7 @@ void WorldManager::drawBackground()
 
     m_window.setView(m_window.getDefaultView());
     m_window.draw(background);
+    sf::Vector2f gizmoPos(m_window.getSize().x - 50.0f, 100.0f);
+    m_screenMap->drawGizmo(m_window, gizmoPos, 40.0f);
     m_window.setView(previousView);
 }
