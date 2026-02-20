@@ -20,6 +20,8 @@ public:
 private:
     void handleEvents();
     void drawBackground();
+    void drawSkyBox();
+    void drawGizmo();
 
     sf::RenderWindow m_window;
 

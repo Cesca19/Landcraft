@@ -28,6 +28,8 @@ public:
     // to do handle window resizing event;
     // might ave to create a base view class to do that
     // so the bacground view and this one could handle it automaticlly
+    void moveTarget(const sf::Vector2f& offset);
+    sf::Vector2f getTargetOrigin() const; // Pour lire la cible actuelle
 private:
     void setCenter(const sf::Vector2f center);
     void updateWindowView();
@@ -39,8 +41,8 @@ private:
     float m_zoomOffset;
     float m_zoomSpeed;
 
-    sf::Vector2f m_currentOrigin;
-    sf::Vector2f m_targetOrigin;
+    sf::Vector2f m_currentCenter;
+    sf::Vector2f m_targetCenter;
     float m_movementSpeed;
 
     sf::Vector2f m_dragStartWorldPos;

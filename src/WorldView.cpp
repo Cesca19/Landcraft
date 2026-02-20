@@ -15,8 +15,8 @@ WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     , m_baseSize(size)
     , m_view({origin}, size)
     , m_window(nullptr)
-    , m_currentOrigin(origin)
-    , m_targetOrigin(origin)
+    , m_currentCenter(origin)
+    , m_targetCenter(origin)
     , m_isDragging(false)
     , m_dragStartWorldPos({0, 0})
 {
@@ -53,15 +53,15 @@ void WorldView::update(const float deltaTime)
 
     // translation lerping
     // To do : add drag speed multiplier to make the drag more responsive, and normal movement smoother
-    if (IsometricProjection::distanceBetweenPoints(m_targetOrigin, m_currentOrigin) > m_movementEpsilon) {
+    if (IsometricProjection::distanceBetweenPoints(m_targetCenter, m_currentCenter) > m_movementEpsilon) {
         float speed = m_isDragging ? 50.0f : m_movementSpeed;
 
-        m_currentOrigin += (m_targetOrigin - m_currentOrigin) * deltaTime * speed;
-        setCenter(m_currentOrigin);
+        m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
+        setCenter(m_currentCenter);
     } else {
-        if (m_currentOrigin != m_targetOrigin) {
-            m_currentOrigin = m_targetOrigin;
-            setCenter(m_currentOrigin);
+        if (m_currentCenter != m_targetCenter) {
+            m_currentCenter = m_targetCenter;
+            setCenter(m_currentCenter);
         }
     }
 
@@ -78,8 +78,8 @@ void WorldView::setSize(const sf::Vector2f size)
 
 void WorldView::resetCenter(const sf::Vector2f origin)
 {
-    m_currentOrigin = origin;
-    m_targetOrigin = origin;
+    m_currentCenter = origin;
+    m_targetCenter = origin;
     setCenter(origin);
 }
 
@@ -104,7 +104,7 @@ void WorldView::zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos)
     // We simulate a view that would already have reached its destination
     sf::View targetView = m_view;
     targetView.setSize(m_baseSize * m_targetZoom);
-    targetView.setCenter(m_targetOrigin);
+    targetView.setCenter(m_targetCenter);
 
     sf::Vector2f mouseWorldPosBefore = m_window->mapPixelToCoords(mousePos, targetView);
 
@@ -116,7 +116,7 @@ void WorldView::zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos)
 
     // 3. Calculate where that same world point would be with the NEW target zoom
     targetView.setSize(m_baseSize * m_targetZoom); 
-    // (The center of targetView is still the old m_targetOrigin for now)
+    // (The center of targetView is still the old m_targetCenter for now)
     sf::Vector2f mouseWorldPosAfter = m_window->mapPixelToCoords(mousePos, targetView);
 
     // 4. Calculate the necessary correction
@@ -124,7 +124,7 @@ void WorldView::zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos)
     // We need to move the camera by (X - Y) to bring the point back under the mouse."
     sf::Vector2f correction = mouseWorldPosBefore - mouseWorldPosAfter;
     // 5. Apply the correction to the TARGET only
-    m_targetOrigin += correction;
+    m_targetCenter += correction;
     // The update() will do the rest: it will interpolate both zoom and position towards these new targets.
 }
 
@@ -142,11 +142,9 @@ void WorldView::updateDragging(sf::Vector2i mousePos)
     sf::Vector2f currentWorldPos = m_window->mapPixelToCoords(mousePos, m_view);
     sf::Vector2f delta = m_dragStartWorldPos - currentWorldPos;
 
-    // Pour le drag, on applique immédiatement à la cible ET à l'origine
-    // pour une réponse 1:1 sans lag ("Marshmallow effect")
-    m_targetOrigin += delta;
-    m_currentOrigin += delta; 
-    setCenter(m_currentOrigin);
+    m_targetCenter += delta;
+    m_currentCenter += delta; 
+    setCenter(m_currentCenter);
 }
 
 void WorldView::stopDragging()
@@ -162,6 +160,16 @@ sf::Vector2f WorldView::getCenter() const
 sf::Vector2f WorldView::getSize() const
 {
     return m_view.getSize();
+}
+
+void WorldView::moveTarget(const sf::Vector2f& offset) 
+{  
+    m_targetCenter += offset;
+}
+
+sf::Vector2f WorldView::getTargetOrigin() const 
+{
+    return m_targetCenter;
 }
 
 void WorldView::setCenter(const sf::Vector2f center)

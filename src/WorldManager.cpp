@@ -3,7 +3,6 @@
 //
 
 #include "WorldManager.hpp"
-#include <iostream>
 
 WorldManager::WorldManager(const int width, const int height, const std::string &windowTitle)
     : m_window(sf::VideoMode(width, height), windowTitle)
@@ -89,6 +88,27 @@ void WorldManager::handleEvents()
                 m_screenMap->rotateAroundXAxis(-m_pitchRotationStep);
         }
 
+        sf::Vector2f moveVector(0.f, 0.f);
+        // scren space movement input
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) moveVector.y -= 1.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) moveVector.y += 1.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) moveVector.x -= 1.f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) moveVector.x += 1.f;
+
+        if (moveVector.x != 0.f || moveVector.y != 0.f)
+        {
+            // normalize the movement vector to ensure consistent speed in all directions
+            // TODO : add it to isometric projection
+            float length = std::hypot(moveVector.x, moveVector.y);
+            moveVector /= length;
+
+            // adapt movement speed based on zoom level to maintain a consistent feel
+            // float currentZoom = m_worldView->getTargetZoom(); 
+            // float adjustedSpeed = m_movementStep * currentZoom; 
+            
+            m_worldView->moveTarget(moveVector * (float)m_movementStep);
+        }
+
         /* camera events */
 
         // zoom with mouse wheel at mouse position
@@ -115,8 +135,16 @@ void WorldManager::handleEvents()
 
 void WorldManager::drawBackground()
 {
-    // may be create a shader and add some particles for night or day
     sf::View previousView = m_window.getView();
+    m_window.setView(m_window.getDefaultView());
+    drawSkyBox();
+    drawGizmo();
+    m_window.setView(previousView);
+}
+
+void WorldManager::drawSkyBox()
+{
+    // may be create a shader and add some particles for night or day
     sf::VertexArray background(sf::Quads, 4);
     // sf::Color bottomColor(120, 72, 153);   // purple
     // sf::Color topColor(255, 179, 193);  // pink
@@ -132,10 +160,11 @@ void WorldManager::drawBackground()
     background[2].color = bottomColor;
     background[3].position = sf::Vector2f(0, windowSize.y);
     background[3].color = bottomColor;
-
-    m_window.setView(m_window.getDefaultView());
     m_window.draw(background);
+}
+
+void WorldManager::drawGizmo()
+{
     sf::Vector2f gizmoPos(m_window.getSize().x - 50.0f, 100.0f);
     m_screenMap->drawGizmo(m_window, gizmoPos, 40.0f);
-    m_window.setView(previousView);
 }
