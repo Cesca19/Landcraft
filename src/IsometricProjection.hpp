@@ -94,6 +94,46 @@ public:
      * @return The world pivot point in tile grid (world) coordinates.
      */
     sf::Vector2f getWorldPivotInWorldCoordinates() const;
+
+    /**
+     * @brief Calculates the dot product of two 2D vectors.
+     * @param v1 The first vector.
+     * @param v2 The second vector.
+     * @return The dot product of the two vectors.
+     */
+    static float dotProduct(const sf::Vector2f &v1, const sf::Vector2f &v2);
+
+    /**
+     * @brief Calculates the magnitude (length) of a 2D vector.
+     * @param v The vector for which to calculate the magnitude.
+     * @return The magnitude of the vector.
+     */
+    static float magnitude(const sf::Vector2f &v);
+
+    /**
+     * @brief Normalizes a 2D vector to have a magnitude of 1.
+     * @param v The vector to normalize.
+     * @return The normalized vector. If the input vector has zero magnitude, returns a zero vector.
+     */
+    static sf::Vector2f normalize(const sf::Vector2f &v);
+
+    /**
+     * @brief Projects a point onto a line defined by a point and a direction.
+     * @param point The point to project.
+     * @param linePoint A point on the line.
+     * @param direction The direction vector of the line.
+     * @return The projected point on the line.
+     */
+    static sf::Vector2f projectPointOnLine(const sf::Vector2f& point,const sf::Vector2f& linePoint, const sf::Vector2f& direction);
+    
+    /**
+     * @brief Offsets a point along a given direction by a specified radius.
+     * @param point The original point to offset.
+     * @param direction The direction vector along which to offset the point.
+     * @param radius The distance to offset the point.
+     * @return The new offset point.
+     */
+    static sf::Vector2f offsetPointAlongDirection(const sf::Vector2f& point, const sf::Vector2f& direction, float radius);
 private:
     int m_projectionAngleX;
     int m_projectionAngleY;

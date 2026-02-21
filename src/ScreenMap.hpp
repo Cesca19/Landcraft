@@ -19,6 +19,7 @@ public:
     void draw(sf::RenderWindow &window);
     void init(const std::string &mapFilepath);
     void setSelectedCornersHeight(int heightOffset);
+    sf::Vector2f getWorldMapCenter() const;
     sf::Vector2f getScreenMapCenter() const;
 
     // yaw rotation
@@ -27,6 +28,7 @@ public:
     void rotateAroundXAxis(float angle);
 
     void drawGizmo(sf::RenderWindow& window, const sf::Vector2f& uiPosition, float size);
+    void drawWorldReference(sf::RenderWindow& window, sf::Vector2f viewCenter, sf::Vector2f viewSize);
     /*
      * Sets the world pivot point in screen coordinates.
      * This is used to define a reference point for camera movement and rotation.
@@ -50,13 +52,16 @@ private:
 
     void buildVertexArrayMap();
 
+    sf::Vector2f getPointScreenCoordinates(sf::Vector2f pointWorld, float height) const;
     /**
-     * Calculates the exact Tile Index under the mouse cursor, accounting for Map Rotation.
+     * Calculates the exact Tile Index of the given screen position, accounting for Map Rotation.
      *
-     * @param mouseScreenPosition The mouse position relative to the window/view (pixels).
-     * @return The coordinates of the tile under the mouse (e.g., x=4.0, y=5.0).
+     * @param pointScreenPosition The screen position relative to the window/view (pixels).
+     * @param height The assumed height of the point in world space
+     * @return The coordinates of the tile under the given screen position (e.g., x=4.0, y=5.0).
+     * these coordinates are in the non rotated world space, so they can be used directly to access the map data.
      */
-    sf::Vector2f getMouseWorldPosition(sf::Vector2f mouseScreenPosition) const;
+    sf::Vector2f getPointTileCoordinates(sf::Vector2f pointScreenPosition, float height = 0) const;
 
     void resetTilesCornerColors() const;
     void setSelectedTileCornersColors() const;

@@ -20,6 +20,7 @@ public:
 private:
     void handleEvents();
     void drawBackground();
+    void drawWireframe();
     void drawSkyBox();
     void drawGizmo();
 

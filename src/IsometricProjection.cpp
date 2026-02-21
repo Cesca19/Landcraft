@@ -90,3 +90,41 @@ sf::Vector2f IsometricProjection::getWorldPivotInWorldCoordinates() const
 {
     return m_worldPivot;
 }
+
+float IsometricProjection::dotProduct(const sf::Vector2f &v1, const sf::Vector2f &v2)
+{
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+float IsometricProjection::magnitude(const sf::Vector2f &v)
+{
+    return std::sqrt(v.x * v.x + v.y * v.y);
+}
+
+sf::Vector2f IsometricProjection::normalize(const sf::Vector2f &v)
+{
+    float mag = magnitude(v);
+    if (mag == 0.f)
+        return sf::Vector2f(0.f, 0.f);
+    return v / mag;
+}
+
+sf::Vector2f IsometricProjection::projectPointOnLine(const sf::Vector2f &point, const sf::Vector2f &linePoint, const sf::Vector2f &direction)
+{
+    sf::Vector2f AP = point - linePoint;
+
+    float dot = dotProduct(AP, direction);
+    float magSq = dotProduct(direction, direction);
+
+    if (magSq == 0.f)
+        return linePoint;
+
+    sf::Vector2f projection = (dot / magSq) * direction;
+    return linePoint + projection;
+}
+
+sf::Vector2f IsometricProjection::offsetPointAlongDirection(const sf::Vector2f &point, const sf::Vector2f &direction, float radius)
+{
+    sf::Vector2f normalizedDirection = direction / magnitude(direction);
+    return point + normalizedDirection * radius;
+}

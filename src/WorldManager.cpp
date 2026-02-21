@@ -41,6 +41,7 @@ void WorldManager::update()
         handleEvents();
         m_window.clear();
         drawBackground();
+        drawWireframe();
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
@@ -140,6 +141,12 @@ void WorldManager::drawBackground()
     drawSkyBox();
     drawGizmo();
     m_window.setView(previousView);
+}
+
+void WorldManager::drawWireframe()
+{
+    // TO do get isometic projection instance out of the scrren map
+    m_screenMap->drawWorldReference(m_window,  m_worldView->getCenter(), m_worldView->getSize());
 }
 
 void WorldManager::drawSkyBox()

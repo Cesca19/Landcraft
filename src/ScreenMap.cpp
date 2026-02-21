@@ -1,4 +1,5 @@
 #include "ScreenMap.hpp"
+#include <iostream>
 
 ScreenMap::ScreenMap(const int tileSizeX, const int tileSizeY, const int heightScale, const int projectionAngleX, const int projectionAngleY)
     : m_tileSizeX(tileSizeX)
@@ -82,13 +83,20 @@ void ScreenMap::setSelectedCornersHeight(const int heightOffset)
     m_doesNeedVertexUpdate = true;
 }
 
-sf::Vector2f ScreenMap::getScreenMapCenter() const
+sf::Vector2f ScreenMap::getWorldMapCenter() const
 {
     const float centerX = (static_cast<float>(m_map[0].size()) - 1.0f) / 2.0f;
     const float centerY = (static_cast<float>(m_map.size()) - 1.0f) / 2.0f;
 
+    return sf::Vector2f(centerX, centerY);
+}
+
+sf::Vector2f ScreenMap::getScreenMapCenter() const
+{
+    sf::Vector2f worldCenter = getWorldMapCenter();
+
     // convert that point into screen space coordinates
-    return m_isometricProjection.getPointScreenPosition({std::round(centerX), std::round(centerY)}, 0);
+    return m_isometricProjection.getPointScreenPosition({std::round(worldCenter.x), std::round(worldCenter.y)}, 0);
 }
 
 void ScreenMap::rotateAroundZAxis(const float angle)
@@ -142,6 +150,50 @@ void ScreenMap::drawGizmo(sf::RenderWindow &window, const sf::Vector2f &uiPositi
     window.draw(lines, 6, sf::Lines);
 }
 
+void ScreenMap::drawWorldReference(sf::RenderWindow &window, sf::Vector2f viewCenter, sf::Vector2f viewSize)
+{
+    float height = 0.1f;
+    float screenViewDiagonalLength = std::hypot(viewSize.x, viewSize.y);
+    float minTileScale = std::min(m_tileSizeX, m_tileSizeY);
+    int screenViewRadius = static_cast<int>(screenViewDiagonalLength / minTileScale);
+
+    sf::Vector2f rotatedOrigin = m_isometricProjection.rotateAroundZAxis(m_currentYawRotationAngle, {0, 0});
+    sf::Vector2f yWorld = m_isometricProjection.rotateAroundZAxis(m_currentYawRotationAngle, sf::Vector2f(0, 1));
+    sf::Vector2f xWorld = m_isometricProjection.rotateAroundZAxis(m_currentYawRotationAngle, sf::Vector2f(1, 0));
+    sf::Vector2f xAxisWorld = xWorld - rotatedOrigin;
+    sf::Vector2f yAxisWorld = yWorld - rotatedOrigin;
+    sf::Vector2f mapCenter = getWorldMapCenter();
+
+    sf::Vector2f viewCenterWorld = getPointTileCoordinates(viewCenter, height);
+    viewCenterWorld  = {std::round(viewCenterWorld.x), std::round(viewCenterWorld.y)};
+    sf::Vector2f worldCenterRotated = IsometricProjection::rotateAroundZAxis(m_currentYawRotationAngle, viewCenterWorld - mapCenter) + mapCenter;
+
+    sf::Vector2f offsetUpViewCenterWorld = IsometricProjection::offsetPointAlongDirection(worldCenterRotated, yAxisWorld, screenViewRadius);
+    sf::Vector2f offsetDownViewCenterWorld = IsometricProjection::offsetPointAlongDirection(worldCenterRotated, yAxisWorld, -screenViewRadius);
+    sf::Vector2f yAxisNormal = IsometricProjection::normalize(sf::Vector2f{-yAxisWorld.y, yAxisWorld.x}); // Perpendicular to the view Y axis (to get the left direction)
+
+    sf::Vector2f offsetLeftViewCenterWorld = IsometricProjection::offsetPointAlongDirection(worldCenterRotated, xAxisWorld, -screenViewRadius);
+    sf::Vector2f offsetRightViewCenterWorld = IsometricProjection::offsetPointAlongDirection(worldCenterRotated, xAxisWorld, screenViewRadius);
+    sf::Vector2f xAxisNormal = IsometricProjection::normalize(sf::Vector2f{-xAxisWorld.y, xAxisWorld.x}); // Perpendicular to the view X axis (to get the up direction)
+
+    sf::Color linesColor(255, 255, 255, 50); // White semi-transparent lines (Wireframe)
+    sf::VertexArray grid(sf::Lines);
+    for (float i = -screenViewRadius; i <= screenViewRadius; ++i) {
+        // y axis parallel lines
+        sf::Vector2f upPositionOnParralelAxis = offsetUpViewCenterWorld +  (yAxisNormal * i);
+        sf::Vector2f downPositionOnParralelAxis = offsetDownViewCenterWorld + (yAxisNormal * i);
+        grid.append(sf::Vertex(m_isometricProjection.getPointScreenPosition(upPositionOnParralelAxis, height), linesColor));
+        grid.append(sf::Vertex(m_isometricProjection.getPointScreenPosition(downPositionOnParralelAxis, height), linesColor));
+
+        // x axis parallel lines
+        sf::Vector2f leftPositionOnParralelAxis = offsetLeftViewCenterWorld +  (xAxisNormal * i);
+        sf::Vector2f rightPositionOnParralelAxis = offsetRightViewCenterWorld + (xAxisNormal * i);
+        grid.append(sf::Vertex(m_isometricProjection.getPointScreenPosition(leftPositionOnParralelAxis, height), linesColor));
+        grid.append(sf::Vertex(m_isometricProjection.getPointScreenPosition(rightPositionOnParralelAxis, height), linesColor));
+    }
+    window.draw(grid);
+}
+
 void ScreenMap::setWorldPivot(sf::Vector2f worldPivotScreenPosition)
 {
     m_isometricProjection.setWorldPivot(worldPivotScreenPosition);
@@ -160,6 +212,7 @@ void ScreenMap::updateCorner(ScreenTileCorner *corner) const
 {
     corner->ScreenPosition = m_isometricProjection.getPointScreenPosition(corner->RotatedWorldPosition, corner->WorldHeight);
 }
+
 
 void ScreenMap::rotateMapAroundZAxis(const float angle)
 {
@@ -241,10 +294,18 @@ void ScreenMap::buildVertexArrayMap()
     }
 }
 
-sf::Vector2f ScreenMap::getMouseWorldPosition(const sf::Vector2f mouseScreenPosition) const
+sf::Vector2f ScreenMap::getPointScreenCoordinates(sf::Vector2f pointWorld, float height) const
+{
+    // isometric projection already applies Pitch rotation, so we only need to apply Yaw rotation to the point before projecting it to screen space
+    sf::Vector2f pointWorldRotated = IsometricProjection::rotateAroundZAxis(m_currentYawRotationAngle, pointWorld);
+    return m_isometricProjection.getPointScreenPosition(pointWorldRotated, height);
+    return sf::Vector2f();
+}
+
+sf::Vector2f ScreenMap::getPointTileCoordinates(const sf::Vector2f pointScreenPosition, float height) const
 {
     const sf::Vector2f worldCenter = {static_cast<float>(m_map[0].size() -1.0f) / 2, static_cast<float>(m_map.size() - 1.0f) / 2 };
-    const sf::Vector2f worldPosition = m_isometricProjection.screen_to_world(mouseScreenPosition.x, mouseScreenPosition.y, 0);
+    const sf::Vector2f worldPosition = m_isometricProjection.screen_to_world(pointScreenPosition.x, pointScreenPosition.y, height);
 
     // inversed of the transformation applied to rotated points
     const sf::Vector2f finalWorldPos = IsometricProjection::rotateAroundZAxis(-m_currentYawRotationAngle, worldPosition - worldCenter) + worldCenter;
@@ -383,7 +444,7 @@ void ScreenMap::getSelectedCorners(const sf::RenderWindow &window, const Selecti
     // get it's real coordinates in the current view
     const sf::Vector2f mouseScreenPosition = window.mapPixelToCoords(mousePixelScreenPosition);
     // convert screen-space → isometric world → tile coords
-    const sf::Vector2f tempPos = getMouseWorldPosition(mouseScreenPosition);
+    const sf::Vector2f tempPos = getPointTileCoordinates(mouseScreenPosition);
     const sf::Vector2i mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
 
     if (selectionMode == SelectionMode::TILE_CORNER)
