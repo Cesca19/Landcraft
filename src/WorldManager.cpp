@@ -53,89 +53,105 @@ void WorldManager::handleEvents()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
-        if (event.type == sf::Event::Closed)
+        if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
             m_window.close();
-        if (event.type == sf::Event::KeyReleased)
-        {
-            if (event.key.code == sf::Keyboard::Escape)
-                m_window.close();
-
-            // map editing event
-            if (event.key.code == sf::Keyboard::Space)
-                m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
-                                ? SelectionMode::TILE_CORNER
-                                : SelectionMode::TILE;
-            if (event.key.code == sf::Keyboard::Add)
-                m_screenMap->setSelectedCornersHeight(m_heightOffset);
-            if (event.key.code == sf::Keyboard::Subtract)
-                m_screenMap->setSelectedCornersHeight(- m_heightOffset);
-
-            // cam events
-            // zoom
-            if (event.key.code == sf::Keyboard::I)
-                m_worldView->zoom(-m_zoomStep);
-            if (event.key.code == sf::Keyboard::O)
-                m_worldView->zoom(m_zoomStep);
-            // yaw
-            if ( event.key.code == sf::Keyboard::Right)
-                m_screenMap->rotateAroundZAxis(m_yawRotationStep);
-            if (event.key.code == sf::Keyboard::Left)
-                m_screenMap->rotateAroundZAxis(-m_yawRotationStep);
-            // pitch
-            if (event.key.code == sf::Keyboard::Up)
-                m_screenMap->rotateAroundXAxis(m_pitchRotationStep);
-            if (event.key.code == sf::Keyboard::Down)
-                m_screenMap->rotateAroundXAxis(-m_pitchRotationStep);
-        }
-
-        sf::Vector2f moveVector(0.f, 0.f);
-        // scren space movement input
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) moveVector.y -= 1.f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) moveVector.y += 1.f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) moveVector.x -= 1.f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) moveVector.x += 1.f;
-
-        if (moveVector.x != 0.f || moveVector.y != 0.f)
-        {
-            // normalize the movement vector to ensure consistent speed in all directions
-            // TODO : add it to isometric projection
-            float length = std::hypot(moveVector.x, moveVector.y);
-            moveVector /= length;
-
-            // adapt movement speed based on zoom level to maintain a consistent feel
-            // float currentZoom = m_worldView->getTargetZoom(); 
-            // float adjustedSpeed = m_movementStep * currentZoom; 
-            
-            m_worldView->moveTarget(moveVector * (float)m_movementStep);
-        }
-
-        /* camera events */
-
-        // zoom with mouse wheel at mouse position
-        // Note: We handle this separately from the keyboard zoom to allow for zooming at the mouse position.
-        if (event.type == sf::Event::MouseWheelScrolled) {
-            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-                {
-                    // m_worldView->zoom(event.mouseWheelScroll.delta);
-                    m_worldView->zoomAtMouse(event.mouseWheelScroll.delta, sf::Mouse::getPosition(m_window));
-                }
-        }
-
-        //  drag and drop with middle mouse button 
-        if (event.type == sf::Event::MouseButtonPressed)
-            if (event.mouseButton.button == sf::Mouse::Left)
-                m_worldView->startDragging(sf::Mouse::getPosition(m_window));
-        if (event.type == sf::Event::MouseButtonReleased)
-            if (event.mouseButton.button == sf::Mouse::Left)
-                m_worldView->stopDragging();
-        if (event.type == sf::Event::MouseMoved)
-            m_worldView->updateDragging(sf::Mouse::getPosition(m_window));
+        handlePanEvents(event);
+        handleRotationEvents(event);
+        handleZoomEvents(event);
+        handleMapEditingEvents(event);
     }
+}
+
+void WorldManager::handlePanEvents(const sf::Event &event) const
+{
+    // mouse
+    //  drag and drop with middle mouse button
+    constexpr sf::Mouse::Button mouseButton = sf::Mouse::Middle;
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton)
+            m_worldView->startDragging(sf::Mouse::getPosition(m_window));
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
+            m_worldView->stopDragging();
+    if (event.type == sf::Event::MouseMoved)
+        m_worldView->updateDragging(sf::Mouse::getPosition(m_window));
+
+    // keyboard
+    sf::Vector2f moveVector(0.f, 0.f);
+    // screen space movement input
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) moveVector.y -= 1.f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) moveVector.y += 1.f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) moveVector.x -= 1.f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) moveVector.x += 1.f;
+
+    if (moveVector.x != 0.f || moveVector.y != 0.f)
+    {
+        // normalize the movement vector to ensure consistent speed in all directions
+        moveVector = IsometricProjection::normalize(moveVector);
+        // adapt movement speed based on zoom level to maintain a consistent feel
+        // float currentZoom = m_worldView->getTargetZoom();
+        // float adjustedSpeed = m_movementStep * currentZoom;
+        m_worldView->moveTarget(moveVector * m_movementStep);
+    }
+}
+
+void WorldManager::handleRotationEvents(const sf::Event &event) const
+{
+    // mouse
+    // right button + vertical / horizontal scroll
+    // start x and y axis dragging and update rotation
+
+    // keyboard
+    // yaw
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
+        m_screenMap->rotateAroundZAxis(m_yawRotationStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)
+        m_screenMap->rotateAroundZAxis(-m_yawRotationStep);
+    // pitch
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
+        m_screenMap->rotateAroundXAxis(m_pitchRotationStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F)
+        m_screenMap->rotateAroundXAxis(-m_pitchRotationStep);
+
+    // gizmo axes click like blender
+}
+
+void WorldManager::handleZoomEvents(const sf::Event &event) const
+{
+    // mouse
+    // zoom with mouse wheel at mouse position
+    // Note: We handle this separately from the keyboard zoom to allow for zooming at the mouse position.
+    const bool isCtrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
+    if (event.type == sf::Event::MouseWheelScrolled)
+        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel && !isCtrlPressed)
+            m_worldView->zoomAtMouse(event.mouseWheelScroll.delta, sf::Mouse::getPosition(m_window));
+
+    // keyboard
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::I)
+        m_worldView->zoom(-m_zoomStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::O)
+        m_worldView->zoom(m_zoomStep);
+}
+
+void WorldManager::handleMapEditingEvents(const sf::Event &event)
+{
+    // keyboard
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+        m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
+                        ? SelectionMode::TILE_CORNER
+                        : SelectionMode::TILE;
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add)
+        m_screenMap->setSelectedCornersHeight(m_heightOffset);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)
+        m_screenMap->setSelectedCornersHeight(- m_heightOffset);
+
+    // mouse
+    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+        && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+        m_screenMap->setSelectedCornersHeight(m_heightOffset * event.mouseWheelScroll.delta);
 }
 
 void WorldManager::drawBackground()
 {
-    sf::View previousView = m_window.getView();
+    const sf::View previousView = m_window.getView();
     m_window.setView(m_window.getDefaultView());
     drawSkyBox();
     drawGizmo();
@@ -146,7 +162,7 @@ void WorldManager::drawBackground()
 
 void WorldManager::drawWireframe()
 {
-    // TO do get isometic projection instance out of the scrren map
+    // TO do get isometric projection instance out of the screen map
     m_screenMap->drawWorldReference(m_window,  m_worldView->getCenter(), m_worldView->getSize());
 }
 
@@ -173,6 +189,6 @@ void WorldManager::drawSkyBox()
 
 void WorldManager::drawGizmo()
 {
-    sf::Vector2f gizmoPos(m_window.getSize().x - 50.0f, 100.0f);
+    const sf::Vector2f gizmoPos(m_window.getSize().x - 50.0f, 100.0f);
     m_screenMap->drawGizmo(m_window, gizmoPos, 40.0f);
 }

@@ -19,7 +19,7 @@ public:
     void setSize(sf::Vector2f size);
     void resetCenter(sf::Vector2f origin);
     void zoom(int zoomDelta);
-    void zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos);
+    void zoomAtMouse(float zoomDelta, sf::Vector2i mousePos);
     void startDragging(sf::Vector2i mousePos);
     void updateDragging(sf::Vector2i mousePos);
     void stopDragging();

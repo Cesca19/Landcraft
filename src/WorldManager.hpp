@@ -19,6 +19,10 @@ public:
     void update();
 private:
     void handleEvents();
+    void handlePanEvents(const sf::Event &event) const;
+    void handleRotationEvents(const sf::Event &event) const;
+    void handleZoomEvents(const sf::Event &event) const;
+    void handleMapEditingEvents(const sf::Event &event);
     void drawBackground();
     void drawWireframe();
     void drawSkyBox();
@@ -30,7 +34,7 @@ private:
     std::unique_ptr<ScreenMap> m_screenMap;
     SelectionMode m_currentSelectionMode;
     // used to define the amount of height to add in WorldSpace coordinates (tiles grid)
-    int m_heightOffset;
+    float m_heightOffset;
 
     // used to define the dir of the zoom
     int m_zoomStep;

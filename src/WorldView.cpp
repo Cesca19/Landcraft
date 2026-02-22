@@ -90,7 +90,7 @@ void WorldView::zoom(const int zoomDelta)
     m_targetZoom = std::clamp(m_targetZoom, m_minZoom, m_maxZoom);
 }
 
-void WorldView::zoomAtMouse(const int zoomDelta, const sf::Vector2i mousePos)
+void WorldView::zoomAtMouse(const float zoomDelta, const sf::Vector2i mousePos)
 {
     // This method allows zooming towards the mouse position, keeping the point under the mouse stable.
     if (!m_window) return;
