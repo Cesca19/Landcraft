@@ -14,7 +14,7 @@ class WorldManager
 public:
     WorldManager(int width, int height, const std::string &windowTitle);
     ~WorldManager();
-    void init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
+    void init(const std::string &worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
         int projectionAngleX, int projectionAngleY);
     void update();
 private:

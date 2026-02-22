@@ -10,14 +10,14 @@ enum class SelectionMode {
 
 struct TileCorner {
     sf::Vector2i Position;
-    int Height;
+    float Height;
     sf::Color Color;
     // tiletype
 };
 
 struct ScreenTileCorner {
     ScreenTileCorner(const sf::Vector2f screenPosition, const sf::Vector2i worldPosition,
-                    const int screenHeight, const int worldHeight, const sf::Color color) {
+                    const float screenHeight, const float worldHeight, const sf::Color color) {
         ScreenPosition = screenPosition;
         WorldPosition = worldPosition;
         ScreenHeight = screenHeight;
@@ -27,8 +27,8 @@ struct ScreenTileCorner {
     }
     sf::Vector2f ScreenPosition;
     sf::Vector2i WorldPosition;
-    int ScreenHeight;
-    int WorldHeight;
+    float ScreenHeight;
+    float WorldHeight;
     sf::Color Color;
     sf::Vector2f RotatedWorldPosition;
     // tiletype

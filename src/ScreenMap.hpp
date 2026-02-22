@@ -12,13 +12,13 @@
 
 class ScreenMap {
 public:
-    ScreenMap(int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX,
-              int projectionAngleY);
+    ScreenMap(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX,
+              float projectionAngleY);
     ~ScreenMap();
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode);
     void draw(sf::RenderWindow &window);
     void init(const std::string &mapFilepath);
-    void setSelectedCornersHeight(int heightOffset);
+    void setSelectedCornersHeight(float heightOffset);
     sf::Vector2f getWorldMapCenter() const;
     sf::Vector2f getScreenMapCenter() const;
 
@@ -79,9 +79,9 @@ private:
 
     float m_epsilon = 0.5f;
 
-    int m_tileSizeX;
-    int m_tileSizeY;
-    int m_heightScale;
+    float m_tileSizeX;
+    float m_tileSizeY;
+    float m_heightScale;
     IsometricProjection m_isometricProjection;
 
     float m_yawRotationSpeed;
@@ -101,6 +101,13 @@ private:
     std::vector<std::vector<std::unique_ptr<Tile> > > m_tilesMap;
     sf::VertexArray m_vertexArrayMap;
     std::shared_ptr<WorldMap> m_worldMap;
+
+    std::vector<sf::Vector2f> m_gizmoAxes;
+    sf::VertexArray m_gizmoVertexArray;
+    std::vector<sf::Vector2f> m_worldReferenceAxesNormals;
+    sf::VertexArray m_worldReferenceVertexArray;
+    float m_lastPitchRotationAngle;
+    sf::Vector2f m_lastViewSize;
 };
 
 #endif // SCREEN_MAP_HPP

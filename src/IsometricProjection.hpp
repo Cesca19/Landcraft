@@ -24,7 +24,7 @@ public:
      * @param projectionAngleX Angle of the X axis projection (in degrees).
      * @param projectionAngleY Angle of the Y axis projection (in degrees).
      */
-    IsometricProjection(int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX, int projectionAngleY);
+    IsometricProjection(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY);
     ~IsometricProjection();
 
     static float radToDeg(float rad);
@@ -51,7 +51,7 @@ public:
      * @param point2dZ The assumed Z plane for the intersection (usually 0 for ground picking).
      * @return The unscaled world coordinates (tile indices).
      */
-    sf::Vector2f screen_to_world(int point2dX, int point2dY, int point2dZ) const;
+    sf::Vector2f screen_to_world(float point2dX, float point2dY, float point2dZ) const;
 
     /**
      * @brief Gets the screen position of a world point with a given height.
@@ -59,7 +59,7 @@ public:
      * @param worldHeight The Z height/elevation of the tile.
      * @return The corresponding 2D coordinates on the screen (in pixels).
      */
-    sf::Vector2f getPointScreenPosition(sf::Vector2f worldPosition, int worldHeight) const;
+    sf::Vector2f getPointScreenPosition(sf::Vector2f worldPosition, float worldHeight) const;
 
     /**
      * @brief Rotates a 2D point around the origin (0,0).
@@ -80,7 +80,7 @@ public:
      *      -> This is what you will do: raise or lower the nose of the camera (look up or down).
      *      -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
      */
-    void rotateAroundXAxis(int newProjectionAngleY);
+    void rotateAroundXAxis(float newProjectionAngleY);
 
     /*
      * Sets the world pivot point in screen coordinates.
@@ -135,11 +135,11 @@ public:
      */
     static sf::Vector2f offsetPointAlongDirection(const sf::Vector2f& point, const sf::Vector2f& direction, float radius);
 private:
-    int m_projectionAngleX;
-    int m_projectionAngleY;
-    int m_tileSizeX;
-    int m_tileSizeY;
-    int m_heightScale;
+    float m_projectionAngleX;
+    float m_projectionAngleY;
+    float m_tileSizeX;
+    float m_tileSizeY;
+    float m_heightScale;
     sf::Vector2f m_worldPivot;
 };
 

@@ -2,7 +2,6 @@
 
 WorldMap::WorldMap()
 {
-
 }
 
 WorldMap::~WorldMap()
@@ -13,7 +12,7 @@ void WorldMap::init(const std::string &filePath)
 {
     m_map.clear();
     // ideally load from filepath
-    std::vector<std::vector<int>> input3dMap = {
+    const std::vector<std::vector<float>> input3dMap = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -71,12 +70,12 @@ const std::vector<std::vector<TileCorner>> &WorldMap::getMap()
     return m_map;
 }
 
-void WorldMap::setCornerHeight(const int heightOffset, const sf::Vector2i &corner)
+void WorldMap::setCornerHeight(const float heightOffset, const sf::Vector2i &corner)
 {
     m_map[corner.y][corner.x].Height += heightOffset;
 }
 
-void WorldMap::setTilesCornersHeight(const int heightOffset, const std::vector<sf::Vector2i> &corners)
+void WorldMap::setTilesCornersHeight(const float heightOffset, const std::vector<sf::Vector2i> &corners)
 {
     for (const sf::Vector2i &cornerPos : corners)
         m_map[cornerPos.y][cornerPos.x].Height += heightOffset;

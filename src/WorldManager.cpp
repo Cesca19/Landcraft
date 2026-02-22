@@ -22,7 +22,7 @@ WorldManager::~WorldManager()
 {
 }
 
-void WorldManager::init(const std::string worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX, int projectionAngleY)
+void WorldManager::init(const std::string &worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX, int projectionAngleY)
 {
     m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY);
     m_screenMap->init(worldMapFilePath);
@@ -41,7 +41,6 @@ void WorldManager::update()
         handleEvents();
         m_window.clear();
         drawBackground();
-        drawWireframe();
         m_worldView->update(deltaTime);
         m_screenMap->update(deltaTime, m_window, m_currentSelectionMode);
         m_screenMap->draw(m_window);
@@ -141,6 +140,8 @@ void WorldManager::drawBackground()
     drawSkyBox();
     drawGizmo();
     m_window.setView(previousView);
+    // draw the wireframe on the world view
+    drawWireframe();
 }
 
 void WorldManager::drawWireframe()

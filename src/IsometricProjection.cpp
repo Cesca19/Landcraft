@@ -4,8 +4,8 @@
 
 #include "IsometricProjection.hpp"
 
-IsometricProjection::IsometricProjection(const int tileSizeX, const int tileSizeY, const int heightScale,
-    const int projectionAngleX, const int projectionAngleY)
+IsometricProjection::IsometricProjection(const float tileSizeX, const float tileSizeY, const float heightScale,
+    const float projectionAngleX, const float projectionAngleY)
     : m_projectionAngleX(projectionAngleX)
     , m_projectionAngleY(projectionAngleY)
     , m_tileSizeX(tileSizeX)
@@ -19,19 +19,19 @@ IsometricProjection::~IsometricProjection()
 {
 }
 
-float IsometricProjection::radToDeg(float rad)
+float IsometricProjection::radToDeg(const float rad)
 {
     return rad * 180 / M_PI;
 }
 
-float IsometricProjection::degToRad(float deg)
+float IsometricProjection::degToRad(const float deg)
 {
     return deg * M_PI / 180;
 }
 
 float IsometricProjection::distanceBetweenPoints(const sf::Vector2f &p1, const sf::Vector2f &p2)
 {
-    return std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2));
+    return static_cast<float>(std::sqrt(std::pow(p2.x - p1.x, 2) + std::pow(p2.y - p1.y, 2)));
 }
 
 sf::Vector2f IsometricProjection::world_to_screen(const float point3dX, const float point3dY, const float point3dZ) const
@@ -49,7 +49,7 @@ sf::Vector2f IsometricProjection::world_to_screen(const float point3dX, const fl
     return point2d;
 }
 
-sf::Vector2f IsometricProjection::screen_to_world(const int point2dX, const int point2dY, const int point2dZ) const
+sf::Vector2f IsometricProjection::screen_to_world(const float point2dX, const float point2dY, const float point2dZ) const
 {
     const float angleX = degToRad(m_projectionAngleX);
     const float angleY = degToRad(m_projectionAngleY);
@@ -60,7 +60,7 @@ sf::Vector2f IsometricProjection::screen_to_world(const int point2dX, const int 
     return sf::Vector2f(scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY) + m_worldPivot;
 }
 
-sf::Vector2f IsometricProjection::getPointScreenPosition(const sf::Vector2f worldPosition, const int worldHeight) const
+sf::Vector2f IsometricProjection::getPointScreenPosition(const sf::Vector2f worldPosition, const float worldHeight) const
 {
     return world_to_screen(worldPosition.x, worldPosition.y, worldHeight);
 }
@@ -76,12 +76,12 @@ sf::Vector2f IsometricProjection::rotateAroundZAxis(const float angle, const sf:
     return rotatedPoint;
 }
 
-void IsometricProjection::rotateAroundXAxis(const int newProjectionAngleY)
+void IsometricProjection::rotateAroundXAxis(const float newProjectionAngleY)
 {
     m_projectionAngleY = newProjectionAngleY;
 }
 
-void IsometricProjection::setWorldPivot(sf::Vector2f worldPivotScreenPosition)
+void IsometricProjection::setWorldPivot(const sf::Vector2f worldPivotScreenPosition)
 {
     m_worldPivot = screen_to_world(worldPivotScreenPosition.x, worldPivotScreenPosition.y, 0);
 }
@@ -105,26 +105,25 @@ sf::Vector2f IsometricProjection::normalize(const sf::Vector2f &v)
 {
     float mag = magnitude(v);
     if (mag == 0.f)
-        return sf::Vector2f(0.f, 0.f);
+        return {0.f, 0.f};
     return v / mag;
 }
 
 sf::Vector2f IsometricProjection::projectPointOnLine(const sf::Vector2f &point, const sf::Vector2f &linePoint, const sf::Vector2f &direction)
 {
-    sf::Vector2f AP = point - linePoint;
-
-    float dot = dotProduct(AP, direction);
-    float magSq = dotProduct(direction, direction);
+    const sf::Vector2f AP = point - linePoint;
+    const float dot = dotProduct(AP, direction);
+    const float magSq = dotProduct(direction, direction);
 
     if (magSq == 0.f)
         return linePoint;
 
-    sf::Vector2f projection = (dot / magSq) * direction;
+    const sf::Vector2f projection = (dot / magSq) * direction;
     return linePoint + projection;
 }
 
-sf::Vector2f IsometricProjection::offsetPointAlongDirection(const sf::Vector2f &point, const sf::Vector2f &direction, float radius)
+sf::Vector2f IsometricProjection::offsetPointAlongDirection(const sf::Vector2f &point, const sf::Vector2f &direction, const float radius)
 {
-    sf::Vector2f normalizedDirection = direction / magnitude(direction);
+    const sf::Vector2f normalizedDirection = direction / magnitude(direction);
     return point + normalizedDirection * radius;
 }
