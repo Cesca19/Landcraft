@@ -285,7 +285,12 @@ log_success "Conan dependencies installed successfully."
 # --- Configure CMake ---
 log_info "Configuring project with CMake (${BUILD_TYPE}, ${RUNTIME_LINK})"
 mkdir -p build && cd build
-if ! cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DRUNTIME_LINK=${RUNTIME_LINK} -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=bin ; then
+if ! cmake .. \
+   -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+   -DRUNTIME_LINK=${RUNTIME_LINK} \
+   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+   -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=bin;
+   then
     log_error "CMake configuration failed."
     exit 1
 fi

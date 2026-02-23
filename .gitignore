@@ -2,3 +2,6 @@
 /build
 /bin
 /.conan_venv
+/.idea/
+/.vscode/
+/out
