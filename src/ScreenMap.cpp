@@ -18,6 +18,9 @@ ScreenMap::ScreenMap(const float tileSizeX, const float tileSizeY, const float h
     , m_gizmoVertexArray(sf::Lines)
     , m_worldReferenceVertexArray(sf::Lines)
     , m_lastPitchRotationAngle(0)
+    , m_mouseLastDragPosition({0, 0})
+    , m_isDraggingForRotation(false)
+    , m_continuousRotationSpeed(0.1f)
 {
 }
 
@@ -110,6 +113,33 @@ void ScreenMap::rotateAroundZAxis(const float angle)
 void ScreenMap::rotateAroundXAxis(const float angle)
 {
     m_targetPitchRotationAngle += angle;
+}
+
+void ScreenMap::startContinuousRotation(sf::RenderWindow &window, sf::Vector2i mousePosition)
+{
+    m_mouseLastDragPosition = mousePosition;
+    m_isDraggingForRotation = true;
+}
+
+void ScreenMap::stopContinuousRotation()
+{
+    m_isDraggingForRotation = false;
+}
+
+void ScreenMap::updateContinuousRotation(sf::RenderWindow &window, sf::Vector2i mousePosition)
+{
+    if (!m_isDraggingForRotation)
+        return;
+    // pitch
+    const float deltaY = mousePosition.y - m_mouseLastDragPosition.y;
+    rotateAroundXAxis(deltaY * m_continuousRotationSpeed);
+    // yaw
+    const float deltaX = mousePosition.x - m_mouseLastDragPosition.x;
+    m_currentYawRotationAngle += deltaX * m_continuousRotationSpeed;
+    m_targetYawRotationAngle = m_currentYawRotationAngle;
+    rotateMapAroundZAxis(m_currentYawRotationAngle);
+    // update last mouse position
+    m_mouseLastDragPosition = mousePosition;
 }
 
 void ScreenMap::drawGizmo(sf::RenderWindow &window, const sf::Vector2f &uiPosition, const float size) {

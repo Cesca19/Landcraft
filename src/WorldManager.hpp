@@ -14,13 +14,13 @@ class WorldManager
 public:
     WorldManager(int width, int height, const std::string &windowTitle);
     ~WorldManager();
-    void init(const std::string &worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale,
-        int projectionAngleX, int projectionAngleY);
+    void init(const std::string &worldMapFilePath, float tileSizeX, float tileSizeY, float heightScale,
+        float projectionAngleX, float projectionAngleY);
     void update();
 private:
     void handleEvents();
     void handlePanEvents(const sf::Event &event) const;
-    void handleRotationEvents(const sf::Event &event) const;
+    void handleRotationEvents(const sf::Event &event);
     void handleZoomEvents(const sf::Event &event) const;
     void handleMapEditingEvents(const sf::Event &event);
     void drawBackground();

@@ -22,7 +22,7 @@ WorldManager::~WorldManager()
 {
 }
 
-void WorldManager::init(const std::string &worldMapFilePath, int tileSizeX, int tileSizeY, int heightScale, int projectionAngleX, int projectionAngleY)
+void WorldManager::init(const std::string &worldMapFilePath, float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY)
 {
     m_screenMap = std::make_unique<ScreenMap>(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY);
     m_screenMap->init(worldMapFilePath);
@@ -93,11 +93,18 @@ void WorldManager::handlePanEvents(const sf::Event &event) const
     }
 }
 
-void WorldManager::handleRotationEvents(const sf::Event &event) const
+void WorldManager::handleRotationEvents(const sf::Event &event)
 {
     // mouse
-    // right button + vertical / horizontal scroll
-    // start x and y axis dragging and update rotation
+    // left button + vertical / horizontal scroll
+    // this might cause problems  when selecting objects in the future
+    constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton)
+        m_screenMap->startContinuousRotation(m_window, sf::Mouse::getPosition(m_window));
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
+        m_screenMap->stopContinuousRotation();
+    if (event.type == sf::Event::MouseMoved)
+        m_screenMap->updateContinuousRotation(m_window, sf::Mouse::getPosition(m_window));
 
     // keyboard
     // yaw

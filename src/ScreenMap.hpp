@@ -27,8 +27,13 @@ public:
     // pitch rotation
     void rotateAroundXAxis(float angle);
 
+    void startContinuousRotation(sf::RenderWindow &window, sf::Vector2i mousePosition);
+    void stopContinuousRotation();
+    void updateContinuousRotation(sf::RenderWindow &window, sf::Vector2i mousePosition);
+
     void drawGizmo(sf::RenderWindow& window, const sf::Vector2f& uiPosition, float size);
     void drawWorldReference(sf::RenderWindow& window, sf::Vector2f viewCenter, sf::Vector2f viewSize);
+    
     /*
      * Sets the world pivot point in screen coordinates.
      * This is used to define a reference point for camera movement and rotation.
@@ -91,6 +96,10 @@ private:
     float m_pitchRotationSpeed;
     float m_currentPitchRotationAngle;
     float m_targetPitchRotationAngle;
+
+    sf::Vector2i m_mouseLastDragPosition;
+    bool m_isDraggingForRotation;
+    float m_continuousRotationSpeed;
 
     bool m_doesNeedVertexUpdate;
     sf::Color m_selectedTilesColor = sf::Color::Magenta;
