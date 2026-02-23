@@ -7,7 +7,7 @@ runs:
       if: runner.os == 'Windows'
       shell: cmd
       run: |
-        if exist .\bin\cpp_project_base.exe (
+        if exist .\bin\landcraft.exe (
           echo Binary found
         ) else (
           echo Binary not found & exit 1
@@ -16,7 +16,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
       run: |
-        if [ -x ./bin/cpp_project_base ]; then
+        if [ -x ./bin/landcraft ]; then
           echo "Binary found"
         else
           echo "Binary not found" >&2
