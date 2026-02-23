@@ -5,10 +5,10 @@ runs:
   steps:
     - name: Compress Windows build
       if: runner.os == 'Windows'
-      run: powershell Compress-Archive -Path bin -DestinationPath "LandcraftApp-${{ github.ref_name }}-Windows.zip"
+      run: powershell Compress-Archive -Path bin -DestinationPath "Landcraft-${{ github.ref_name }}-Windows.zip"
       shell: cmd
 
     - name: Compress Linux build
       if: runner.os == 'Linux'
-      run: tar -czf "LandcraftApp-${{ github.ref_name }}-Linux.tar.gz" bin
+      run: tar -czf "Landcraft-${{ github.ref_name }}-Linux.tar.gz" bin
       shell: bash
