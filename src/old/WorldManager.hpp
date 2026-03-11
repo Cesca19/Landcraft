@@ -7,7 +7,7 @@
 #define _USE_MATH_DEFINES
 
 #include "ScreenMap.hpp"
-#include "WorldView.hpp"
+#include "../WorldView.hpp"
 
 class WorldManager
 {

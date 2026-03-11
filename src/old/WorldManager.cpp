@@ -2,7 +2,7 @@
 // Created by fran on 03/02/2026.
 //
 
-#include "WorldManager.hpp"
+#include "../WorldManager.hpp"
 
 WorldManager::WorldManager(const int width, const int height, const std::string &windowTitle)
     : m_window(sf::VideoMode(width, height), windowTitle)

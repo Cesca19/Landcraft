@@ -5,9 +5,9 @@
 #include <memory>
 #include <vector>
 
-#include "Tile.hpp"
-#include "TileCorner.hpp"
-#include "WorldMap.hpp"
+#include "../Tile.hpp"
+#include "../TileCorner.hpp"
+#include "../WorldMap.hpp"
 #include "IsometricProjection.hpp"
 
 class ScreenMap {

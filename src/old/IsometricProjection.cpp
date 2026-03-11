@@ -2,10 +2,10 @@
 // Created by fran on 07/02/2026.
 //
 
-#include "IsometricProjection.hpp"
+#include "../IsometricProjection.hpp"
 
 IsometricProjection::IsometricProjection(const float tileSizeX, const float tileSizeY, const float heightScale,
-    const float projectionAngleX, const float projectionAngleY)
+                                         const float projectionAngleX, const float projectionAngleY)
     : m_projectionAngleX(projectionAngleX)
     , m_projectionAngleY(projectionAngleY)
     , m_tileSizeX(tileSizeX)

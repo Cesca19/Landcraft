@@ -1,4 +1,4 @@
-#include "WorldMap.hpp"
+#include "../WorldMap.hpp"
 
 WorldMap::WorldMap()
 {

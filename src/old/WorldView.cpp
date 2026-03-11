@@ -2,7 +2,7 @@
 // Created by fran on 03/02/2026.
 //
 
-#include "WorldView.hpp"
+#include "../WorldView.hpp"
 
 WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     : m_minZoom(0.2f)

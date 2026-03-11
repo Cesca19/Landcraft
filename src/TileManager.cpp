@@ -2,7 +2,4 @@
 // Created by fran on 03/03/2026.
 //
 
-int main()
-{
-    return 0;
-}
+#include "TileManager.hpp"
