@@ -6,7 +6,7 @@
 #define LANDCRAFT_TILE_H
 
 #include <vector>
-#include "../TileCorner.hpp"
+#include "TileCorner.hpp"
 
 class Tile
 {

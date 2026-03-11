@@ -4,6 +4,7 @@
 
 #ifndef LANDCRAFT_MATHUTILS_HPP
 #define LANDCRAFT_MATHUTILS_HPP
+#define _USE_MATH_DEFINES
 
 #include <SFML/System/Vector2.hpp>
 #include <cmath>

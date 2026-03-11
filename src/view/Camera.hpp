@@ -6,7 +6,7 @@
 #define LANDCRAFT_CAMERA_HPP
 
 #include <SFML/System/Vector2.hpp>
-#include "MathUtils.hpp"
+#include "../utils/MathUtils.hpp"
 
 class Camera {
 public:

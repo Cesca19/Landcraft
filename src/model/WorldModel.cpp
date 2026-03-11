@@ -1,18 +1,18 @@
-//
-// Created by fran on 03/03/2026.
+﻿//
+// Created by fran on 11/03/2026.
 //
 
-#include "WorldData.hpp"
+#include "WorldModel.hpp"
 
-WorldData::WorldData()
+WorldModel::WorldModel()
 {
 }
 
-WorldData::~WorldData()
+WorldModel::~WorldModel()
 {
 }
 
-void WorldData::loadMap(std::string mapName)
+void WorldModel::loadMap(std::string mapName)
 {
     m_map.clear();
     m_map = {
@@ -47,4 +47,51 @@ void WorldData::loadMap(std::string mapName)
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     };
+    createWorldTileCorners();
+    createWorldTiles();
+}
+
+std::vector<std::vector<Tile>> &WorldModel::getTiles()
+{
+    return m_tiles;
+}
+
+void WorldModel::createWorldTiles()
+{
+    m_tiles.clear();
+    for (int col = 0; col < m_corners.size(); col++)
+        for (int row = 0; row < m_corners[col].size(); row++)
+            createTileFromTileCorner(col, row);
+}
+
+void WorldModel::createTileFromTileCorner(int row, int col)
+{
+    if (m_corners.size() <= 1 || m_corners[0].size() <= 1
+        || col < 0 || col + 1 >= m_corners[0].size()
+        || row < 0 || row + 1 >= m_corners.size())
+        return;
+    std::vector<TileCorner *> tileCorners = {
+        m_corners[row][col].get(),
+        m_corners[row][col + 1].get(),
+        m_corners[row + 1][col + 1].get(),
+        m_corners[row + 1][col].get(),
+    };
+    if (m_tiles.size() < row + 1)
+        m_tiles.emplace_back();
+    m_tiles[row].emplace_back(tileCorners);
+}
+
+void WorldModel::createWorldTileCorners()
+{
+    m_corners.clear();
+    for (int row = 0; row < m_map.size(); row++) {
+        std::vector<std::unique_ptr<TileCorner>> rowCorners;
+        for (int col = 0; col < m_map[row].size(); col++) {
+            std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
+                row, col, m_map[row][col], sf::Vector2f(0.0f, 0.0f), ""
+            );
+            rowCorners.push_back(std::move(tileCorner));
+        }
+        m_corners.push_back(std::move(rowCorners));
+    }
 }
