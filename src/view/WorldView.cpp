@@ -189,6 +189,22 @@ void WorldView::rotateYaw(const float angle) const
     m_camera->rotateYaw(angle);
 }
 
+void WorldView::startContinuousRotation(const sf::RenderWindow &window) const
+{
+    m_camera->startContinuousRotation(sf::Mouse::getPosition(window));
+}
+
+void WorldView::stopContinuousRotation() const
+{
+    m_camera->stopContinuousRotation();
+}
+
+void WorldView::updateContinuousRotation(const sf::RenderWindow &window, const std::vector<std::vector<Tile>>& tiles) const
+{
+    m_camera->updateContinuousRotation(sf::Mouse::getPosition(window));
+    m_tileMap->updatePositions(tiles, *m_camera);
+}
+
 void WorldView::updateViewCenter(const sf::Vector2f center)
 {
     m_view.setCenter(center);

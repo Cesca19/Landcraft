@@ -17,6 +17,9 @@ Camera::Camera(const float tileSizeX, const float tileSizeY, const float heightS
     , m_yawRotationSpeed(10)
     , m_currentYawRotationAngle(0)
     , m_targetYawRotationAngle(0)
+    , m_mouseLastDragPosition({0, 0})
+    , m_isDraggingForRotation(false)
+    , m_continuousRotationSpeed(0.15f)
 {
 }
 
@@ -102,11 +105,40 @@ bool Camera::update(const float deltaTime)
 void Camera::rotatePitch(const float angle)
 {
     m_targetPitchRotationAngle += angle;
+    m_targetPitchRotationAngle = std::clamp(m_targetPitchRotationAngle, 5.0f, 90.0f);
 }
 
 void Camera::rotateYaw(const float angle)
 {
     m_targetYawRotationAngle += angle;
+}
+
+void Camera::startContinuousRotation(const sf::Vector2i mousePosition)
+{
+    m_mouseLastDragPosition = mousePosition;
+    m_isDraggingForRotation = true;
+}
+
+void Camera::stopContinuousRotation()
+{
+    m_isDraggingForRotation = false;
+}
+
+void Camera::updateContinuousRotation(const sf::Vector2i mousePosition)
+{
+    if (!m_isDraggingForRotation)
+        return;
+    // pitch
+    const auto deltaY = static_cast<float>(mousePosition.y - m_mouseLastDragPosition.y);
+    rotatePitch(deltaY * m_continuousRotationSpeed);
+
+    // yaw
+    const int deltaX = mousePosition.x - m_mouseLastDragPosition.x;
+    m_currentYawRotationAngle += static_cast<float>(deltaX) * m_continuousRotationSpeed * -1;
+    m_targetYawRotationAngle = m_currentYawRotationAngle;
+
+    // update last mouse position
+    m_mouseLastDragPosition = mousePosition;
 }
 
 void Camera::rotateAroundXAxis(const float newProjectionAngleY)

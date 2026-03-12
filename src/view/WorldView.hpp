@@ -37,8 +37,12 @@ public:
 
     void rotatePitch(float angle) const;
     void rotateYaw(float angle) const;
+
+    void startContinuousRotation(const sf::RenderWindow &window) const;
+    void stopContinuousRotation() const;
+    void updateContinuousRotation(const sf::RenderWindow &window, const std::vector<std::vector<Tile>>& tiles) const;
 private:
-    void updateViewCenter(const sf::Vector2f center);
+    void updateViewCenter(sf::Vector2f center);
 
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<TileMap> m_tileMap;

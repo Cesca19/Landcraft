@@ -6,6 +6,7 @@
 #define LANDCRAFT_CAMERA_HPP
 
 #include <SFML/System/Vector2.hpp>
+#include <algorithm>
 #include "../utils/MathUtils.hpp"
 
 class Camera {
@@ -31,7 +32,6 @@ public:
      * @return The corresponding 2D coordinates on the screen (in pixels).
      */
     sf::Vector2f world_to_screen(float point3dX, float point3dY, float point3dZ) const;
-
     /**
      * Un-projects a 2D point from Screen Space (Pixels) back to 3D World Space (Tile Grid).
      * This is the inverse operation of world_to_screen.
@@ -49,9 +49,7 @@ public:
      * @param worldPivotScreenPosition The screen coordinates of the pivot point.
      */
     void setWorldPivotWithScreenPosition(sf::Vector2f worldPivotScreenPosition);
-
     void setWorldPivotWithWorldPosition(sf::Vector2f worldPivotWorldPosition);
-
     /**
      * @brief Returns the current world pivot in world coordinates.
      * @return The world pivot point in tile grid (world) coordinates.
@@ -61,6 +59,9 @@ public:
     bool update(float deltaTime);
     void rotatePitch(float angle);
     void rotateYaw(float angle);
+    void startContinuousRotation(sf::Vector2i mousePosition);
+    void stopContinuousRotation();
+    void updateContinuousRotation(sf::Vector2i mousePosition);
 private:
     /**
      * @brief Rotates the map around the X axis by changing the projection angle.
@@ -96,6 +97,10 @@ private:
     float m_currentYawRotationAngle;
     float m_targetYawRotationAngle;
     float m_epsilon = 0.5f;
+
+    sf::Vector2i m_mouseLastDragPosition;
+    bool m_isDraggingForRotation;
+    float m_continuousRotationSpeed;
 };
 
 

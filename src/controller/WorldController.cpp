@@ -84,13 +84,13 @@ void WorldController::handleRotationEvents(sf::RenderWindow& window, const sf::E
     // mouse
     // left button + vertical / horizontal scroll
     // this might cause problems  when selecting objects in the future
-    /*constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
+    constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton)
-        m_screenMap->startContinuousRotation(m_window, sf::Mouse::getPosition(m_window));
+        m_worldView.startContinuousRotation(window);
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
-        m_screenMap->stopContinuousRotation();
+        m_worldView.stopContinuousRotation();
     if (event.type == sf::Event::MouseMoved)
-        m_screenMap->updateContinuousRotation(m_window, sf::Mouse::getPosition(m_window));*/
+        m_worldView.updateContinuousRotation(window, m_worldModel.getTiles());
 
     // keyboard
     // yaw
