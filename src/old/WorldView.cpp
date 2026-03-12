@@ -32,9 +32,6 @@ void WorldView::init(sf::RenderWindow &window)
 void WorldView::update(const float deltaTime)
     WorldView::WorldView()
 {
-}
-
-{
     bool needsUpdate = false;
     // if (m_isDragging) dont='t know who should do the update
     //     updateDragging(sf::Mouse::getPosition(*m_window));
@@ -58,11 +55,11 @@ void WorldView::update(const float deltaTime)
         float speed = m_isDragging ? 50.0f : m_movementSpeed;
 
         m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
-        setCenter(m_currentCenter);
+        updateViewCenter(m_currentCenter);
     } else {
         if (m_currentCenter != m_targetCenter) {
             m_currentCenter = m_targetCenter;
-            setCenter(m_currentCenter);
+            updateViewCenter(m_currentCenter);
         }
     }
 
@@ -77,11 +74,11 @@ void WorldView::setSize(const sf::Vector2f size)
     updateWindowView();
 }
 
-void WorldView::resetCenter(const sf::Vector2f origin)
+void WorldView::setCenter(const sf::Vector2f origin)
 {
     m_currentCenter = origin;
     m_targetCenter = origin;
-    setCenter(origin);
+    updateViewCenter(origin);
 }
 
 void WorldView::zoom(const int zoomDelta)
@@ -105,7 +102,7 @@ void WorldView::zoomAtMouse(const float zoomDelta, const sf::Vector2i mousePos)
     // We simulate a view that would already have reached its destination
     sf::View targetView = m_view;
     targetView.setSize(m_baseSize * m_targetZoom);
-    targetView.setCenter(m_targetCenter);
+    targetView.updateViewCenter(m_targetCenter);
 
     sf::Vector2f mouseWorldPosBefore = m_window->mapPixelToCoords(mousePos, targetView);
 
@@ -145,7 +142,7 @@ void WorldView::updateDragging(sf::Vector2i mousePos)
 
     m_targetCenter += delta;
     m_currentCenter += delta; 
-    setCenter(m_currentCenter);
+    updateViewCenter(m_currentCenter);
 }
 
 void WorldView::stopDragging()
@@ -173,9 +170,9 @@ sf::Vector2f WorldView::getTargetOrigin() const
     return m_targetCenter;
 }
 
-void WorldView::setCenter(const sf::Vector2f center)
+void WorldView::updateViewCenter(const sf::Vector2f center)
 {
-    m_view.setCenter(center);
+    m_view.updateViewCenter(center);
     updateWindowView();
 }
 

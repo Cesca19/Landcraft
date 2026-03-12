@@ -7,7 +7,7 @@
 TileMap::TileMap()
     : m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
-    , m_shadedTileColor(sf::Color(150, 150, 150))
+    , m_shadedTileColor(sf::Color(150, 150, 150, 200))
     , m_wireframeTileColor(sf::Color::White)
     , m_selectedTileColor(sf::Color::Magenta)
 {

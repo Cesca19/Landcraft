@@ -17,7 +17,7 @@ public:
     void init(sf::RenderWindow & window);
     void update(float deltaTime);
     void setSize(sf::Vector2f size);
-    void resetCenter(sf::Vector2f origin);
+    void setCenter(sf::Vector2f origin);
     void zoom(int zoomDelta);
     void zoomAtMouse(float zoomDelta, sf::Vector2i mousePos);
     void startDragging(sf::Vector2i mousePos);
@@ -31,7 +31,7 @@ public:
     void moveTarget(const sf::Vector2f& offset);
     sf::Vector2f getTargetOrigin() const; // Pour lire la cible actuelle
 private:
-    void setCenter(const sf::Vector2f center);
+    void updateViewCenter(const sf::Vector2f center);
     void updateWindowView();
 
     float m_minZoom;
@@ -47,7 +47,6 @@ private:
 
     sf::Vector2f m_dragStartWorldPos;
     bool m_isDragging;
-
 
     sf::Vector2f m_baseSize;
     sf::View m_view;

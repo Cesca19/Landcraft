@@ -14,18 +14,18 @@
 int main()
 {
     WorldController worldController;
-    worldController.init("assets/maps/map.txt", TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE,
-                        PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y);
+    worldController.init("assets/maps/map.txt", 
+        {TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y},
+        {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}}
+    );
     sf::RenderWindow window(sf::VideoMode(1200, 800), "Landcraft");
+    sf::Clock clock;
+    float deltaTime = 0;
     while (window.isOpen())
     {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        // worldController.update(0.0);
+        deltaTime = clock.restart().asSeconds();
+        worldController.handleEvents(window);
+        worldController.update(deltaTime);
         window.clear(sf::Color(196, 218, 242));
         worldController.draw(window);
         window.display();
