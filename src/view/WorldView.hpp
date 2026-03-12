@@ -16,7 +16,7 @@ class WorldView
 public:
     WorldView();
     void init(sf::Vector2f center, sf::Vector2f size);
-    void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY);
+    void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles);
     void draw(sf::RenderWindow& window) const;

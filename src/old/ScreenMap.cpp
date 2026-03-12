@@ -1,4 +1,4 @@
-#include "../ScreenMap.hpp"
+#include "ScreenMap.hpp"
 #include <iostream>
 
 ScreenMap::ScreenMap(const float tileSizeX, const float tileSizeY, const float heightScale, const float projectionAngleX, const float projectionAngleY)

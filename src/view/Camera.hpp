@@ -48,7 +48,9 @@ public:
      * This is used to define a reference point for camera movement and rotation.
      * @param worldPivotScreenPosition The screen coordinates of the pivot point.
      */
-    void setWorldPivot(sf::Vector2f worldPivotScreenPosition);
+    void setWorldPivotWithScreenPosition(sf::Vector2f worldPivotScreenPosition);
+
+    void setWorldPivotWithWorldPosition(sf::Vector2f worldPivotWorldPosition);
 
     /**
      * @brief Returns the current world pivot in world coordinates.
@@ -68,6 +70,16 @@ private:
      *      -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
      */
     void rotateAroundXAxis(float newProjectionAngleY);
+
+    /**
+     * @brief Rotates a 2D point around a specific center
+     * This is the Yaw (lacet) rotation :  the rotation around the Z-axis (the vertical axis)
+     *      -> it's similar to turning the head left or right (rotating the map on itself).
+     * @param angle The rotation angle in RADIANS.
+     * @param point The point to rotate.
+     * @return The new rotated coordinates.
+     */
+    static sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point, sf::Vector2f rotationCenter);
 
     float m_projectionAngleX;
     float m_projectionAngleY;

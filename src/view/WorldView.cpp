@@ -17,7 +17,7 @@ WorldView::WorldView()
 {
 }
 
-void WorldView::init(sf::Vector2f center, sf::Vector2f size)
+void WorldView::init(const sf::Vector2f center, const sf::Vector2f size)
 {
     m_view.setCenter(center);
     m_view.setSize(size);
@@ -27,15 +27,15 @@ void WorldView::init(sf::Vector2f center, sf::Vector2f size)
     m_targetCenter = center;
 }
 
-void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY)
+void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, const sf::Vector2f worldPivot)
 {
     m_camera = std::make_unique<Camera>(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY);
+    m_camera->setWorldPivotWithWorldPosition(worldPivot);
 }
 
 void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
 {
     m_tileMap = std::make_unique<TileMap>();
-    // set cam world pivot
     m_tileMap->init(tiles, *m_camera);
 }
 

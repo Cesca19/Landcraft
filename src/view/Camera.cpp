@@ -26,8 +26,11 @@ Camera::~Camera()
 
 sf::Vector2f Camera::world_to_screen(float point3dX, float point3dY, float point3dZ) const
 {
-    const float centeredWorldX = point3dX - m_worldPivot.x;
-    const float centeredWorldY = point3dY - m_worldPivot.y;
+    // apply current yaw rotation to the point3D
+    const sf::Vector2f rotated3dPoint = rotateAroundZAxis(m_currentYawRotationAngle, sf::Vector2f(point3dX, point3dY), m_worldPivot);
+
+    const float centeredWorldX = rotated3dPoint.x - m_worldPivot.x;
+    const float centeredWorldY = rotated3dPoint.y - m_worldPivot.y;
     const float scaledWorldX = centeredWorldX * m_tileSizeX;
     const float scaledWorldY = centeredWorldY * m_tileSizeY;
     const float angleX = MathUtils::degToRad(m_projectionAngleX);
@@ -36,6 +39,7 @@ sf::Vector2f Camera::world_to_screen(float point3dX, float point3dY, float point
 
     point2d.x = std::cos(angleX) * scaledWorldX - std::cos(angleX) * scaledWorldY ;
     point2d.y = std::sin(angleY) * scaledWorldY + std::sin(angleY) * scaledWorldX - point3dZ * m_heightScale;
+
     return point2d;
 }
 
@@ -50,9 +54,14 @@ sf::Vector2f Camera::screen_to_world(float point2dX, float point2dY, float point
     return sf::Vector2f(scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY) + m_worldPivot;
 }
 
-void Camera::setWorldPivot(const sf::Vector2f worldPivotScreenPosition)
+void Camera::setWorldPivotWithScreenPosition(const sf::Vector2f worldPivotScreenPosition)
 {
     m_worldPivot = screen_to_world(worldPivotScreenPosition.x, worldPivotScreenPosition.y, 0);
+}
+
+void Camera::setWorldPivotWithWorldPosition(const sf::Vector2f worldPivotWorldPosition)
+{
+    m_worldPivot = worldPivotWorldPosition;
 }
 
 sf::Vector2f Camera::getWorldPivotInWorldCoordinates() const
@@ -76,6 +85,17 @@ bool Camera::update(const float deltaTime)
             rotateAroundXAxis(m_currentPitchRotationAngle);
             hasMoved = true;
         }
+
+    // upd yaw rotation
+    if (std::abs(m_targetYawRotationAngle - m_currentYawRotationAngle) > m_epsilon) {
+        m_currentYawRotationAngle = m_currentYawRotationAngle +
+            (m_targetYawRotationAngle - m_currentYawRotationAngle) * m_yawRotationSpeed * deltaTime;
+        hasMoved = true;
+    } else
+        if (m_currentYawRotationAngle != m_targetYawRotationAngle) {
+            m_currentYawRotationAngle = m_targetYawRotationAngle;
+            hasMoved = true;
+        }
     return hasMoved;
 }
 
@@ -84,11 +104,24 @@ void Camera::rotatePitch(const float angle)
     m_targetPitchRotationAngle += angle;
 }
 
-void Camera::rotateYaw(float angle)
+void Camera::rotateYaw(const float angle)
 {
+    m_targetYawRotationAngle += angle;
 }
 
 void Camera::rotateAroundXAxis(const float newProjectionAngleY)
 {
     m_projectionAngleY = newProjectionAngleY;
+}
+
+sf::Vector2f Camera::rotateAroundZAxis(const float angle, sf::Vector2f point, const sf::Vector2f rotationCenter)
+{
+    const float radAngle = MathUtils::degToRad(angle);
+    sf::Vector2f rotatedPoint;
+    point -= rotationCenter;
+
+    // 2D rotation matrix applied
+    rotatedPoint.x = point.x * std::cos(radAngle) - point.y * std::sin(radAngle);
+    rotatedPoint.y = point.x * std::sin(radAngle) + point.y * std::cos(radAngle);
+    return rotatedPoint + rotationCenter;
 }

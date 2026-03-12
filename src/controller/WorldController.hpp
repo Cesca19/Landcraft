@@ -33,10 +33,9 @@ public:
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleRotationEvents(sf::RenderWindow& window, const sf::Event &event);
-    void handleZoomEvents(sf::RenderWindow& window, const sf::Event &event);
+    void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event);
     // add event for turn on/off wireframe, shaded mode,
-
 
     WorldModel m_worldModel;
     WorldView m_worldView;

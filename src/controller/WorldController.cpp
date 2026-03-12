@@ -17,7 +17,8 @@ void WorldController::init(const std::string &mapName,
 {
     m_worldModel.loadMap(mapName);
     m_worldView.init(viewSettings.center, viewSettings.size);
-    m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale, cameraSettings.projectionAngleX, cameraSettings.projectionAngleY);
+    m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
+        cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles());
     m_worldView.zoom(10);
 }
@@ -93,10 +94,10 @@ void WorldController::handleRotationEvents(sf::RenderWindow& window, const sf::E
 
     // keyboard
     // yaw
-    /*if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
-        m_screenMap->rotateAroundZAxis(m_yawRotationStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
+        m_worldView.rotateYaw(m_yawRotationStep);
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)
-        m_screenMap->rotateAroundZAxis(-m_yawRotationStep);*/
+        m_worldView.rotateYaw(-m_yawRotationStep);
     // pitch
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
         m_worldView.rotatePitch(m_pitchRotationStep);
@@ -106,7 +107,7 @@ void WorldController::handleRotationEvents(sf::RenderWindow& window, const sf::E
     // add gizmo axes click like blender
 }
 
-void WorldController::handleZoomEvents(sf::RenderWindow& window, const sf::Event &event)
+void WorldController::handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event)
 {
     // mouse
     // zoom with mouse wheel at mouse position

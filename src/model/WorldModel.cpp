@@ -56,15 +56,23 @@ std::vector<std::vector<Tile>> &WorldModel::getTiles()
     return m_tiles;
 }
 
+sf::Vector2f WorldModel::getCenter() const
+{
+    const float centerX = (static_cast<float>(m_map[0].size()) - 1.0f) / 2.0f;
+    const float centerY = (static_cast<float>(m_map.size()) - 1.0f) / 2.0f;
+
+    return {centerX, centerY};
+}
+
 void WorldModel::createWorldTiles()
 {
     m_tiles.clear();
-    for (int col = 0; col < m_corners.size(); col++)
-        for (int row = 0; row < m_corners[col].size(); row++)
-            createTileFromTileCorner(col, row);
+    for (int row = 0; row < m_corners.size(); row++)
+        for (int col = 0; col < m_corners[row].size(); col++)
+            createTileFromTileCorner(row, col);
 }
 
-void WorldModel::createTileFromTileCorner(int row, int col)
+void WorldModel::createTileFromTileCorner(const int row, const int col)
 {
     if (m_corners.size() <= 1 || m_corners[0].size() <= 1
         || col < 0 || col + 1 >= m_corners[0].size()

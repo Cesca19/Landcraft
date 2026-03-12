@@ -20,7 +20,6 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
 
     m_shadedTilesVertexArray.clear();
     m_wireframeTilesVertexArray.clear();
-    // m_shadedTilesVertexArray.resize(tiles.size() * tiles[0].size() * 6); // 2 triangles per tile
     for (int row = 0; row < tiles.size(); ++row)
         for (int col = 0; col < tiles[0].size(); ++col)
         {
