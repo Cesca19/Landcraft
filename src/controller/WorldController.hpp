@@ -29,9 +29,9 @@ public:
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings);
     void handleEvents(sf::RenderWindow& window);
     void update(float deltaTime);
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) const;
 private:
-    void handlePanEvents(sf::RenderWindow& window, const sf::Event &event);
+    void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleRotationEvents(sf::RenderWindow& window, const sf::Event &event);
     void handleZoomEvents(sf::RenderWindow& window, const sf::Event &event);
     void handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event);
@@ -43,6 +43,8 @@ private:
 
     float m_movementStep;
     int m_zoomStep;
+    float m_pitchRotationStep;
+    float m_yawRotationStep;
 };
 
 

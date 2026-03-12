@@ -7,35 +7,69 @@
 TileMap::TileMap()
     : m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
-    , m_shadedTileColor(sf::Color(150, 150, 150, 200))
+    , m_shadedTileColor(sf::Color(150, 150, 150, 40))
     , m_wireframeTileColor(sf::Color::White)
     , m_selectedTileColor(sf::Color::Magenta)
 {
 }
 
-void TileMap::init(const std::vector<std::vector<Tile>> &tiles, Camera &camera)
+void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
 {
     if (tiles.empty() || tiles[0].empty())
-    {
         return; // TO DO: Handle empty tile map case
-    }
-    int nbRows = tiles.size();
-    int nbCols = tiles[0].size();
-    m_shadedTilesVertexArray.clear();
-    m_shadedTilesVertexArray.resize(nbRows * nbCols * 6); // 2 triangles per tile
 
-    for (int row = 0; row < nbRows; ++row)
-    {
-        for (int col = 0; col < nbCols; ++col)
+    m_shadedTilesVertexArray.clear();
+    m_wireframeTilesVertexArray.clear();
+    // m_shadedTilesVertexArray.resize(tiles.size() * tiles[0].size() * 6); // 2 triangles per tile
+    for (int row = 0; row < tiles.size(); ++row)
+        for (int col = 0; col < tiles[0].size(); ++col)
         {
             const Tile &tile = tiles[row][col];
             addShadedTile(tile, camera);
             addWireframeTile(tile, camera);
         }
+}
+
+void TileMap::updatePositions(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
+{
+    if (tiles.empty() || tiles[0].empty())
+        return; // TO DO: Handle empty tile map case
+
+    int shadedIndex = 0;
+    int wireframeIndex = 0;
+
+    for (int row = 0; row < tiles.size(); ++row)
+    {
+        for (int col = 0; col < tiles[0].size(); ++col)
+        {
+            const Tile& tile = tiles[row][col];
+
+            // shaded triangles update
+            for (const TileCorner* corner : tile.getUpRightTriangleCorners()) {
+                m_shadedTilesVertexArray[shadedIndex++].position =
+                    camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
+            }
+            for (const TileCorner* corner : tile.getDownLeftTriangleCorners()) {
+                m_shadedTilesVertexArray[shadedIndex++].position =
+                    camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
+            }
+
+            // wireframe update
+            std::vector<TileCorner*> corners = tile.getCorners();
+            for (size_t i = 0; i < corners.size(); ++i) {
+                const TileCorner* corner1 = corners[i];
+                const TileCorner* corner2 = corners[(i + 1) % corners.size()];
+
+                m_wireframeTilesVertexArray[wireframeIndex++].position =
+                    camera.world_to_screen(corner1->getRow(), corner1->getColumn(), corner1->getHeight());
+                m_wireframeTilesVertexArray[wireframeIndex++].position =
+                    camera.world_to_screen(corner2->getRow(), corner2->getColumn(), corner2->getHeight());
+            }
+        }
     }
 }
 
-void TileMap::addShadedTile(const Tile &tile, Camera &camera)
+void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
 {
     // -> shaded tiles
 
@@ -58,7 +92,7 @@ void TileMap::addShadedTile(const Tile &tile, Camera &camera)
     }
 }
 
-void TileMap::addWireframeTile(const Tile &tile, Camera &camera)
+void TileMap::addWireframeTile(const Tile &tile, const Camera &camera)
 {
     // -> wireframe tiles
     std::vector<TileCorner *> corners = tile.getCorners();

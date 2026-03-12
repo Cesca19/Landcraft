@@ -43,15 +43,6 @@ public:
      */
     sf::Vector2f screen_to_world(float point2dX, float point2dY, float point2dZ) const;
 
-    /**
-     * @brief Rotates the map around the X axis by changing the projection angle.
-     * It simulates a pitch rotation by altering the vertical projection of the tiles.
-     *  this is the Pitch (tangage) rotation : This is the rotation around the X axis.
-     *      -> This is what you will do: raise or lower the nose of the camera (look up or down).
-     *      -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
-     */
-    void rotateAroundXAxis(float newProjectionAngleY);
-
     /*
      * Sets the world pivot point in screen coordinates.
      * This is used to define a reference point for camera movement and rotation.
@@ -65,13 +56,34 @@ public:
      */
     sf::Vector2f getWorldPivotInWorldCoordinates() const;
 
+    bool update(float deltaTime);
+    void rotatePitch(float angle);
+    void rotateYaw(float angle);
 private:
+    /**
+     * @brief Rotates the map around the X axis by changing the projection angle.
+     * It simulates a pitch rotation by altering the vertical projection of the tiles.
+     *  this is the Pitch (tangage) rotation : This is the rotation around the X axis.
+     *      -> This is what you will do: raise or lower the nose of the camera (look up or down).
+     *      -> more on that here https://www.youtube.com/watch?v=pQ24NtnaLl8
+     */
+    void rotateAroundXAxis(float newProjectionAngleY);
+
     float m_projectionAngleX;
     float m_projectionAngleY;
     float m_tileSizeX;
     float m_tileSizeY;
     float m_heightScale;
     sf::Vector2f m_worldPivot;
+
+    float m_pitchRotationSpeed;
+    float m_currentPitchRotationAngle;
+    float m_targetPitchRotationAngle;
+
+    float m_yawRotationSpeed;
+    float m_currentYawRotationAngle;
+    float m_targetYawRotationAngle;
+    float m_epsilon = 0.5f;
 };
 
 

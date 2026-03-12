@@ -4,13 +4,19 @@
 
 #include "Camera.hpp"
 
-Camera::Camera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY)
+Camera::Camera(const float tileSizeX, const float tileSizeY, const float heightScale, const float projectionAngleX, const float projectionAngleY)
     : m_projectionAngleX(projectionAngleX)
     , m_projectionAngleY(projectionAngleY)
     , m_tileSizeX(tileSizeX)
     , m_tileSizeY(tileSizeY)
     , m_heightScale(heightScale)
     , m_worldPivot({0, 0})
+    , m_pitchRotationSpeed(20)
+    , m_currentPitchRotationAngle(projectionAngleY)
+    , m_targetPitchRotationAngle(projectionAngleY)
+    , m_yawRotationSpeed(10)
+    , m_currentYawRotationAngle(0)
+    , m_targetYawRotationAngle(0)
 {
 }
 
@@ -44,11 +50,6 @@ sf::Vector2f Camera::screen_to_world(float point2dX, float point2dY, float point
     return sf::Vector2f(scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY) + m_worldPivot;
 }
 
-void Camera::rotateAroundXAxis(const float newProjectionAngleY)
-{
-    m_projectionAngleY = newProjectionAngleY;
-}
-
 void Camera::setWorldPivot(const sf::Vector2f worldPivotScreenPosition)
 {
     m_worldPivot = screen_to_world(worldPivotScreenPosition.x, worldPivotScreenPosition.y, 0);
@@ -57,4 +58,37 @@ void Camera::setWorldPivot(const sf::Vector2f worldPivotScreenPosition)
 sf::Vector2f Camera::getWorldPivotInWorldCoordinates() const
 {
     return m_worldPivot;
+}
+
+bool Camera::update(const float deltaTime)
+{
+    bool hasMoved = false;
+    //upd pitch rotation
+    if (std::abs(m_targetPitchRotationAngle - m_currentPitchRotationAngle) > m_epsilon) {
+        m_currentPitchRotationAngle = m_currentPitchRotationAngle +
+                                        (m_targetPitchRotationAngle - m_currentPitchRotationAngle)
+                                        * m_pitchRotationSpeed * deltaTime;
+        rotateAroundXAxis(m_currentPitchRotationAngle);
+        hasMoved = true;
+    } else
+        if (m_currentPitchRotationAngle != m_targetPitchRotationAngle) {
+            m_currentPitchRotationAngle = m_targetPitchRotationAngle;
+            rotateAroundXAxis(m_currentPitchRotationAngle);
+            hasMoved = true;
+        }
+    return hasMoved;
+}
+
+void Camera::rotatePitch(const float angle)
+{
+    m_targetPitchRotationAngle += angle;
+}
+
+void Camera::rotateYaw(float angle)
+{
+}
+
+void Camera::rotateAroundXAxis(const float newProjectionAngleY)
+{
+    m_projectionAngleY = newProjectionAngleY;
 }

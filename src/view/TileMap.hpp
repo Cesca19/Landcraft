@@ -13,11 +13,13 @@ class TileMap  : public sf::Drawable, public sf::Transformable
 {
 public:
     TileMap();
-    void init(const std::vector<std::vector<Tile>>& tiles, Camera& camera);
+    void init(const std::vector<std::vector<Tile>>& tiles, const Camera& camera);
+    void updatePositions(const std::vector<std::vector<Tile>>& tiles, const Camera& camera);
 private:
-    void addShadedTile(const Tile& tile, Camera& camera);
-    void addWireframeTile(const Tile& tile, Camera& camera);
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    void addShadedTile(const Tile& tile, const Camera& camera);
+    void addWireframeTile(const Tile& tile, const Camera& camera);
+
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     
     sf::VertexArray m_shadedTilesVertexArray;
     sf::VertexArray m_wireframeTilesVertexArray;

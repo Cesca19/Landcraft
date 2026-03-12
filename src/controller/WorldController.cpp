@@ -7,6 +7,8 @@
 WorldController::WorldController()
     : m_movementStep(5.f)
     , m_zoomStep(1)
+    , m_pitchRotationStep(5)
+    , m_yawRotationStep(22.5)
 {
 }
 
@@ -35,17 +37,17 @@ void WorldController::handleEvents(sf::RenderWindow &window)
     }
 }
 
-void WorldController::update(float deltaTime)
+void WorldController::update(const float deltaTime)
 {
-    m_worldView.update(deltaTime);
+    m_worldView.update(deltaTime, m_worldModel.getTiles());
 }
 
-void WorldController::draw(sf::RenderWindow &window)
+void WorldController::draw(sf::RenderWindow &window) const
 {
     m_worldView.draw(window);
 }
 
-void WorldController::handlePanEvents(sf::RenderWindow& window, const sf::Event &event)
+void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::Event &event)
 {
     // mouse
     //  drag and drop with middle mouse button
@@ -78,6 +80,30 @@ void WorldController::handlePanEvents(sf::RenderWindow& window, const sf::Event 
 
 void WorldController::handleRotationEvents(sf::RenderWindow& window, const sf::Event &event)
 {
+    // mouse
+    // left button + vertical / horizontal scroll
+    // this might cause problems  when selecting objects in the future
+    /*constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton)
+        m_screenMap->startContinuousRotation(m_window, sf::Mouse::getPosition(m_window));
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
+        m_screenMap->stopContinuousRotation();
+    if (event.type == sf::Event::MouseMoved)
+        m_screenMap->updateContinuousRotation(m_window, sf::Mouse::getPosition(m_window));*/
+
+    // keyboard
+    // yaw
+    /*if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
+        m_screenMap->rotateAroundZAxis(m_yawRotationStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)
+        m_screenMap->rotateAroundZAxis(-m_yawRotationStep);*/
+    // pitch
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
+        m_worldView.rotatePitch(m_pitchRotationStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F)
+        m_worldView.rotatePitch(-m_pitchRotationStep);
+
+    // add gizmo axes click like blender
 }
 
 void WorldController::handleZoomEvents(sf::RenderWindow& window, const sf::Event &event)

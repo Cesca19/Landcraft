@@ -9,19 +9,19 @@ TileCorner::TileCorner(int row, int col, int height, int textureID)
 {
 }
 
-int TileCorner::getRow() const
+float TileCorner::getRow() const
 {
-    return m_row;
+    return static_cast<float>(m_row);
 }
 
-int TileCorner::getColumn() const
+float TileCorner::getColumn() const
 {
-    return m_col;
+    return static_cast<float>(m_col);
 }
 
-int TileCorner::getHeight() const
+float TileCorner::getHeight() const
 {
-    return m_height;
+    return static_cast<float>(m_height);
 }
 
 int TileCorner::getTextureID() const

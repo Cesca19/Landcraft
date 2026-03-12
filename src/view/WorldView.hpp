@@ -18,19 +18,25 @@ public:
     void init(sf::Vector2f center, sf::Vector2f size);
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
-    void update(float deltaTime);
-    void draw(sf::RenderWindow& window);
+    void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles);
+    void draw(sf::RenderWindow& window) const;
+
     void setSize(sf::Vector2f size);
     void setCenter(sf::Vector2f center);
     sf::Vector2f getCenter() const;
     sf::Vector2f getSize() const;
+
     void zoom(int zoomDelta);
-    void zoomAtMouse(sf::RenderWindow& window, float zoomDelta);
-    void startDragging(sf::RenderWindow& window);
-    void updateDragging(sf::RenderWindow& window);
+    void zoomAtMouse(const sf::RenderWindow& window, float zoomDelta);
+
+    void startDragging(const sf::RenderWindow& window);
+    void updateDragging(const sf::RenderWindow& window);
     void stopDragging();
     void moveTarget(const sf::Vector2f& offset);
     sf::Vector2f getTargetOrigin() const;
+
+    void rotatePitch(float angle) const;
+    void rotateYaw(float angle) const;
 private:
     void updateViewCenter(const sf::Vector2f center);
 

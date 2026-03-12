@@ -11,9 +11,9 @@
 class TileCorner {
 public:
     TileCorner(int row, int col, int height, int textureID);
-    int getRow() const;
-    int getColumn() const;
-    int getHeight() const;
+    float getRow() const;
+    float getColumn() const;
+    float getHeight() const;
     int getTextureID() const;
 private:    
     int m_row;
