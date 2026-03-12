@@ -8,10 +8,19 @@ WorldController::WorldController()
 {
 }
 
-void WorldController::init(const std::string &mapName)
+void WorldController::init(const std::string &mapName, float tileSizeX, float tileSizeY, float heightScale, 
+                float projectionAngleX, float projectionAngleY)
 {
     m_worldModel.loadMap(mapName);
-    std::vector<std::vector<Tile>>& tiles = m_worldModel.getTiles();
-    // iterate through the tiles triangle and for each of them get their coordinates
-    // send thoses data to the world view to create the vertex array
+    m_worldView.initCamera(tileSizeX, tileSizeY, heightScale, projectionAngleX, projectionAngleY);
+    m_worldView.initTileMap(m_worldModel.getTiles());
+}
+
+void WorldController::update(float deltaTime)
+{
+}
+
+void WorldController::draw(sf::RenderWindow &window)
+{
+    m_worldView.draw(window);
 }

@@ -88,7 +88,7 @@ void WorldModel::createWorldTileCorners()
         std::vector<std::unique_ptr<TileCorner>> rowCorners;
         for (int col = 0; col < m_map[row].size(); col++) {
             std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
-                row, col, m_map[row][col], sf::Vector2f(0.0f, 0.0f), ""
+                row, col, m_map[row][col], 0
             );
             rowCorners.push_back(std::move(tileCorner));
         }

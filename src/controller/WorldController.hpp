@@ -12,8 +12,10 @@ class WorldController
 {
 public:
     WorldController();
-    void init(const std::string& mapName);
+    void init(const std::string& mapName, float tileSizeX, float tileSizeY, float heightScale, 
+                float projectionAngleX, float projectionAngleY);
     void update(float deltaTime);
+    void draw(sf::RenderWindow& window);
 private:
     WorldModel m_worldModel;
     WorldView m_worldView;

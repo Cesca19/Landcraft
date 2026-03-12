@@ -3,6 +3,7 @@
 //
 
 #include "../WorldView.hpp"
+#include "WorldView.hpp"
 
 WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
     : m_minZoom(0.2f)
@@ -22,10 +23,6 @@ WorldView::WorldView(const sf::Vector2f origin, const sf::Vector2f size)
 {
 }
 
-WorldView::~WorldView()
-{
-}
-
 void WorldView::init(sf::RenderWindow &window)
 {
     m_window = &window;
@@ -33,6 +30,10 @@ void WorldView::init(sf::RenderWindow &window)
 }
 
 void WorldView::update(const float deltaTime)
+    WorldView::WorldView()
+{
+}
+
 {
     bool needsUpdate = false;
     // if (m_isDragging) dont='t know who should do the update
