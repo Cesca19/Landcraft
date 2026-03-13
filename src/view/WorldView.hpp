@@ -25,6 +25,7 @@ public:
     void setCenter(sf::Vector2f center);
     sf::Vector2f getCenter() const;
     sf::Vector2f getSize() const;
+    const Camera &getCamera() const;
 
     void zoom(int zoomDelta);
     void zoomAtMouse(const sf::RenderWindow& window, float zoomDelta);

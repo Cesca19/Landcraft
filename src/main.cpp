@@ -25,7 +25,7 @@ int main()
     {
         deltaTime = clock.restart().asSeconds();
         worldController.handleEvents(window);
-        worldController.update(deltaTime);
+        worldController.update(deltaTime, window);
         window.clear(sf::Color(196, 218, 242));
         worldController.draw(window);
         window.display();

@@ -67,9 +67,9 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
             updateViewCenter(m_currentCenter);
         }
 
-    bool cameraMoved = false;
-    cameraMoved = m_camera->update(deltaTime);
-    if (cameraMoved)
+    bool hasCameraMoved = false;
+    m_camera->update(deltaTime, hasCameraMoved);
+    if (hasCameraMoved)
         m_tileMap->updatePositions(tiles, *m_camera);
 }
 
@@ -109,7 +109,12 @@ void WorldView::zoom(const int zoomDelta)
     m_targetZoom = std::clamp(m_targetZoom, m_minZoom, m_maxZoom);
 }
 
-void WorldView::zoomAtMouse(const sf::RenderWindow& window, const float zoomDelta)
+const Camera &WorldView::getCamera() const
+{
+    return *m_camera;
+}
+
+void WorldView::zoomAtMouse(const sf::RenderWindow &window, const float zoomDelta)
 {
     // This method allows zooming towards the mouse position, keeping the point under the mouse stable.
     // --- CRUCIAL STEP: PREDICTIVE CALCULATION ---

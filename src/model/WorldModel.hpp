@@ -17,6 +17,7 @@ public:
     ~WorldModel();
     void loadMap(std::string mapName);
     std::vector<std::vector<Tile>>& getTiles();
+    std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
     sf::Vector2f getCenter() const;
 private:
     void createWorldTiles();

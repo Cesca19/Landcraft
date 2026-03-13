@@ -26,7 +26,6 @@ private:
 
     sf::Color m_shadedTileColor;
     sf::Color m_wireframeTileColor;
-    sf::Color m_selectedTileColor;
     // sf::Texture m_tileset;
 };
 

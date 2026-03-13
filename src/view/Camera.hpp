@@ -56,12 +56,15 @@ public:
      */
     sf::Vector2f getWorldPivotInWorldCoordinates() const;
 
-    bool update(float deltaTime);
+    void update(float deltaTime, bool &hasMoved);
     void rotatePitch(float angle);
     void rotateYaw(float angle);
     void startContinuousRotation(sf::Vector2i mousePosition);
     void stopContinuousRotation();
     void updateContinuousRotation(sf::Vector2i mousePosition);
+
+    float getTileSizeX() const { return m_tileSizeX; }
+    float getTileSizeY() const { return m_tileSizeY; }
 private:
     /**
      * @brief Rotates the map around the X axis by changing the projection angle.

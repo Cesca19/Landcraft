@@ -38,14 +38,18 @@ void WorldController::handleEvents(sf::RenderWindow &window)
     }
 }
 
-void WorldController::update(const float deltaTime)
+void WorldController::update(const float deltaTime, sf::RenderWindow &window)
 {
     m_worldView.update(deltaTime, m_worldModel.getTiles());
+    bool hasModelChanged = false;
+    m_selectionController.update(deltaTime, window, SelectionMode::TILE_CORNER,
+         m_worldModel, m_worldView.getCamera(), hasModelChanged);
 }
 
-void WorldController::draw(sf::RenderWindow &window) const
+void WorldController::draw(sf::RenderWindow &window)
 {
     m_worldView.draw(window);
+    m_selectionController.draw(window, m_worldView.getCamera());
 }
 
 void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::Event &event)

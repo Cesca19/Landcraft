@@ -78,6 +78,10 @@ add_executable(${MY_TARGET}
         src/model/TileCorner.hpp
         src/view/TileMap.cpp
         src/view/TileMap.hpp
+        src/controller/SelectionController.cpp
+        src/controller/SelectionController.hpp
+        src/view/SelectionView.cpp
+        src/view/SelectionView.hpp
 )
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)

@@ -56,6 +56,11 @@ std::vector<std::vector<Tile>> &WorldModel::getTiles()
     return m_tiles;
 }
 
+std::vector<std::vector<std::unique_ptr<TileCorner>>> &WorldModel::getCorners()
+{
+    return m_corners;
+}
+
 sf::Vector2f WorldModel::getCenter() const
 {
     const float centerX = (static_cast<float>(m_map[0].size()) - 1.0f) / 2.0f;

@@ -54,7 +54,8 @@ sf::Vector2f Camera::screen_to_world(float point2dX, float point2dY, float point
 
     scaledPoint3d.x = 0.5f * ((point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
     scaledPoint3d.y = 0.5f * (-(point2dX / std::cos(angleX)) + (point2dY + point2dZ * m_heightScale) / std::sin(angleY));
-    return sf::Vector2f(scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY) + m_worldPivot;
+    sf::Vector2f tempPos = sf::Vector2f(scaledPoint3d.x / m_tileSizeX, scaledPoint3d.y / m_tileSizeY) + m_worldPivot;
+    return  rotateAroundZAxis(-m_currentYawRotationAngle, tempPos, m_worldPivot);
 }
 
 void Camera::setWorldPivotWithScreenPosition(const sf::Vector2f worldPivotScreenPosition)
@@ -72,9 +73,9 @@ sf::Vector2f Camera::getWorldPivotInWorldCoordinates() const
     return m_worldPivot;
 }
 
-bool Camera::update(const float deltaTime)
+void Camera::update(const float deltaTime, bool &hasMoved)
 {
-    bool hasMoved = false;
+    hasMoved = false;
     //upd pitch rotation
     if (std::abs(m_targetPitchRotationAngle - m_currentPitchRotationAngle) > m_epsilon) {
         m_currentPitchRotationAngle = m_currentPitchRotationAngle +
@@ -99,7 +100,6 @@ bool Camera::update(const float deltaTime)
             m_currentYawRotationAngle = m_targetYawRotationAngle;
             hasMoved = true;
         }
-    return hasMoved;
 }
 
 void Camera::rotatePitch(const float angle)

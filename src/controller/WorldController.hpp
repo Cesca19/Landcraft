@@ -7,6 +7,7 @@
 
 #include "../model/WorldModel.hpp"
 #include "../view/WorldView.hpp"
+#include "SelectionController.hpp"
 
 struct CameraSettings {
     float tileSizeX;
@@ -28,8 +29,8 @@ public:
     void init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings);
     void handleEvents(sf::RenderWindow& window);
-    void update(float deltaTime);
-    void draw(sf::RenderWindow& window) const;
+    void update(float deltaTime, sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window);
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleRotationEvents(sf::RenderWindow& window, const sf::Event &event);
@@ -39,6 +40,7 @@ private:
 
     WorldModel m_worldModel;
     WorldView m_worldView;
+    SelectionController m_selectionController;
 
     float m_movementStep;
     int m_zoomStep;

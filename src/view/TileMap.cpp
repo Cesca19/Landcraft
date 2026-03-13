@@ -9,7 +9,6 @@ TileMap::TileMap()
     , m_wireframeTilesVertexArray(sf::Lines)
     , m_shadedTileColor(sf::Color(150, 150, 150, 40))
     , m_wireframeTileColor(sf::Color::White)
-    , m_selectedTileColor(sf::Color::Magenta)
 {
 }
 
@@ -46,11 +45,11 @@ void TileMap::updatePositions(const std::vector<std::vector<Tile>> &tiles, const
             // shaded triangles update
             for (const TileCorner* corner : tile.getUpRightTriangleCorners()) {
                 m_shadedTilesVertexArray[shadedIndex++].position =
-                    camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
+                    camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             }
             for (const TileCorner* corner : tile.getDownLeftTriangleCorners()) {
                 m_shadedTilesVertexArray[shadedIndex++].position =
-                    camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
+                    camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             }
 
             // wireframe update
@@ -60,9 +59,9 @@ void TileMap::updatePositions(const std::vector<std::vector<Tile>> &tiles, const
                 const TileCorner* corner2 = corners[(i + 1) % corners.size()];
 
                 m_wireframeTilesVertexArray[wireframeIndex++].position =
-                    camera.world_to_screen(corner1->getRow(), corner1->getColumn(), corner1->getHeight());
+                    camera.world_to_screen(corner1->getColumn(), corner1->getRow(), corner1->getHeight());
                 m_wireframeTilesVertexArray[wireframeIndex++].position =
-                    camera.world_to_screen(corner2->getRow(), corner2->getColumn(), corner2->getHeight());
+                    camera.world_to_screen(corner2->getColumn(), corner2->getRow(), corner2->getHeight());
             }
         }
     }
