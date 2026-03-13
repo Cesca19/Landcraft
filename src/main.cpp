@@ -24,10 +24,12 @@ int main()
     while (window.isOpen())
     {
         deltaTime = clock.restart().asSeconds();
+        window.clear(sf::Color(196, 218, 242));
+
         worldController.handleEvents(window);
         worldController.update(deltaTime, window);
-        window.clear(sf::Color(196, 218, 242));
         worldController.draw(window);
+        
         window.display();
     }
     return 0;

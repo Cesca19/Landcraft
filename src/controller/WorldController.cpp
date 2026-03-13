@@ -5,10 +5,12 @@
 #include "WorldController.hpp"
 
 WorldController::WorldController()
-    : m_movementStep(5.f)
+    : m_movementStep(0.5f)
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
+    , m_isRotating(false)
+    , m_isMovementKeyPressed(false)
 {
 }
 
@@ -26,35 +28,40 @@ void WorldController::init(const std::string &mapName,
 void WorldController::handleEvents(sf::RenderWindow &window)
 {
     sf::Event event;
+    m_isMovementKeyPressed = false;
+
     while (window.pollEvent(event))
     {
         if (event.type == sf::Event::Closed 
             || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
             window.close();
-        handlePanEvents(window, event);
+        
+        handlePanMouseEvents(window, event);
         handleRotationEvents(window, event);
         handleZoomEvents(window, event);
         handleMapEditingEvents(window, event);
     }
+    handlePanKeyboardEvents();
 }
 
 void WorldController::update(const float deltaTime, sf::RenderWindow &window)
 {
     m_worldView.update(deltaTime, m_worldModel.getTiles());
     bool hasModelChanged = false;
-    m_selectionController.update(deltaTime, window, SelectionMode::TILE_CORNER,
-         m_worldModel, m_worldView.getCamera(), hasModelChanged);
+    if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving())
+        m_selectionController.update(deltaTime, window, SelectionMode::TILE_CORNER,
+            m_worldModel, m_worldView.getCamera(), hasModelChanged);
 }
 
 void WorldController::draw(sf::RenderWindow &window)
 {
     m_worldView.draw(window);
-    m_selectionController.draw(window, m_worldView.getCamera());
+    if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving()) // only draw selection when not panning or rotating to avoid visual clutter
+        m_selectionController.draw(window, m_worldView.getCamera());
 }
 
-void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::Event &event)
+void WorldController::handlePanMouseEvents(const sf::RenderWindow& window, const sf::Event &event)
 {
-    // mouse
     //  drag and drop with middle mouse button
     constexpr sf::Mouse::Button mouseButton = sf::Mouse::Middle;
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton)
@@ -63,7 +70,10 @@ void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::
             m_worldView.stopDragging();
     if (event.type == sf::Event::MouseMoved)
         m_worldView.updateDragging(window);
+}
 
+void WorldController::handlePanKeyboardEvents()
+{
     // keyboard
     sf::Vector2f moveVector(0.f, 0.f);
     // screen space movement input
@@ -80,7 +90,9 @@ void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::
         // float currentZoom = m_worldView->getTargetZoom();
         // float adjustedSpeed = m_movementStep * currentZoom;
         m_worldView.moveTarget(moveVector * m_movementStep);
+        m_isMovementKeyPressed = true;
     }
+
 }
 
 void WorldController::handleRotationEvents(sf::RenderWindow& window, const sf::Event &event)
@@ -89,25 +101,37 @@ void WorldController::handleRotationEvents(sf::RenderWindow& window, const sf::E
     // left button + vertical / horizontal scroll
     // this might cause problems  when selecting objects in the future
     constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
-    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton)
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == mouseButton) {   
         m_worldView.startContinuousRotation(window);
-    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
-        m_worldView.stopContinuousRotation();
+        m_isRotating = true;
+    }
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton) {
+        m_worldView.stopContinuousRotation(); 
+        m_isRotating = false;
+    }
     if (event.type == sf::Event::MouseMoved)
         m_worldView.updateContinuousRotation(window, m_worldModel.getTiles());
 
     // keyboard
     // yaw
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
         m_worldView.rotateYaw(m_yawRotationStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)
+        m_isMovementKeyPressed = true;
+    }
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E) {
         m_worldView.rotateYaw(-m_yawRotationStep);
+        m_isMovementKeyPressed = true;
+    }
     // pitch
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
         m_worldView.rotatePitch(m_pitchRotationStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F)
+        m_isMovementKeyPressed = true;
+    }
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F) {
         m_worldView.rotatePitch(-m_pitchRotationStep);
-
+        m_isMovementKeyPressed = true;
+    }
+    
     // add gizmo axes click like blender
 }
 

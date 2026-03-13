@@ -20,6 +20,7 @@ public:
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles);
     void draw(sf::RenderWindow& window) const;
+    bool isMoving();
 
     void setSize(sf::Vector2f size);
     void setCenter(sf::Vector2f center);
@@ -68,6 +69,8 @@ private:
     // make it global
     float m_zoomEpsilon = 0.001f;
     float m_movementEpsilon = 0.1f;
+
+    bool m_isMoving;
 };
 
 

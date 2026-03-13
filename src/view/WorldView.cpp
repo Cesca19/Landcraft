@@ -14,6 +14,7 @@ WorldView::WorldView()
     , m_movementSpeed(10.0f)
     , m_isDragging(false)
     , m_dragStartWorldPos({0, 0})
+    , m_isMoving(false)
 {
 }
 
@@ -45,38 +46,48 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
     //     updateDragging(sf::Mouse::getPosition(*m_window));
 
     // zoom lerping
+    m_isMoving = false;
     if (std::abs(m_targetZoom - m_currentZoom) > m_zoomEpsilon) {
         m_currentZoom += (m_targetZoom - m_currentZoom) * deltaTime * m_zoomSpeed;
         m_view.setSize(m_baseSize * m_currentZoom);
+        m_isMoving = true;
     } else
         if (m_currentZoom != m_targetZoom) {
             m_currentZoom = m_targetZoom;
             m_view.setSize(m_baseSize * m_currentZoom);
+            m_isMoving = true;
         }
 
     // translation lerping
     // To do : add drag speed multiplier to make the drag more responsive, and normal movement smoother
     if (MathUtils::distanceBetweenPoints(m_targetCenter, m_currentCenter) > m_movementEpsilon) {
         const float speed = m_isDragging ? 50.0f : m_movementSpeed;
-
         m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
         updateViewCenter(m_currentCenter);
+        m_isMoving = true;
     } else
         if (m_currentCenter != m_targetCenter) {
             m_currentCenter = m_targetCenter;
             updateViewCenter(m_currentCenter);
+            m_isMoving = true;
         }
 
     bool hasCameraMoved = false;
     m_camera->update(deltaTime, hasCameraMoved);
     if (hasCameraMoved)
         m_tileMap->updatePositions(tiles, *m_camera);
+    m_isMoving = m_isMoving || hasCameraMoved;
 }
 
 void WorldView::draw(sf::RenderWindow &window) const
 {
     window.setView(m_view);
     window.draw(*m_tileMap);
+}
+
+bool WorldView::isMoving()
+{
+    return m_isMoving;
 }
 
 void WorldView::setSize(const sf::Vector2f size)

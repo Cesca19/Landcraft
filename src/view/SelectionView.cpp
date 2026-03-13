@@ -5,10 +5,10 @@
 #include "SelectionView.hpp"
 
 SelectionView::SelectionView()
-    : m_tileCornerRadius(2.5f)
+    : m_tileCornerRadius(5)
     , m_highlightedTilesVertexArray(sf::Triangles)
-    , m_highlightedTileCorner(m_tileCornerRadius) // radius of 5 pixels for corner highlights
-    , m_highlightedTileCornerColor(sf::Color::Magenta)
+    , m_highlightedTileCorner(m_tileCornerRadius)
+    , m_highlightedTileCornerColor(255, 0, 255, 100)
     , m_highlightedTileColor(255, 0, 255, 128) // half-transparent magenta
 {
     m_highlightedTileCorner.setFillColor(m_highlightedTileCornerColor);

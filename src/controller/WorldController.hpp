@@ -32,7 +32,8 @@ public:
     void update(float deltaTime, sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 private:
-    void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event);
+    void handlePanMouseEvents(const sf::RenderWindow& window, const sf::Event &event);
+    void handlePanKeyboardEvents();
     void handleRotationEvents(sf::RenderWindow& window, const sf::Event &event);
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event);
@@ -46,6 +47,8 @@ private:
     int m_zoomStep;
     float m_pitchRotationStep;
     float m_yawRotationStep;
+    bool m_isRotating;
+    bool m_isMovementKeyPressed;
 };
 
 
