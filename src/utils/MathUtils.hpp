@@ -37,6 +37,10 @@ namespace MathUtils
     sf::Vector2f offsetPointAlongDirection(const sf::Vector2f& point, const sf::Vector2f& direction, float radius);
 
     sf::Vector2f rotateAroundPointZAxis(const float angle, const sf::Vector2f point);
+
+    bool isInsideTriangle(sf::Vector2f point, sf::Vector2f triangleCorner1, 
+        sf::Vector2f triangleCorner2, sf::Vector2f triangleCorner3, const float epsilon = 0.01f);
+    float triangleArea(sf::Vector2f point1, sf::Vector2f point2, sf::Vector2f point3);
 };
 
 

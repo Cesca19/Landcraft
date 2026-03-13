@@ -19,7 +19,6 @@ public:
     std::vector<TileCorner*> getDownLeftTriangleCorners() const;
 private:
     void updateTriangleCorners();
-
     std::vector<TileCorner*> m_corners;
     std::vector<TileCorner*> m_upRightTriangleCorners;
     std::vector<TileCorner*> m_downLeftTriangleCorners;

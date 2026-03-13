@@ -28,3 +28,8 @@ int TileCorner::getTextureID() const
 {
     return m_textureID;
 }
+
+sf::Vector2f TileCorner::getPosition() const
+{
+    return sf::Vector2f(getColumn(), getRow());
+}

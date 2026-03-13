@@ -49,6 +49,7 @@ private:
     float m_yawRotationStep;
     bool m_isRotating;
     bool m_isMovementKeyPressed;
+    SelectionMode m_currentSelectionMode;
 };
 
 

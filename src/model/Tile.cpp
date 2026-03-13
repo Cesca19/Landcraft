@@ -31,12 +31,6 @@ std::vector<TileCorner*> Tile::getCorners() const
     return m_corners;
 }
 
-void Tile::updateTriangleCorners()
-{
-    m_upRightTriangleCorners = {m_corners[0], m_corners[1], m_corners[2]};
-    m_downLeftTriangleCorners = {m_corners[2], m_corners[3], m_corners[0]};
-}
-
 std::vector<TileCorner*> Tile::getUpRightTriangleCorners() const
 {
     return m_upRightTriangleCorners;
@@ -45,4 +39,10 @@ std::vector<TileCorner*> Tile::getUpRightTriangleCorners() const
 std::vector<TileCorner*> Tile::getDownLeftTriangleCorners() const
 {
     return m_downLeftTriangleCorners;
+}
+
+void Tile::updateTriangleCorners()
+{
+    m_upRightTriangleCorners = {m_corners[0], m_corners[1], m_corners[2]};
+    m_downLeftTriangleCorners = {m_corners[2], m_corners[3], m_corners[0]};
 }

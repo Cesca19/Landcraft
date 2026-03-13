@@ -69,4 +69,32 @@ namespace MathUtils {
         rotatedPoint.y = point.x * std::sin(radAngle) + point.y * std::cos(radAngle);
         return rotatedPoint;
     }
+
+    
+    bool isInsideTriangle(sf::Vector2f point, sf::Vector2f triangleCorner1, sf::Vector2f triangleCorner2,
+        sf::Vector2f triangleCorner3, const float epsilon)
+    {
+        /* Calculate area of triangle ABC */
+        float A = triangleArea (triangleCorner1, triangleCorner2, triangleCorner3);
+
+        /* Calculate area of triangle PBC */
+        float A1 = triangleArea (point, triangleCorner2, triangleCorner3);
+
+        /* Calculate area of triangle PAC */
+        float A2 = triangleArea (triangleCorner1, point, triangleCorner3);
+
+        /* Calculate area of triangle PAB */
+        float A3 = triangleArea (triangleCorner1, triangleCorner2, point);
+
+        /* Check if sum of A1, A2 and A3 is same as A */
+        return std::abs(A - (A1 + A2 + A3)) < epsilon;
+    }
+
+    float triangleArea(sf::Vector2f point1, sf::Vector2f point2, sf::Vector2f point3)
+    {
+        return std::abs((point1.x*(point2.y-point3.y)
+                        + point2.x*(point3.y-point1.y)
+                        + point3.x*(point1.y-point2.y))
+                        /2.0);
+    }
 }

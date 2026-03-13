@@ -9,7 +9,7 @@ SelectionView::SelectionView()
     , m_highlightedTilesVertexArray(sf::Triangles)
     , m_highlightedTileCorner(m_tileCornerRadius)
     , m_highlightedTileCornerColor(255, 0, 255, 100)
-    , m_highlightedTileColor(255, 0, 255, 128) // half-transparent magenta
+    , m_highlightedTileColor(255, 0, 255, 40) // half-transparent magenta
 {
     m_highlightedTileCorner.setFillColor(m_highlightedTileCornerColor);
     m_highlightedTileCorner.setOrigin(m_tileCornerRadius, m_tileCornerRadius); 
@@ -19,22 +19,22 @@ SelectionView::~SelectionView()
 {
 }
 
-void SelectionView::drawTiles(sf::RenderWindow &window, const std::vector<Tile> &tilesToHighlight, const Camera &camera)
+void SelectionView::drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera)
 {
     m_highlightedTilesVertexArray.clear();
     m_highlightedTilesVertexArray.resize(tilesToHighlight.size() * 6); // 2 triangles per tile, 3 corners per triangle
 
     int index = 0;
 
-    for (const Tile& tile : tilesToHighlight) {
+    for (const Tile* tile : tilesToHighlight) {
         // up-right triangle
-        for (const TileCorner* corner : tile.getUpRightTriangleCorners()) {
+        for (const TileCorner* corner : tile->getUpRightTriangleCorners()) {
             m_highlightedTilesVertexArray[index].position = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             m_highlightedTilesVertexArray[index++].color = m_highlightedTileColor;
         }
         
         // down-left triangle
-        for (const TileCorner* corner : tile.getDownLeftTriangleCorners()) {
+        for (const TileCorner* corner : tile->getDownLeftTriangleCorners()) {
             m_highlightedTilesVertexArray[index].position = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             m_highlightedTilesVertexArray[index++].color = m_highlightedTileColor;
         }

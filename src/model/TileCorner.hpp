@@ -15,6 +15,7 @@ public:
     float getColumn() const;
     float getHeight() const;
     int getTextureID() const;
+    sf::Vector2f getPosition() const;
 private:    
     int m_row;
     int m_col;

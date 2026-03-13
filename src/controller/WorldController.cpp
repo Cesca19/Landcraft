@@ -11,6 +11,7 @@ WorldController::WorldController()
     , m_yawRotationStep(22.5)
     , m_isRotating(false)
     , m_isMovementKeyPressed(false)
+    , m_currentSelectionMode(SelectionMode::TILE_CORNER)
 {
 }
 
@@ -49,7 +50,7 @@ void WorldController::update(const float deltaTime, sf::RenderWindow &window)
     m_worldView.update(deltaTime, m_worldModel.getTiles());
     bool hasModelChanged = false;
     if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving())
-        m_selectionController.update(deltaTime, window, SelectionMode::TILE_CORNER,
+        m_selectionController.update(deltaTime, window, m_currentSelectionMode,
             m_worldModel, m_worldView.getCamera(), hasModelChanged);
 }
 
@@ -154,4 +155,9 @@ void WorldController::handleZoomEvents(const sf::RenderWindow& window, const sf:
 
 void WorldController::handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event)
 {
+    // keyboard
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+        m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
+                        ? SelectionMode::TILE_CORNER
+                        : SelectionMode::TILE;
 }
