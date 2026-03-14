@@ -9,6 +9,7 @@ WorldController::WorldController()
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
+    , m_heightStep(1)
     , m_isRotating(false)
     , m_isMovementKeyPressed(false)
     , m_currentSelectionMode(SelectionMode::TILE_CORNER)
@@ -160,4 +161,21 @@ void WorldController::handleMapEditingEvents(sf::RenderWindow& window, const sf:
         m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
                         ? SelectionMode::TILE_CORNER
                         : SelectionMode::TILE;
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add)
+        updateSelectedCornersHeight(m_heightStep);
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)
+        updateSelectedCornersHeight(- m_heightStep);
+
+    // mouse
+    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+        && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+        updateSelectedCornersHeight(m_heightStep * static_cast<int>(event.mouseWheelScroll.delta));
+}
+
+void WorldController::updateSelectedCornersHeight(const int heightStep)
+{
+    const std::vector<TileCorner *> corners = m_selectionController.getSelectedTileCorners();
+    for (TileCorner * corner: corners)
+        corner->addHeight(heightStep);
+    m_worldView.updateTileCorners(m_worldModel.getTiles(), corners);
 }

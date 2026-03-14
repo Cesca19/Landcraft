@@ -38,6 +38,7 @@ private:
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event);
     // add event for turn on/off wireframe, shaded mode,
+    void updateSelectedCornersHeight(int heightStep);
 
     WorldModel m_worldModel;
     WorldView m_worldView;
@@ -47,6 +48,7 @@ private:
     int m_zoomStep;
     float m_pitchRotationStep;
     float m_yawRotationStep;
+    int m_heightStep;
     bool m_isRotating;
     bool m_isMovementKeyPressed;
     SelectionMode m_currentSelectionMode;

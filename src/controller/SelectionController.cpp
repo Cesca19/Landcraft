@@ -48,6 +48,15 @@ void SelectionController::getSelectedCorners(const sf::RenderWindow &window, con
     
 }
 
+std::vector<TileCorner *> SelectionController::getSelectedTileCorners() const
+{
+    std::vector<TileCorner*> selectedCorners(m_selectedTileCorners);
+    for (const Tile *tile : m_selectedTiles)
+        for (TileCorner *corner : tile->getCorners())
+            selectedCorners.push_back(corner);
+    return selectedCorners;
+}
+
 void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition)
 {
     // TO DO : radius should be at least equal to the highest tile height (abs)

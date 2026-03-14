@@ -16,6 +16,7 @@ public:
     float getHeight() const;
     int getTextureID() const;
     sf::Vector2f getPosition() const;
+    void addHeight(int heightStep);
 private:    
     int m_row;
     int m_col;

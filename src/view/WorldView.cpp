@@ -221,6 +221,11 @@ void WorldView::updateContinuousRotation(const sf::RenderWindow &window, const s
     m_tileMap->updatePositions(tiles, *m_camera);
 }
 
+void WorldView::updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const
+{
+    m_tileMap->updatePositions(worldTiles, selectedCorners, *m_camera);
+}
+
 void WorldView::updateViewCenter(const sf::Vector2f center)
 {
     m_view.setCenter(center);
