@@ -5,6 +5,7 @@
 #ifndef LANDCRAFT_SELECTIONCONTROLLER_HPP
 #define LANDCRAFT_SELECTIONCONTROLLER_HPP
 
+#include <set>
 #include <SFML/Graphics.hpp>
 #include "../model/WorldModel.hpp"
 #include "../view/SelectionView.hpp"

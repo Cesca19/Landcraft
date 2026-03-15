@@ -50,11 +50,14 @@ void SelectionController::getSelectedCorners(const sf::RenderWindow &window, con
 
 std::vector<TileCorner *> SelectionController::getSelectedTileCorners() const
 {
-    std::vector<TileCorner*> selectedCorners(m_selectedTileCorners);
+    std::set<TileCorner*> uniqueCorners;
+
+    for (TileCorner* corner : m_selectedTileCorners)
+        uniqueCorners.insert(corner);
     for (const Tile *tile : m_selectedTiles)
         for (TileCorner *corner : tile->getCorners())
-            selectedCorners.push_back(corner);
-    return selectedCorners;
+            uniqueCorners.insert(corner);
+    return std::vector<TileCorner*>(uniqueCorners.begin(), uniqueCorners.end());
 }
 
 void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition)
