@@ -1,18 +1,21 @@
-#include "WorldMap.hpp"
+﻿//
+// Created by fran on 11/03/2026.
+//
 
-WorldMap::WorldMap()
+#include "WorldModel.hpp"
+
+WorldModel::WorldModel()
 {
 }
 
-WorldMap::~WorldMap()
+WorldModel::~WorldModel()
 {
 }
 
-void WorldMap::init(const std::string &filePath)
+void WorldModel::loadMap(std::string mapName)
 {
     m_map.clear();
-    // ideally load from filepath
-    const std::vector<std::vector<float>> input3dMap = {
+    m_map = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -43,40 +46,71 @@ void WorldMap::init(const std::string &filePath)
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        // {0, 0, 0, 0, 0, 0, 0, 1},
-        // {0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-        // {0, 0, 0, 5, 3, 0, 0, 1, 1, 0},
-        // {0, 9, 0, 0, 0, 0, 0, 0},
-        // {0, 7, 5, 0, 0, 0, 0, 1},
-        // {0, 3, 6, 0, 0, 0, 0, 1, 1, 0},
-        // {0, 0, 0, 0, 0, 0, 0, 0},
-        // {0, 0, 0, 1, 1, 1, 0, 0},
-        // {0, 0, 0, 1, 1, 1, 0, 0},
-        // {0, 0, 0, 0, 0, 0, 0, 0}
     };
+    createWorldTileCorners();
+    createWorldTiles();
+}
 
-    for (int y = 0; y < input3dMap.size(); y++) {
-        std::vector<TileCorner> row;
-        for (int x = 0; x < input3dMap[y].size(); x++) {
-            TileCorner tile = {sf::Vector2i(x, y), input3dMap[y][x], sf::Color::Cyan};
-            row.push_back(tile);
+std::vector<std::vector<Tile>> &WorldModel::getTiles()
+{
+    return m_tiles;
+}
+
+std::vector<std::vector<std::unique_ptr<TileCorner>>> &WorldModel::getCorners()
+{
+    return m_corners;
+}
+
+sf::Vector2f WorldModel::getCenter() const
+{
+    const float centerX = (static_cast<float>(m_map[0].size()) - 1.0f) / 2.0f;
+    const float centerY = (static_cast<float>(m_map.size()) - 1.0f) / 2.0f;
+
+    return {centerX, centerY};
+}
+
+void WorldModel::setTilesTextureId(const std::vector<Tile *> &tilesToPaint, const int textureId)
+{
+    for (const Tile *tile : tilesToPaint)
+        tile->setTextureId(textureId);
+}
+
+void WorldModel::createWorldTiles()
+{
+    m_tiles.clear();
+    for (int row = 0; row < m_corners.size(); row++)
+        for (int col = 0; col < m_corners[row].size(); col++)
+            createTileFromTileCorner(row, col);
+}
+
+void WorldModel::createTileFromTileCorner(const int row, const int col)
+{
+    if (m_corners.size() <= 1 || m_corners[0].size() <= 1
+        || col < 0 || col + 1 >= m_corners[0].size()
+        || row < 0 || row + 1 >= m_corners.size())
+        return;
+    std::vector<TileCorner *> tileCorners = {
+        m_corners[row][col].get(),
+        m_corners[row][col + 1].get(),
+        m_corners[row + 1][col + 1].get(),
+        m_corners[row + 1][col].get(),
+    };
+    if (m_tiles.size() < row + 1)
+        m_tiles.emplace_back();
+    m_tiles[row].emplace_back(tileCorners);
+}
+
+void WorldModel::createWorldTileCorners()
+{
+    m_corners.clear();
+    for (int row = 0; row < m_map.size(); row++) {
+        std::vector<std::unique_ptr<TileCorner>> rowCorners;
+        for (int col = 0; col < m_map[row].size(); col++) {
+            std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
+                row, col, m_map[row][col], 0 // default white texture
+            );
+            rowCorners.push_back(std::move(tileCorner));
         }
-        m_map.push_back(row);
+        m_corners.push_back(std::move(rowCorners));
     }
-}
-
-const std::vector<std::vector<TileCorner>> &WorldMap::getMap()
-{
-    return m_map;
-}
-
-void WorldMap::setCornerHeight(const float heightOffset, const sf::Vector2i &corner)
-{
-    m_map[corner.y][corner.x].Height += heightOffset;
-}
-
-void WorldMap::setTilesCornersHeight(const float heightOffset, const std::vector<sf::Vector2i> &corners)
-{
-    for (const sf::Vector2i &cornerPos : corners)
-        m_map[cornerPos.y][cornerPos.x].Height += heightOffset;
 }
