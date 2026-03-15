@@ -11,7 +11,6 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_shadedTileColor(sf::Color(150, 150, 150, 75))
     , m_wireframeTileColor(sf::Color::White)
 {
-    m_tilesetTexture.loadFromFile(tilesetFilepath);
     sf::Image image;
     if (image.loadFromFile(tilesetFilepath)) {
         image.setPixel(0, 0, sf::Color::White);// add a white pixel
@@ -118,7 +117,6 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
     {
         sf::Vector2f screenPos = camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
         m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
-        // TO DO: Set vertex texture coordinates and texture based on corner->getTextureID()
     }
 
     // down left triangle
@@ -127,7 +125,6 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
     {
         sf::Vector2f screenPos = camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
         m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
-        // TO DO: Set vertex texture coordinates and texture based on corner->getTextureID()
     }
     paintTile(m_shadedTilesVertexArray.getVertexCount() - 6, tile.getTextureId());
 }

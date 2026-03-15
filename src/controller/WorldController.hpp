@@ -5,7 +5,6 @@
 #ifndef LANDCRAFT_WORLDCONTROLLER_HPP
 #define LANDCRAFT_WORLDCONTROLLER_HPP
 
-#include <cstdlib>
 #include "../model/WorldModel.hpp"
 #include "../view/WorldView.hpp"
 #include "SelectionController.hpp"
@@ -34,11 +33,12 @@ public:
     void update(float deltaTime, sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 private:
-    void handlePanMouseEvents(const sf::RenderWindow& window, const sf::Event &event);
-    void handlePanKeyboardEvents();
+    void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event);
+    void handleContinuousPanEvents();
     void handleRotationEvents(sf::RenderWindow& window, const sf::Event &event);
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event);
+    void handleContinuousMapEditingEvents();
     // add event for turn on/off wireframe, shaded mode,
     void updateSelectedCornersHeight(int heightStep);
 
@@ -53,6 +53,7 @@ private:
     int m_heightStep;
     bool m_isRotating;
     bool m_isMovementKeyPressed;
+    int m_currentTextureId;
     SelectionMode m_currentSelectionMode;
 };
 

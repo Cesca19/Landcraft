@@ -14,7 +14,6 @@
 int main()
 {
     // Get a different random number each time the program runs
-    srand(time(0));
     sf::RenderWindow window(sf::VideoMode(1200, 800), "Landcraft");
     WorldController worldController;
     worldController.init("assets/maps/map.txt", 
