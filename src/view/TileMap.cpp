@@ -12,11 +12,6 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_wireframeTileColor(sf::Color::White)
 {
     m_tilesetTexture.loadFromFile(tilesetFilepath);
-    // sf::Image image;
-    // if (image.loadFromFile(tilesetFilepath)) {
-    //     image.setPixel(0, 0, sf::Color::White);// add a white pixel
-    //     m_tilesetTexture.loadFromImage(image);
-    // }
 }
 
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
