@@ -59,13 +59,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
 # --- Executable setup ---
 set(MY_TARGET landcraft)
 add_executable(${MY_TARGET}
-#        src/old/main.cpp
-#        src/old/WorldMap.cpp
-#        src/old/ScreenMap.cpp
-#        src/old/Tile.cpp
-#        src/old/WorldManager.cpp
-#        src/old/WorldView.cpp
-#        src/old/IsometricProjection.cpp
         src/main.cpp
         src/utils/MathUtils.cpp
         src/model/WorldModel.cpp
