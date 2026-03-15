@@ -19,7 +19,7 @@ public:
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
     void initEnvironment(sf::Vector2u windowSize);
-    void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, sf::RenderWindow &window);
+    void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
     bool isMoving() const;
 
@@ -46,6 +46,7 @@ public:
     void updateContinuousRotation(const sf::RenderWindow &window, const std::vector<std::vector<Tile>>& tiles) const;
 
     void updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const;
+    void paintTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<Tile *> & tilesToPaint, int textureId) const;
 private:
     void updateViewCenter(sf::Vector2f center);
 

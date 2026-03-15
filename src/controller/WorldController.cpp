@@ -12,7 +12,7 @@ WorldController::WorldController()
     , m_heightStep(1)
     , m_isRotating(false)
     , m_isMovementKeyPressed(false)
-    , m_currentSelectionMode(SelectionMode::TILE_CORNER)
+    , m_currentSelectionMode(SelectionMode::TILE)
 {
 }
 
@@ -158,10 +158,20 @@ void WorldController::handleZoomEvents(const sf::RenderWindow& window, const sf:
 void WorldController::handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event)
 {
     // keyboard
+    // -> selection mode switching
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
         m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
                         ? SelectionMode::TILE_CORNER
                         : SelectionMode::TILE;
+
+    // tiles painting
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
+        int textureId = rand() % 4;
+        m_worldModel.setTilesTextureId(m_selectionController.getSelectedTiles(), textureId);
+        m_worldView.paintTiles(m_worldModel.getTiles(), m_selectionController.getSelectedTiles(), textureId);
+    }
+
+    // -> corners editing
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add)
         updateSelectedCornersHeight(m_heightStep);
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)

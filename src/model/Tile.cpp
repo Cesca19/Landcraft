@@ -41,6 +41,26 @@ std::vector<TileCorner*> Tile::getDownLeftTriangleCorners() const
     return m_downLeftTriangleCorners;
 }
 
+sf::Vector2f Tile::getPosition() const
+{
+    if (m_corners.empty())
+        return {-1, -1};
+    return m_corners[0]->getPosition();
+}
+
+int Tile::getTextureId() const
+{
+    if (m_corners.empty())
+        return -1;
+    return m_corners[0]->getTextureID();
+}
+
+void Tile::setTextureId(const int textureId) const
+{
+    for (TileCorner* corner : m_corners)
+        corner->setTextureId(textureId);
+}
+
 void Tile::updateTriangleCorners()
 {
     m_upRightTriangleCorners = {m_corners[0], m_corners[1], m_corners[2]};

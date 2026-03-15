@@ -17,6 +17,9 @@ public:
     std::vector<TileCorner*> getCorners() const;
     std::vector<TileCorner*> getUpRightTriangleCorners() const;
     std::vector<TileCorner*> getDownLeftTriangleCorners() const;
+    sf::Vector2f getPosition() const;
+    int getTextureId() const;
+    void setTextureId(int textureId) const;
 private:
     void updateTriangleCorners();
     std::vector<TileCorner*> m_corners;

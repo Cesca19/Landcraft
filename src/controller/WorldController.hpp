@@ -5,6 +5,7 @@
 #ifndef LANDCRAFT_WORLDCONTROLLER_HPP
 #define LANDCRAFT_WORLDCONTROLLER_HPP
 
+#include <cstdlib>
 #include "../model/WorldModel.hpp"
 #include "../view/WorldView.hpp"
 #include "SelectionController.hpp"

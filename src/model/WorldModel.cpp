@@ -69,6 +69,12 @@ sf::Vector2f WorldModel::getCenter() const
     return {centerX, centerY};
 }
 
+void WorldModel::setTilesTextureId(const std::vector<Tile *> &tilesToPaint, const int textureId)
+{
+    for (const Tile *tile : tilesToPaint)
+        tile->setTextureId(textureId);
+}
+
 void WorldModel::createWorldTiles()
 {
     m_tiles.clear();
@@ -101,7 +107,7 @@ void WorldModel::createWorldTileCorners()
         std::vector<std::unique_ptr<TileCorner>> rowCorners;
         for (int col = 0; col < m_map[row].size(); col++) {
             std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
-                row, col, m_map[row][col], 0
+                row, col, m_map[row][col], -1 // default white texture
             );
             rowCorners.push_back(std::move(tileCorner));
         }

@@ -36,7 +36,7 @@ void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, 
 
 void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
 {
-    m_tileMap = std::make_unique<TileMap>();
+    m_tileMap = std::make_unique<TileMap>("assets/textures/tilemap-tileset.png", sf::Vector2u{32, 32});
     m_tileMap->init(tiles, *m_camera);
 }
 
@@ -46,7 +46,7 @@ void WorldView::initEnvironment(const sf::Vector2u windowSize)
     m_environmentView->init(windowSize);
 }
 
-void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile>>& tiles, sf::RenderWindow &window)
+void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window)
 {
     // if (m_isDragging) don't know who should do the update
     //     updateDragging(sf::Mouse::getPosition(*m_window));
@@ -235,6 +235,12 @@ void WorldView::updateContinuousRotation(const sf::RenderWindow &window, const s
 void WorldView::updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const
 {
     m_tileMap->updatePositions(worldTiles, selectedCorners, *m_camera);
+}
+
+void WorldView::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, const std::vector<Tile *> &tilesToPaint,
+    const int textureId) const
+{
+    m_tileMap->paintTiles(worldTiles, tilesToPaint, textureId);
 }
 
 void WorldView::updateViewCenter(const sf::Vector2f center)

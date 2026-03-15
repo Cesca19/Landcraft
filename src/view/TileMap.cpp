@@ -4,12 +4,19 @@
 
 #include "TileMap.hpp"
 
-TileMap::TileMap()
-    : m_shadedTilesVertexArray(sf::Triangles)
+TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSize)
+    : m_tilesSize(tilesSize)
+    , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
-    , m_shadedTileColor(sf::Color(150, 150, 150, 40))
+    , m_shadedTileColor(sf::Color(150, 150, 150, 75))
     , m_wireframeTileColor(sf::Color::White)
 {
+    m_tilesetTexture.loadFromFile(tilesetFilepath);
+    sf::Image image;
+    if (image.loadFromFile(tilesetFilepath)) {
+        image.setPixel(0, 0, sf::Color::White);// add a white pixel
+        m_tilesetTexture.loadFromImage(image);
+    }
 }
 
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
@@ -88,6 +95,20 @@ void TileMap::updatePositions(const std::vector<std::vector<Tile>>& worldTiles, 
     updateTiles(worldTiles, tilesToUpdate, camera);
 }
 
+void TileMap::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, const std::vector<Tile *> &tilesToPaint,
+    const int textureId)
+{
+    if (worldTiles.empty() || worldTiles[0].empty() || tilesToPaint.empty()) return;
+    const int nbCols = static_cast<int>(worldTiles[0].size());
+    for (const Tile *tile : tilesToPaint) {
+        sf::Vector2f tilePosition = tile->getPosition();
+        if (tilePosition == sf::Vector2f{-1, -1})
+            continue;
+        const int tileIndex = static_cast<int>(tilePosition.y * nbCols + tilePosition.x);
+        paintTile(tileIndex * 6, textureId);
+    }
+}
+
 void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
 {
     // -> shaded tiles
@@ -108,6 +129,7 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
         m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
         // TO DO: Set vertex texture coordinates and texture based on corner->getTextureID()
     }
+    paintTile(m_shadedTilesVertexArray.getVertexCount() - 6, tile.getTextureId());
 }
 
 void TileMap::addWireframeTile(const Tile &tile, const Camera &camera)
@@ -168,15 +190,44 @@ void TileMap::updateWireframeTile(const Tile &tile, const Camera &camera, int wi
     }
 }
 
+void TileMap::paintTile(int shadedIndex, const int textureId)
+{
+    if (textureId == -1) {
+        for (int i = 0; i < 6; i++) {
+            m_shadedTilesVertexArray[shadedIndex].texCoords = sf::Vector2f(0.f, 0.f);
+            m_shadedTilesVertexArray[shadedIndex].color = m_shadedTileColor;
+            shadedIndex++;
+        }
+        return;
+    }
+    const unsigned int x = textureId * m_tilesSize.x;
+    const int y = 0;
+    sf::Vector2f texCoords[6] = {
+        sf::Vector2f(x, y),
+        sf::Vector2f(x + m_tilesSize.x, y),
+        sf::Vector2f(x + m_tilesSize.x, y + m_tilesSize.y),
+        sf::Vector2f(x + m_tilesSize.x, y + m_tilesSize.y),
+        sf::Vector2f(x, y + m_tilesSize.y),
+        sf::Vector2f(x, y)
+    };
+    for (const auto texCoord : texCoords) {
+        m_shadedTilesVertexArray[shadedIndex].texCoords = texCoord;
+        m_shadedTilesVertexArray[shadedIndex].color = sf::Color::White;
+        shadedIndex++;
+    }
+}
+
 void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
 {
     // apply the transform
     states.transform *= getTransform();
 
     // apply the tileset texture
-    // states.texture = &m_tileset;
+    states.texture = &m_tilesetTexture;
 
     // draw the vertex array
     target.draw(m_shadedTilesVertexArray, states);
+
+    states.texture = nullptr;
     target.draw(m_wireframeTilesVertexArray, states);
 }

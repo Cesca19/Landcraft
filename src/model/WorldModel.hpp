@@ -19,6 +19,7 @@ public:
     std::vector<std::vector<Tile>>& getTiles();
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
     sf::Vector2f getCenter() const;
+    void setTilesTextureId(const std::vector<Tile *> &tilesToPaint, int textureId);
 private:
     void createWorldTiles();
     void createTileFromTileCorner(int row, int col);
