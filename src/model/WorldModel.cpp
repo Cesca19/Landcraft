@@ -107,7 +107,7 @@ void WorldModel::createWorldTileCorners()
         std::vector<std::unique_ptr<TileCorner>> rowCorners;
         for (int col = 0; col < m_map[row].size(); col++) {
             std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
-                row, col, m_map[row][col], -1 // default white texture
+                row, col, m_map[row][col], 0 // default white texture
             );
             rowCorners.push_back(std::move(tileCorner));
         }

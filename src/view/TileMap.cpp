@@ -11,11 +11,12 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_shadedTileColor(sf::Color(150, 150, 150, 75))
     , m_wireframeTileColor(sf::Color::White)
 {
-    sf::Image image;
-    if (image.loadFromFile(tilesetFilepath)) {
-        image.setPixel(0, 0, sf::Color::White);// add a white pixel
-        m_tilesetTexture.loadFromImage(image);
-    }
+    m_tilesetTexture.loadFromFile(tilesetFilepath);
+    // sf::Image image;
+    // if (image.loadFromFile(tilesetFilepath)) {
+    //     image.setPixel(0, 0, sf::Color::White);// add a white pixel
+    //     m_tilesetTexture.loadFromImage(image);
+    // }
 }
 
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
@@ -189,7 +190,7 @@ void TileMap::updateWireframeTile(const Tile &tile, const Camera &camera, int wi
 
 void TileMap::paintTile(int shadedIndex, const int textureId)
 {
-    if (textureId == -1) {
+    if (textureId <= 0) {
         for (int i = 0; i < 6; i++) {
             m_shadedTilesVertexArray[shadedIndex].texCoords = sf::Vector2f(0.f, 0.f);
             m_shadedTilesVertexArray[shadedIndex].color = m_shadedTileColor;

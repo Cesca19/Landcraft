@@ -13,7 +13,7 @@ WorldController::WorldController()
     , m_isRotating(false)
     , m_isMovementKeyPressed(false)
     , m_currentSelectionMode(SelectionMode::TILE)
-    , m_currentTextureId(0)
+    , m_currentTextureId(1)
 {
 }
 
@@ -168,11 +168,10 @@ void WorldController::handleMapEditingEvents(sf::RenderWindow& window, const sf:
 
     // tile painting texture picking
     if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) m_currentTextureId = 0; // grass
-        if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) m_currentTextureId = 1; // water
-        if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) m_currentTextureId = 2; // tree
-        if (event.key.code == sf::Keyboard::Num4 || event.key.code == sf::Keyboard::Numpad4) {m_currentTextureId = 3;} // stone
-        if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) m_currentTextureId = -1; // clear
+        if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) m_currentTextureId = 0; // clear
+        if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) m_currentTextureId = 1; // grass
+        if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) m_currentTextureId = 2; // water
+        if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) m_currentTextureId = 3; // sand
     }
 
     // -> corners editing
