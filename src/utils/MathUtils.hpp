@@ -34,7 +34,7 @@ namespace MathUtils
      * @param radius The distance to offset the point.
      * @return The new offset point.
      */
-    sf::Vector2f offsetPointAlongDirection(const sf::Vector2f& point, const sf::Vector2f& direction, float radius);
+    sf::Vector2f offsetPointAlongDirection(const sf::Vector2f& point, const sf::Vector2f& direction, int radius);
 
     sf::Vector2f rotateAroundPointZAxis(const float angle, const sf::Vector2f point);
 

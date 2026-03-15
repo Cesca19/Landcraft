@@ -27,7 +27,7 @@ Camera::~Camera()
 {
 }
 
-sf::Vector2f Camera::world_to_screen(float point3dX, float point3dY, float point3dZ) const
+sf::Vector2f Camera::world_to_screen(const float point3dX, const float point3dY, const float point3dZ) const
 {
     // apply current yaw rotation to the point3D
     const sf::Vector2f rotated3dPoint = rotateAroundZAxis(m_currentYawRotationAngle, sf::Vector2f(point3dX, point3dY), m_worldPivot);
@@ -46,7 +46,12 @@ sf::Vector2f Camera::world_to_screen(float point3dX, float point3dY, float point
     return point2d;
 }
 
-sf::Vector2f Camera::screen_to_world(float point2dX, float point2dY, float point2dZ) const
+sf::Vector2f Camera::world_to_screen(const sf::Vector2f point3d, const float point3dZ) const
+{
+    return world_to_screen(point3d.x, point3d.y, point3dZ);
+}
+
+sf::Vector2f Camera::screen_to_world(const float point2dX, const float point2dY, const float point2dZ) const
 {
     const float angleX = MathUtils::degToRad(m_projectionAngleX);
     const float angleY = MathUtils::degToRad(m_projectionAngleY);

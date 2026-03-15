@@ -40,7 +40,13 @@ void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
     m_tileMap->init(tiles, *m_camera);
 }
 
-void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile>>& tiles)
+void WorldView::initEnvironment(const sf::Vector2u windowSize)
+{
+    m_environmentView = std::make_unique<EnvironmentView>();
+    m_environmentView->init(windowSize);
+}
+
+void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile>>& tiles, sf::RenderWindow &window)
 {
     // if (m_isDragging) don't know who should do the update
     //     updateDragging(sf::Mouse::getPosition(*m_window));
@@ -77,17 +83,22 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
     if (hasCameraMoved)
         m_tileMap->updatePositions(tiles, *m_camera);
     m_isMoving = m_isMoving || hasCameraMoved;
+    m_environmentView->update(*m_camera, m_view.getCenter(), m_view.getSize(),
+        {window.getSize().x - 50.0f, 100.0f}, 40, isMoving());
 }
 
 void WorldView::draw(sf::RenderWindow &window) const
 {
+    m_environmentView->drawSkyBox(window);
+    m_environmentView->drawWorldReference(window);
     window.setView(m_view);
     window.draw(*m_tileMap);
+    m_environmentView->drawWorldGizmo(window);
 }
 
-bool WorldView::isMoving()
+bool WorldView::isMoving() const
 {
-    return m_isMoving;
+    return m_isMoving || m_isDragging;
 }
 
 void WorldView::setSize(const sf::Vector2f size)

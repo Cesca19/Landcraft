@@ -52,10 +52,10 @@ namespace MathUtils {
         return linePoint + projection;
     }
 
-    sf::Vector2f offsetPointAlongDirection(const sf::Vector2f &point, const sf::Vector2f &direction, const float radius)
+    sf::Vector2f offsetPointAlongDirection(const sf::Vector2f &point, const sf::Vector2f &direction, const int radius)
     {
         const sf::Vector2f normalizedDirection = direction / magnitude(direction);
-        return point + normalizedDirection * radius;
+        return point + normalizedDirection * static_cast<float>(radius);
 
     }
 

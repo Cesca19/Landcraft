@@ -20,6 +20,7 @@ struct CameraSettings {
 struct ViewSettings {
     sf::Vector2f center;
     sf::Vector2f size;
+    sf::Vector2u windowSize;
 };
 
 class WorldController 

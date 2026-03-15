@@ -82,6 +82,8 @@ add_executable(${MY_TARGET}
         src/controller/SelectionController.hpp
         src/view/SelectionView.cpp
         src/view/SelectionView.hpp
+        src/view/EnvironmentView.cpp
+        src/view/EnvironmentView.hpp
 )
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)

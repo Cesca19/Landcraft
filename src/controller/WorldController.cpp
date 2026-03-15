@@ -5,7 +5,7 @@
 #include "WorldController.hpp"
 
 WorldController::WorldController()
-    : m_movementStep(0.5f)
+    : m_movementStep(1)
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
@@ -24,6 +24,7 @@ void WorldController::init(const std::string &mapName,
     m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles());
+    m_worldView.initEnvironment(viewSettings.windowSize);
     m_worldView.zoom(10);
 }
 
@@ -48,7 +49,7 @@ void WorldController::handleEvents(sf::RenderWindow &window)
 
 void WorldController::update(const float deltaTime, sf::RenderWindow &window)
 {
-    m_worldView.update(deltaTime, m_worldModel.getTiles());
+    m_worldView.update(deltaTime, m_worldModel.getTiles(), window);
     bool hasModelChanged = false;
     if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving())
         m_selectionController.update(deltaTime, window, m_currentSelectionMode,

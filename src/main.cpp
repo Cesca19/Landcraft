@@ -13,12 +13,12 @@
 
 int main()
 {
+    sf::RenderWindow window(sf::VideoMode(1200, 800), "Landcraft");
     WorldController worldController;
     worldController.init("assets/maps/map.txt", 
         {TILE_SIZE_X, TILE_SIZE_Y, HEIGHT_SCALE, PROJECTION_ANGLE_X, PROJECTION_ANGLE_Y},
-        {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}}
+        {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}, window.getSize()}
     );
-    sf::RenderWindow window(sf::VideoMode(1200, 800), "Landcraft");
     sf::Clock clock;
     float deltaTime = 0;
     while (window.isOpen())

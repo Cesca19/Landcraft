@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include "Camera.hpp"
 #include "TileMap.hpp"
-#include "../utils/MathUtils.hpp"
+#include "EnvironmentView.hpp"
 
 class WorldView 
 {
@@ -18,9 +18,10 @@ public:
     void init(sf::Vector2f center, sf::Vector2f size);
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
-    void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles);
+    void initEnvironment(sf::Vector2u windowSize);
+    void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
-    bool isMoving();
+    bool isMoving() const;
 
     void setSize(sf::Vector2f size);
     void setCenter(sf::Vector2f center);
@@ -50,6 +51,7 @@ private:
 
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<TileMap> m_tileMap;
+    std::unique_ptr<EnvironmentView> m_environmentView;
     sf::View m_view;
 
     float m_minZoom;
@@ -74,6 +76,5 @@ private:
 
     bool m_isMoving;
 };
-
 
 #endif //LANDCRAFT_WORLDVIEW_HPP

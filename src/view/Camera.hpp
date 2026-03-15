@@ -32,6 +32,7 @@ public:
      * @return The corresponding 2D coordinates on the screen (in pixels).
      */
     sf::Vector2f world_to_screen(float point3dX, float point3dY, float point3dZ) const;
+    sf::Vector2f world_to_screen(sf::Vector2f point3d, float point3dZ) const;
     /**
      * Un-projects a 2D point from Screen Space (Pixels) back to 3D World Space (Tile Grid).
      * This is the inverse operation of world_to_screen.
@@ -65,6 +66,7 @@ public:
 
     float getTileSizeX() const { return m_tileSizeX; }
     float getTileSizeY() const { return m_tileSizeY; }
+
 private:
     /**
      * @brief Rotates the map around the X axis by changing the projection angle.
@@ -84,7 +86,7 @@ private:
      * @return The new rotated coordinates.
      */
     static sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point, sf::Vector2f rotationCenter);
-
+private:
     float m_projectionAngleX;
     float m_projectionAngleY;
     float m_tileSizeX;
