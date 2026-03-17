@@ -18,6 +18,7 @@ public:
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const Camera& camera);
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &modifiedCorners, const Camera& camera);
     void paintTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<Tile *> & tilesToPaint, int textureId);
+    void paintTile(const std::vector<std::vector<Tile>>& worldTiles, Tile *tileToPaint, int textureId);
 private:
     void addShadedTile(const Tile& tile, const Camera& camera);
     void addWireframeTile(const Tile& tile, const Camera& camera);

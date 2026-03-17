@@ -104,6 +104,17 @@ void TileMap::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, const
     }
 }
 
+void TileMap::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile *tileToPaint, int textureId)
+{
+    if (worldTiles.empty() || worldTiles[0].empty() || tileToPaint == nullptr) return;
+    const int nbCols = static_cast<int>(worldTiles[0].size());
+    sf::Vector2f tilePosition = tileToPaint->getPosition();
+    if (tilePosition == sf::Vector2f{-1, -1})
+        return;
+    const int tileIndex = static_cast<int>(tilePosition.y * nbCols + tilePosition.x);
+    paintTile(tileIndex * 6, textureId);
+}
+
 void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
 {
     // -> shaded tiles

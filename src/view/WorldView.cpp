@@ -243,6 +243,11 @@ void WorldView::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, con
     m_tileMap->paintTiles(worldTiles, tilesToPaint, textureId);
 }
 
+void WorldView::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile *tileToPaint, int textureId) const
+{
+    m_tileMap->paintTile(worldTiles, tileToPaint, textureId);
+}
+
 void WorldView::updateViewCenter(const sf::Vector2f center)
 {
     m_view.setCenter(center);

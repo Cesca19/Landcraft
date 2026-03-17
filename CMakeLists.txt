@@ -77,6 +77,17 @@ add_executable(${MY_TARGET}
         src/view/SelectionView.hpp
         src/view/EnvironmentView.cpp
         src/view/EnvironmentView.hpp
+        src/command/ICommand.hpp
+        src/command/SetTilesCornersHeightCommand.cpp
+        src/command/SetTilesCornersHeightCommand.hpp
+        src/command/PaintTilesCommand.cpp
+        src/command/PaintTilesCommand.hpp
+        src/command/CommandHistory.cpp
+        src/command/CommandHistory.hpp
+        src/controller/NavigationController.cpp
+        src/controller/NavigationController.hpp
+        src/controller/EditionController.cpp
+        src/controller/EditionController.hpp
 )
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)

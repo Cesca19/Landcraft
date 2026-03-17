@@ -7,7 +7,8 @@
 
 #include "../model/WorldModel.hpp"
 #include "../view/WorldView.hpp"
-#include "SelectionController.hpp"
+#include "EditionController.hpp"
+
 
 struct CameraSettings {
     float tileSizeX;
@@ -39,22 +40,26 @@ private:
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event);
     void handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event);
     void handleContinuousMapEditingEvents();
+    void handleUndoRedoEvents(const sf::RenderWindow& window, const sf::Event &event);
+
     // add event for turn on/off wireframe, shaded mode,
     void updateSelectedCornersHeight(int heightStep);
 
     WorldModel m_worldModel;
     WorldView m_worldView;
-    SelectionController m_selectionController;
+    EditionController m_editionController;
+    // SelectionController m_selectionController;
+    // CommandHistory m_commandHistory;
 
     float m_movementStep;
     int m_zoomStep;
     float m_pitchRotationStep;
     float m_yawRotationStep;
-    int m_heightStep;
+    // int m_heightStep;
     bool m_isRotating;
     bool m_isMovementKeyPressed;
-    int m_currentTextureId;
-    SelectionMode m_currentSelectionMode;
+    // int m_currentTextureId;
+    // SelectionMode m_currentSelectionMode;
 };
 
 

@@ -9,11 +9,11 @@ WorldController::WorldController()
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
-    , m_heightStep(1)
+    // , m_heightStep(1)
     , m_isRotating(false)
     , m_isMovementKeyPressed(false)
-    , m_currentSelectionMode(SelectionMode::TILE)
-    , m_currentTextureId(1)
+    // , m_currentSelectionMode(SelectionMode::TILE)
+    // , m_currentTextureId(1)
 {
 }
 
@@ -43,26 +43,32 @@ void WorldController::handleEvents(sf::RenderWindow &window)
         handlePanEvents(window, event);
         handleRotationEvents(window, event);
         handleZoomEvents(window, event);
-        handleMapEditingEvents(window, event);
+        m_editionController.handleEvents(window, event, m_worldModel, m_worldView);
+        // handleMapEditingEvents(window, event);
     }
     handleContinuousPanEvents();
-    handleContinuousMapEditingEvents();
+    m_editionController.handleContinuousEvents(window, m_worldModel, m_worldView);
+    // handleContinuousMapEditingEvents();
 }
 
 void WorldController::update(const float deltaTime, sf::RenderWindow &window)
 {
     m_worldView.update(deltaTime, m_worldModel.getTiles(), window);
-    bool hasModelChanged = false;
-    if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving())
-        m_selectionController.update(deltaTime, window, m_currentSelectionMode,
-            m_worldModel, m_worldView.getCamera(), hasModelChanged);
+    bool isNavigating = m_isMovementKeyPressed || m_isRotating || m_worldView.isMoving();
+    m_editionController.update(deltaTime, window, m_worldModel, m_worldView, isNavigating);
+    // bool hasModelChanged = false;
+    // if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving())
+    //     m_selectionController.update(deltaTime, window, m_currentSelectionMode,
+    //         m_worldModel, m_worldView.getCamera(), hasModelChanged);
 }
 
 void WorldController::draw(sf::RenderWindow &window)
 {
     m_worldView.draw(window);
-    if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving()) // only draw selection when not panning or rotating to avoid visual clutter
-        m_selectionController.draw(window, m_worldView.getCamera());
+    bool isNavigating = m_isMovementKeyPressed || m_isRotating || m_worldView.isMoving();
+    m_editionController.draw(window, m_worldView.getCamera(), isNavigating);
+    // if (!m_isMovementKeyPressed && !m_isRotating && !m_worldView.isMoving()) // only draw selection when not panning or rotating to avoid visual clutter
+    //     m_selectionController.draw(window, m_worldView.getCamera());
 }
 
 void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::Event &event)
@@ -79,6 +85,8 @@ void WorldController::handlePanEvents(const sf::RenderWindow& window, const sf::
 
 void WorldController::handleContinuousPanEvents()
 {
+    const bool isCtrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
+    if (isCtrlPressed) return;
     // keyboard
     sf::Vector2f moveVector(0.f, 0.f);
     // screen space movement input
@@ -159,48 +167,58 @@ void WorldController::handleZoomEvents(const sf::RenderWindow& window, const sf:
 
 void WorldController::handleMapEditingEvents(sf::RenderWindow& window, const sf::Event &event)
 {
-    // keyboard
-    // -> selection mode switching
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
-        m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
-                        ? SelectionMode::TILE_CORNER
-                        : SelectionMode::TILE;
+    // // keyboard
+    // // -> selection mode switching
+    // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
+    //     m_currentSelectionMode = (m_currentSelectionMode == SelectionMode::TILE)
+    //                     ? SelectionMode::TILE_CORNER
+    //                     : SelectionMode::TILE;
 
-    // tile painting texture picking
-    if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) m_currentTextureId = 0; // clear
-        if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) m_currentTextureId = 1; // grass
-        if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) m_currentTextureId = 2; // water
-        if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) m_currentTextureId = 3; // sand
-    }
+    // // tile painting texture picking
+    // // Later it will we be ui button that will change the current textureId
+    // if (event.type == sf::Event::KeyPressed) {
+    //     if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) m_currentTextureId = 0; // clear
+    //     if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) m_currentTextureId = 1; // grass
+    //     if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) m_currentTextureId = 2; // water
+    //     if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) m_currentTextureId = 3; // sand
+    // }
 
-    // -> corners editing
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add)
-        updateSelectedCornersHeight(m_heightStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)
-        updateSelectedCornersHeight(- m_heightStep);
+    // // -> corners editing
+    // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add)
+    //     updateSelectedCornersHeight(m_heightStep);
+    // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)
+    //     updateSelectedCornersHeight(- m_heightStep);
 
-    // mouse
-    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
-        && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-        updateSelectedCornersHeight(m_heightStep * static_cast<int>(event.mouseWheelScroll.delta));
+    // // mouse
+    // if ((sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
+    //     && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+    //     updateSelectedCornersHeight(m_heightStep * static_cast<int>(event.mouseWheelScroll.delta));
 }
 
 void WorldController::handleContinuousMapEditingEvents()
 {
-    // tiles painting
-    constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
-    if (sf::Mouse::isButtonPressed(mouseButton)) {
-        // Later it will we be ui button that will change the current textureId
-        m_worldModel.setTilesTextureId(m_selectionController.getSelectedTiles(), m_currentTextureId);
-        m_worldView.paintTiles(m_worldModel.getTiles(), m_selectionController.getSelectedTiles(), m_currentTextureId);
-    }
+    // // tiles painting
+    // constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
+    // const std::vector<Tile *> selectedTiles = m_selectionController.getSelectedTiles();
+    // if (sf::Mouse::isButtonPressed(mouseButton) && selectedTiles.size() > 0)
+    //     m_commandHistory.addCommand(std::make_unique<PaintTilesCommand>
+    //         (selectedTiles, m_currentTextureId), m_worldModel, m_worldView);
+}
+
+void WorldController::handleUndoRedoEvents(const sf::RenderWindow &window, const sf::Event &event)
+{
+    // const bool isCtrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
+    // if (isCtrlPressed && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z)
+    //     m_commandHistory.undoCommand(m_worldModel, m_worldView);
+    // if (isCtrlPressed && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Y)
+    //     m_commandHistory.redoCommand(m_worldModel, m_worldView);
+
 }
 
 void WorldController::updateSelectedCornersHeight(const int heightStep)
 {
-    const std::vector<TileCorner *> corners = m_selectionController.getSelectedTileCorners();
-    for (TileCorner * corner: corners)
-        corner->addHeight(heightStep);
-    m_worldView.updateTileCorners(m_worldModel.getTiles(), corners);
+    // const std::vector<TileCorner *> selectedCorners = m_selectionController.getSelectedTileCorners();
+    // if (selectedCorners.size() == 0) return;
+    // m_commandHistory.addCommand(std::make_unique<SetTilesCornersHeightCommand>
+    //     (selectedCorners, heightStep), m_worldModel, m_worldView);
 }
