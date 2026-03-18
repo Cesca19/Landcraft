@@ -31,6 +31,8 @@ private:
     int m_heightStep;
     int m_currentTextureId;
     SelectionMode m_currentSelectionMode;
+    const sf::Mouse::Button m_paintMouseButton = sf::Mouse::Left;
+    std::unique_ptr<PaintTilesCommand> m_ongoingPaintCommand;
 };
 
 

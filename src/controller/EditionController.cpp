@@ -22,11 +22,9 @@ void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &
 void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldModel &model, WorldView &view)
 {
     // tiles painting
-    constexpr sf::Mouse::Button mouseButton = sf::Mouse::Left;
     const std::vector<Tile *> selectedTiles = m_selectionController.getSelectedTiles();
-    if (sf::Mouse::isButtonPressed(mouseButton) && selectedTiles.size() > 0)
-        m_commandHistory.addCommand(std::make_unique<PaintTilesCommand>
-            (selectedTiles, m_currentTextureId), model, view);
+    if (sf::Mouse::isButtonPressed(m_paintMouseButton) && m_ongoingPaintCommand != nullptr && selectedTiles.size() > 0)
+        m_ongoingPaintCommand->AddTiles(selectedTiles, model, view);
 }
 
 void EditionController::update(float deltaTime, sf::RenderWindow &window, WorldModel &model, WorldView &view, bool isNavigating)
@@ -71,6 +69,20 @@ void EditionController::handleTilePaintingEvents(sf::RenderWindow &window, const
         if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) m_currentTextureId = 1; // grass
         if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) m_currentTextureId = 2; // water
         if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) m_currentTextureId = 3; // sand
+    }
+
+    // paint starting
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == m_paintMouseButton
+        && m_ongoingPaintCommand == nullptr) {
+        m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(m_selectionController.getSelectedTiles(), m_currentTextureId);
+        m_ongoingPaintCommand->execute(model, view);
+    }
+    // paint ending
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == m_paintMouseButton
+        && m_ongoingPaintCommand != nullptr) {
+        if (!m_ongoingPaintCommand->isEmpty())
+            m_commandHistory.addCommand(std::move(m_ongoingPaintCommand), model, view);
+        m_ongoingPaintCommand = nullptr;
     }
 }
 

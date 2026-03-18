@@ -10,10 +10,12 @@
 class PaintTilesCommand : public ICommand
 {
 public:
-    PaintTilesCommand(const std::vector<Tile *> tiles, const int textureId);
+    PaintTilesCommand(const std::vector<Tile *> &tiles, const int textureId);
+    void AddTiles(const std::vector<Tile *> tiles, WorldModel &model, WorldView &view);
     void execute(WorldModel& model, WorldView& view) override;
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;
+    bool isEmpty() const;
 private:
     std::vector<Tile *> m_tiles;
     int m_textureId;
