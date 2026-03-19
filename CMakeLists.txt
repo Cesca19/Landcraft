@@ -89,6 +89,15 @@ add_executable(${MY_TARGET}
         src/controller/EditionController.cpp
         src/controller/EditionController.hpp
 )
+
+# --- ADDRESS SANITIZER IN DEBUG MODE ---
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    # Ajoute les options de compilation pour ASan
+    target_compile_options(${MY_TARGET}  PRIVATE -fsanitize=address -fno-omit-frame-pointer -g)
+    # Ajoute les options de l'éditeur de liens pour ASan
+    target_link_options(${MY_TARGET}  PRIVATE -fsanitize=address)
+endif()
+
 target_compile_features(${MY_TARGET} PRIVATE cxx_std_17)
 target_link_libraries(${MY_TARGET} PUBLIC sfml::sfml)
 

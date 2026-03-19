@@ -8,6 +8,7 @@ EnvironmentView::EnvironmentView()
     : m_skyBox(sf::Quads, 4)
     , m_worldReferenceVertexArray(sf::Lines)
     , m_gizmoVertexArray(sf::Lines)
+    , m_maxScreenViewRadius(200)
 {
 }
 
@@ -56,7 +57,9 @@ void EnvironmentView::updateWorldReference(const Camera &camera, const sf::Vecto
     // get the wireframe tile nb required to cover the entire screen
     const float screenViewDiagonalLength = std::hypot(viewSize.x, viewSize.y);
     const auto minTileScale = std::min(camera.getTileSizeX(), camera.getTileSizeY());
-    const float screenViewRadius = (std::round(screenViewDiagonalLength / minTileScale) * 2);
+    // const float screenViewRadius = (std::round(screenViewDiagonalLength / minTileScale) * 2);
+    const float calculatedRadius = std::round(screenViewDiagonalLength / minTileScale) * 2;
+    const float screenViewRadius = std::min(calculatedRadius, 200.0f); // crash guard security
     const sf::Color linesColor(255, 255, 255, 50); // White semi-transparent lines (Wireframe)
 
     m_worldReferenceVertexArray.clear();

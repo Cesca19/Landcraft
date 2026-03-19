@@ -24,6 +24,7 @@ private:
     void initSkyBox(sf::Vector2u windowSize);
     void initWorldGizmo();
 
+    float m_maxScreenViewRadius;
     sf::VertexArray m_skyBox;
     sf::VertexArray m_worldReferenceVertexArray;
     // std::vector<sf::Vector2f> m_gizmoAxes;

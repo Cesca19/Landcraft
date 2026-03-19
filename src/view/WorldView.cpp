@@ -54,7 +54,8 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
     // zoom lerping
     m_isMoving = false;
     if (std::abs(m_targetZoom - m_currentZoom) > m_zoomEpsilon) {
-        m_currentZoom += (m_targetZoom - m_currentZoom) * deltaTime * m_zoomSpeed;
+        float t = std::min(deltaTime * m_zoomSpeed, 1.0f);
+        m_currentZoom += (m_targetZoom - m_currentZoom) * t;
         m_view.setSize(m_baseSize * m_currentZoom);
         m_isMoving = true;
     } else
@@ -68,7 +69,9 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
     // To do : add drag speed multiplier to make the drag more responsive, and normal movement smoother
     if (MathUtils::distanceBetweenPoints(m_targetCenter, m_currentCenter) > m_movementEpsilon) {
         const float speed = m_isDragging ? 50.0f : m_movementSpeed;
-        m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
+        float t = std::min(deltaTime * speed, 1.0f);
+        m_currentCenter += (m_targetCenter - m_currentCenter) * t;
+        // m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
         updateViewCenter(m_currentCenter);
         m_isMoving = true;
     } else
