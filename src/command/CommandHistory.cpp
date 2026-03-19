@@ -9,12 +9,15 @@ CommandHistory::CommandHistory()
 {
 }
 
-void CommandHistory::addCommand(std::unique_ptr<ICommand> command, WorldModel &model, WorldView &view)
+void CommandHistory::addCommand(std::unique_ptr<ICommand> command, WorldModel& model, WorldView& view)
 {
-    if (m_currentIndex != m_commandList.size() - 1)
-        m_commandList.erase(m_commandList.begin() + m_currentIndex + 1, m_commandList.end());
+    if (!m_commandList.empty() && m_currentIndex < (int) m_commandList.size() - 1) {
+        auto eraseStart = m_commandList.begin() + (m_currentIndex + 1);
+        m_commandList.erase(eraseStart, m_commandList.end());
+    }
+
     command->execute(model, view);
-    addHistoryMessage(std::to_string(m_currentIndex) + ": " + command->getName());
+    addHistoryMessage(std::to_string(m_currentIndex + 1) + ": " + command->getName());
     m_commandList.push_back(std::move(command));
     m_currentIndex++;
     // current index store the index of the last executed command, 
