@@ -18,16 +18,18 @@ PaintTilesCommand::PaintTilesCommand(const std::vector<Tile *> &tiles, const int
 
 void PaintTilesCommand::AddTiles(const std::vector<Tile *> tiles, WorldModel &model, WorldView &view)
 {
-    std::vector<Tile *> tilesToPaint;
-    for (Tile * tile: tiles) {
-        if (tile->getTextureId() == m_textureId)
-            continue; // skip if the tile already has the target texture to avoid unnecessary painting
-        m_tiles.push_back(tile);
-        tilesToPaint.push_back(tile);
-        m_previousTextureIds.push_back(tile->getTextureId());
-        tile->setTextureId(m_textureId);
-    }
-    view.paintTiles(model.getTiles(), tilesToPaint, m_textureId);
+    for (Tile * tile: tiles)
+        AddTile(tile, model, view);
+}
+
+void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, WorldView &view)
+{
+    if (tile->getTextureId() == m_textureId)
+        return; // skip if the tile already has the target texture to avoid unnecessary painting
+    m_tiles.push_back(tile);
+    m_previousTextureIds.push_back(tile->getTextureId());
+    tile->setTextureId(m_textureId);
+    view.paintTile(model.getTiles(), tile, m_textureId);
 }
 
 void PaintTilesCommand::execute(WorldModel &model, WorldView &view)
@@ -51,4 +53,10 @@ std::string PaintTilesCommand::getName()
 bool PaintTilesCommand::isEmpty() const
 {
     return m_tiles.empty();
+}
+
+Tile *PaintTilesCommand::getLastPaintedTile() const
+{
+    if (m_tiles.empty()) return nullptr;
+    return m_tiles.back();
 }

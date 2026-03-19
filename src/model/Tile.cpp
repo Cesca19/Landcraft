@@ -6,6 +6,7 @@
 
 Tile::Tile()
 {
+    m_corners.clear();
 }
 
 Tile::Tile(const std::vector<TileCorner*> &corners, const int textureId)
@@ -47,6 +48,16 @@ sf::Vector2f Tile::getPosition() const
     if (m_corners.empty())
         return {-1, -1};
     return m_corners[0]->getPosition();
+}
+
+sf::Vector2i Tile::getGridPosition() const
+{
+    if (m_corners.empty())
+        return {-1, -1};
+    return sf::Vector2i(
+        static_cast<int>(m_corners[0]->getColumn()),
+        static_cast<int>(m_corners[0]->getRow())
+    );
 }
 
 int Tile::getTextureId() const
