@@ -11,7 +11,7 @@ class CommandHistory
 {
 public:
     CommandHistory();
-    void addCommand(std::unique_ptr<ICommand> command, WorldModel& model, WorldView& view);
+    void addCommand(std::unique_ptr<ICommand> command, WorldModel& model, WorldView& view, bool shouldExecute = false);
     void undoCommand(WorldModel& model, WorldView& view);
     void redoCommand(WorldModel& model, WorldView& view);
 private:

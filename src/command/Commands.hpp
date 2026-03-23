@@ -1,2 +1,2 @@
 #include "PaintTilesCommand.hpp"
-#include "SetTilesCornersHeightCommand.hpp"
+#include "EditTilesCornersHeightCommand.hpp"

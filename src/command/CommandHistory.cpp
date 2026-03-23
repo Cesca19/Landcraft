@@ -9,14 +9,14 @@ CommandHistory::CommandHistory()
 {
 }
 
-void CommandHistory::addCommand(std::unique_ptr<ICommand> command, WorldModel& model, WorldView& view)
+void CommandHistory::addCommand(std::unique_ptr<ICommand> command, WorldModel& model, WorldView& view, bool shouldExecute)
 {
-    if (!m_commandList.empty() && m_currentIndex < (int) m_commandList.size() - 1) {
+    if (!m_commandList.empty() && m_currentIndex < static_cast<int>(m_commandList.size()) - 1) {
         auto eraseStart = m_commandList.begin() + (m_currentIndex + 1);
         m_commandList.erase(eraseStart, m_commandList.end());
     }
-
-    command->execute(model, view);
+    if (shouldExecute)
+        command->execute(model, view);
     addHistoryMessage(std::to_string(m_currentIndex + 1) + ": " + command->getName());
     m_commandList.push_back(std::move(command));
     m_currentIndex++;

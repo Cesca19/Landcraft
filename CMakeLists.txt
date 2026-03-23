@@ -78,8 +78,8 @@ add_executable(${MY_TARGET}
         src/view/EnvironmentView.cpp
         src/view/EnvironmentView.hpp
         src/command/ICommand.hpp
-        src/command/SetTilesCornersHeightCommand.cpp
-        src/command/SetTilesCornersHeightCommand.hpp
+        src/command/EditTilesCornersHeightCommand.cpp
+        src/command/EditTilesCornersHeightCommand.hpp
         src/command/PaintTilesCommand.cpp
         src/command/PaintTilesCommand.hpp
         src/command/CommandHistory.cpp

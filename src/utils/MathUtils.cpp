@@ -97,4 +97,50 @@ namespace MathUtils {
                         + point3.x*(point1.y-point2.y))
                         /2.0);
     }
+
+    std::vector<sf::Vector2i> getBresenhamLine(const sf::Vector2i start, const sf::Vector2i end)
+    {
+        std::vector<sf::Vector2i> linePoints;
+        int dx = std::abs(end.x - start.x);
+        int dy = std::abs(end.y - start.y);
+
+        int mainAxisStep = (dx > dy) ? dx : dy;
+        int secondaryAxisStep = (dx > dy) ? dy : dx;
+
+        int stepX = (end.x > start.x) ? 1 : -1;
+        int stepY = (end.y > start.y) ? 1 : -1;
+
+        int slopeError = 0;
+        int x = start.x;
+        int y = start.y;
+
+        linePoints.emplace_back(x, y);
+        while (x != end.x || y != end.y) {
+            if (dx > dy)
+                x += stepX;
+            else
+                y += stepY;
+            // mathematically we should have slopeError += (secondaryAxisStep / mainAxisStep)
+            // but to avoid floating point precision issues by multiplying everything by mainAxisStep * 2
+            // slopeError += (secondaryAxisStep / mainAxisStep) * 2 * mainAxisStep;
+            // we finally end up with
+            slopeError += secondaryAxisStep * 2;
+            // we do the same thing for the comparison with 0.5,
+            // we multiply by mainAxisStep * 2 to avoid floating point precision issues
+            // so instead of comparing slopeError >= 0.5 we compare
+            // slopeError >= (0.5 * mainAxisStep * 2) an finally we end up with
+            if (slopeError >= mainAxisStep) {
+                if (dx > dy)
+                    y += stepY;
+                else
+                    x += stepX;
+                // and we should reset the slope error by subtracting 1 but since the other
+                // operations are multiplied by mainAxisStep * 2 we need to do the same
+                // for the reset, so we subtract mainAxisStep * 2 instead of just 1
+                slopeError -= mainAxisStep * 2;
+            }
+            linePoints.emplace_back(x, y);
+        }
+        return linePoints;
+    }
 }

@@ -16,7 +16,7 @@ public:
     EditionController();
     void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void handleContinuousEvents(sf::RenderWindow& window, WorldModel& model, WorldView& view);
-    void update(float deltaTime, sf::RenderWindow& window, WorldModel& model, WorldView& view, bool isNavigating);
+    void update(float deltaTime, sf::RenderWindow& window, WorldModel& model, const WorldView& view, bool isNavigating);
     void draw(sf::RenderWindow& window, const Camera& camera, bool isNavigating);
 private:
     void handleUndoRedoEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
@@ -24,7 +24,6 @@ private:
     void handleTilePaintingEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void handleHeightEditingEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void updateSelectedCornersHeight(WorldModel& model, WorldView& view, int heightStep);
-    std::vector<sf::Vector2i> getBresenhamLine(sf::Vector2i start, sf::Vector2i end) const;
 
     SelectionController m_selectionController;
     CommandHistory m_commandHistory;
@@ -33,6 +32,7 @@ private:
     int m_currentTextureId;
     SelectionMode m_currentSelectionMode;
     const sf::Mouse::Button m_paintMouseButton = sf::Mouse::Left;
+    std::unique_ptr<EditTilesCornersHeightCommand> m_ongoingEditCornersHeightCommand;
     std::unique_ptr<PaintTilesCommand> m_ongoingPaintCommand;
     Tile* m_lastPaintedTile;
 };

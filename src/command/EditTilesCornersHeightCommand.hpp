@@ -6,10 +6,11 @@
 #define LANDCRAFT_SETTILESCORNERSHEIGHTCOMMAND_HPP
 #include "ICommand.hpp"
 
-class SetTilesCornersHeightCommand : public ICommand
+class EditTilesCornersHeightCommand : public ICommand
 {
 public:
-    SetTilesCornersHeightCommand(const std::vector<TileCorner *> corners, const int heightStep);
+    EditTilesCornersHeightCommand(const std::vector<TileCorner *> &corners, int heightStep);
+    void addHeight(int heightStep, WorldModel &model, const WorldView &view);
     void execute(WorldModel& model, WorldView& view) override;
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;

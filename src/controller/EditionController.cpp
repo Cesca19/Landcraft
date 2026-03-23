@@ -6,8 +6,8 @@
 
 EditionController::EditionController()
     : m_heightStep(1)
-    , m_currentSelectionMode(SelectionMode::TILE)
     , m_currentTextureId(1)
+    , m_currentSelectionMode(SelectionMode::TILE)
     , m_lastPaintedTile(nullptr)
 {
 }
@@ -29,7 +29,7 @@ void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldMo
         || selectedTiles.empty())
         return;
 
-    Tile *currentTile = selectedTiles[0];
+    const Tile *currentTile = selectedTiles[0];
     if (currentTile == m_lastPaintedTile)
         return;
 
@@ -43,8 +43,8 @@ void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldMo
     if (worldTiles.empty() || worldTiles[0].empty())
         return;
 
-    std::vector<sf::Vector2i> lineTilesPositions = 
-            getBresenhamLine(m_lastPaintedTile->getGridPosition(), currentTile->getGridPosition());
+    const std::vector<sf::Vector2i> lineTilesPositions =
+            MathUtils::getBresenhamLine(m_lastPaintedTile->getGridPosition(), currentTile->getGridPosition());
     for (const sf::Vector2i& pos : lineTilesPositions)
         if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size()) 
         && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
@@ -53,7 +53,7 @@ void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldMo
     m_lastPaintedTile = m_ongoingPaintCommand->getLastPaintedTile();
 }
 
-void EditionController::update(float deltaTime, sf::RenderWindow &window, WorldModel &model, WorldView &view, bool isNavigating)
+void EditionController::update(const float deltaTime, sf::RenderWindow &window, WorldModel &model, const WorldView &view, const bool isNavigating)
 {
     bool hasModelChanged = false;
     if (!isNavigating)
@@ -122,62 +122,31 @@ void EditionController::handleHeightEditingEvents(sf::RenderWindow &window, cons
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)
         updateSelectedCornersHeight(model, view, -m_heightStep);
 
+
     // mouse
     if ((sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
-        && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
-        updateSelectedCornersHeight(model, view, m_heightStep * static_cast<int>(event.mouseWheelScroll.delta));
+        && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+        if (m_ongoingEditCornersHeightCommand == nullptr) {
+            const std::vector<TileCorner *> selectedCorners = m_selectionController.getSelectedTileCorners();
+            if (selectedCorners.empty()) return;
+            m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(selectedCorners, m_heightStep * static_cast<int>(event.mouseWheelScroll.delta));
+            m_ongoingEditCornersHeightCommand->execute(model, view);
+        } else
+            m_ongoingEditCornersHeightCommand->addHeight(m_heightStep  * static_cast<int>(event.mouseWheelScroll.delta), model, view);
+    }
+    // register the last control used in the previous if and use it here and then reset
+    if (event.type == sf::Event::KeyReleased
+        && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl)
+        && m_ongoingEditCornersHeightCommand != nullptr) {
+        m_commandHistory.addCommand(std::move(m_ongoingEditCornersHeightCommand), model, view);
+        m_ongoingEditCornersHeightCommand = nullptr;
+    }
 }
 
 void EditionController::updateSelectedCornersHeight(WorldModel &model, WorldView &view, int heightStep)
 {
     const std::vector<TileCorner *> selectedCorners = m_selectionController.getSelectedTileCorners();
-    if (selectedCorners.size() == 0) return;
-    m_commandHistory.addCommand(std::make_unique<SetTilesCornersHeightCommand>
-        (selectedCorners, heightStep), model, view);
-}
-
-std::vector<sf::Vector2i> EditionController::getBresenhamLine(sf::Vector2i start, sf::Vector2i end) const
-{
-    std::vector<sf::Vector2i> linePoints;
-    int dx = std::abs(end.x - start.x);
-    int dy = std::abs(end.y - start.y);
-
-    int mainAxisStep = (dx > dy) ? dx : dy;
-    int secondaryAxisStep = (dx > dy) ? dy : dx;
-
-    int stepX = (end.x > start.x) ? 1 : -1;
-    int stepY = (end.y > start.y) ? 1 : -1;
-
-    int slopeError = 0;
-    int x = start.x;
-    int y = start.y;
-
-    linePoints.push_back(sf::Vector2i(x, y));
-    while (x != end.x || y != end.y) {
-        if (dx > dy)
-            x += stepX;
-        else
-            y += stepY;
-        // mathematically we should have slopeError += (secondaryAxisStep / mainAxisStep) 
-        // but to avoid floating point precision issues by multiplying everything by mainAxisStep * 2
-        // slopeError += (secondaryAxisStep / mainAxisStep) * 2 * mainAxisStep;
-        // we finally end up with 
-        slopeError += secondaryAxisStep * 2;
-        // we do the same thing for the comparison with 0.5, 
-        // we multiply by mainAxisStep * 2 to avoid floating point precision issues
-        // so instead of comparing slopeError >= 0.5 we compare 
-        // slopeError >= (0.5 * mainAxisStep * 2) an finally we end up with
-        if (slopeError >= mainAxisStep) {
-            if (dx > dy)
-                y += stepY;
-            else
-                x += stepX;
-            // and we should reset the slope error by subtracting 1 but since the other 
-            // operations are multiplied by mainAxisStep * 2 we need to do the same 
-            // for the reset, so we subtract mainAxisStep * 2 instead of just 1
-            slopeError -= mainAxisStep * 2;
-        }
-        linePoints.push_back(sf::Vector2i(x, y));
-    }
-    return linePoints;
+    if (selectedCorners.empty()) return;
+    m_commandHistory.addCommand(std::make_unique<EditTilesCornersHeightCommand>
+        (selectedCorners, heightStep), model, view, true);
 }
