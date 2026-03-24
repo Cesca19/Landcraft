@@ -6,10 +6,10 @@
 #define LANDCRAFT_EDITIONCONTROLLER_HPP
 
 #include "SelectionController.hpp"
-#include "../command/Commands.hpp"
-#include "../command/CommandHistory.hpp"
 #include "../model/WorldModel.hpp"
 #include "../view/WorldView.hpp"
+#include "../commands/CommandHistory.hpp"
+#include "../editionTools/EditionTools.hpp"
 
 class EditionController {
 public:
@@ -20,21 +20,12 @@ public:
     void draw(sf::RenderWindow& window, const Camera& camera, bool isNavigating);
 private:
     void handleUndoRedoEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
-    void handleSelectionEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
-    void handleTilePaintingEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
-    void handleHeightEditingEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
-    void updateSelectedCornersHeight(WorldModel& model, WorldView& view, int heightStep);
+    void handleEditionToolSwitchEvents(const sf::Event& event);
 
-    SelectionController m_selectionController;
     CommandHistory m_commandHistory;
-
-    int m_heightStep;
-    int m_currentTextureId;
-    SelectionMode m_currentSelectionMode;
-    const sf::Mouse::Button m_paintMouseButton = sf::Mouse::Left;
-    std::unique_ptr<EditTilesCornersHeightCommand> m_ongoingEditCornersHeightCommand;
-    std::unique_ptr<PaintTilesCommand> m_ongoingPaintCommand;
-    Tile* m_lastPaintedTile;
+    SelectionController m_selectionController;
+    int m_currentEditionTool;
+    std::vector<std::unique_ptr<IEditionTool>> m_editionTools;
 };
 
 #endif //LANDCRAFT_EDITIONCONTROLLER_HPP

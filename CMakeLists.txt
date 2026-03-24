@@ -77,17 +77,21 @@ add_executable(${MY_TARGET}
         src/view/SelectionView.hpp
         src/view/EnvironmentView.cpp
         src/view/EnvironmentView.hpp
-        src/command/ICommand.hpp
-        src/command/EditTilesCornersHeightCommand.cpp
-        src/command/EditTilesCornersHeightCommand.hpp
-        src/command/PaintTilesCommand.cpp
-        src/command/PaintTilesCommand.hpp
-        src/command/CommandHistory.cpp
-        src/command/CommandHistory.hpp
+        src/commands/ICommand.hpp
+        src/commands/EditTilesCornersHeightCommand.cpp
+        src/commands/EditTilesCornersHeightCommand.hpp
+        src/commands/PaintTilesCommand.cpp
+        src/commands/PaintTilesCommand.hpp
+        src/commands/CommandHistory.cpp
+        src/commands/CommandHistory.hpp
         src/controller/NavigationController.cpp
         src/controller/NavigationController.hpp
         src/controller/EditionController.cpp
         src/controller/EditionController.hpp
+        src/editionTools/PaintTool.cpp
+        src/editionTools/PaintTool.hpp
+        src/editionTools/ElevationTool.cpp
+        src/editionTools/ElevationTool.hpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---
