@@ -4,18 +4,28 @@
 
 #include "EditTilesCornersHeightCommand.hpp"
 
-EditTilesCornersHeightCommand::EditTilesCornersHeightCommand(const std::vector<TileCorner *> &corners, const int heightStep)
+EditTilesCornersHeightCommand::EditTilesCornersHeightCommand(const std::vector<TileCorner *> &corners, const float heightStep)
     : m_corners(corners)
     , m_heightStep(heightStep)
 {
 }
 
-void EditTilesCornersHeightCommand::addHeight(const int heightStep, WorldModel &model, const WorldView &view)
+void EditTilesCornersHeightCommand::addHeight(const float heightStep, WorldModel &model, const WorldView &view)
 {
     m_heightStep += heightStep;
     for (TileCorner * corner: m_corners)
         corner->addHeight(heightStep);
     view.updateTileCorners(model.getTiles(), m_corners);
+}
+
+void EditTilesCornersHeightCommand::addNewCorners(const std::vector<TileCorner *> &corners, WorldModel &model,
+    const WorldView &view)
+{
+    for (TileCorner * corner: corners) {
+        corner->addHeight(m_heightStep);
+        m_corners.push_back(corner);
+    }
+    view.updateTileCorners(model.getTiles(), corners);
 }
 
 void EditTilesCornersHeightCommand::execute(WorldModel &model, WorldView &view)

@@ -20,9 +20,11 @@ private:
     void handleSelectionEvents(const sf::Event& event);
     void handleHeightEditingEvents(const sf::Event& event, WorldModel& model, WorldView& view,
                                  const SelectionController &selectionController, CommandHistory &history);
-    static void updateSelectedCornersHeight(WorldModel& model, WorldView& view, int heightStep,
-                                            const SelectionController &selectionController, CommandHistory &history);
-    int m_heightStep;
+    void handleKeyBoardHeightEditingEvents(WorldModel& model, WorldView& view, const SelectionController &selectionController, CommandHistory &history);
+    void startContinuousElevation(WorldModel &model, WorldView &view, const SelectionController &selectionController, float heightStep);
+    void updateContinuousElevation(WorldModel &model, const WorldView &view, const SelectionController &selectionController);
+    void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
+    float m_heightStep;
     bool m_isSelectionLocked;
     SelectionMode m_currentSelectionMode;
     std::unique_ptr<EditTilesCornersHeightCommand> m_ongoingEditCornersHeightCommand;

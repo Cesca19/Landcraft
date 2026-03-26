@@ -34,7 +34,7 @@ sf::Vector2f TileCorner::getPosition() const
     return sf::Vector2f(getColumn(), getRow());
 }
 
-void TileCorner::addHeight(const int heightStep)
+void TileCorner::addHeight(const float heightStep)
 {
     m_height += heightStep;
 }
