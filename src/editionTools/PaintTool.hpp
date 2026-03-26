@@ -14,9 +14,9 @@ public:
     PaintTool();
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
-    void handleEvents(const sf::Event& event, WorldModel& model, WorldView& view,
+    void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
                               SelectionController& selectionController, CommandHistory& history) override;
-    void handleContinuousEvents(WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
+    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
 private:
     int m_currentTextureId;
     Tile* m_lastPaintedTile;

@@ -21,7 +21,7 @@ SelectionMode PaintTool::getRequiredSelectionMode() const
     return SelectionMode::TILE;
 }
 
-void PaintTool::handleEvents(const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController,
                              CommandHistory &history)
 {
     // tile painting texture picking
@@ -50,7 +50,7 @@ void PaintTool::handleEvents(const sf::Event &event, WorldModel &model, WorldVie
         }
 }
 
-void PaintTool::handleContinuousEvents(WorldModel &model, WorldView &view, SelectionController &selectionController,
+void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
     CommandHistory &history)
 {
     // tiles painting

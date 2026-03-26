@@ -14,13 +14,13 @@ EditionController::EditionController()
 void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view)
 {
     handleEditionToolSwitchEvents(event);
-    m_editionTools[m_currentEditionTool]->handleEvents(event, model, view, m_selectionController, m_commandHistory);
+    m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, m_selectionController, m_commandHistory);
     handleUndoRedoEvents(window, event, model, view);
 }
 
 void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldModel &model, WorldView &view)
 {
-    m_editionTools[m_currentEditionTool]->handleContinuousEvents(model, view, m_selectionController, m_commandHistory);
+    m_editionTools[m_currentEditionTool]->handleContinuousEvents(window, model, view, m_selectionController, m_commandHistory);
 }
 
 void EditionController::update(const float deltaTime, sf::RenderWindow &window, WorldModel &model, const WorldView &view, const bool isNavigating)
