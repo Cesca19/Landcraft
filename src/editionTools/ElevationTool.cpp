@@ -11,6 +11,7 @@ ElevationTool::ElevationTool()
     , m_ongoingEditCornersHeightCommand(nullptr)
     , m_continuousElevationInterval(0.25f)
     , m_lastMouseScreenPosition(-1, -1)
+    , m_mouseMovementThreshold(0.5f)
 {
 }
 
@@ -50,19 +51,6 @@ void ElevationTool::handleSelectionEvents(const sf::Event &event)
 void ElevationTool::handleHeightEditingEvents(const sf::Event& event, WorldModel& model, WorldView& view,
                                  const SelectionController &selectionController, CommandHistory &history)
 {
-    // unlock the selection on mouse move
-    // if (event.type == sf::Event::MouseMoved) {
-    //     m_isSelectionLocked = false;
-    // }
-
-
-    // // -> corners editing
-    // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add)
-    //     updateSelectedCornersHeight(model, view, m_heightStep, selectionController, history);
-    // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract)
-    //     updateSelectedCornersHeight(model, view, -m_heightStep, selectionController, history);
-
-
     // mouse
     // if ((sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
     //     && event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
@@ -72,7 +60,7 @@ void ElevationTool::handleHeightEditingEvents(const sf::Event& event, WorldModel
     //         // m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(selectedCorners, m_heightStep * static_cast<int>(event.mouseWheelScroll.delta));
     //         // m_ongoingEditCornersHeightCommand->execute(model, view);
     //     } else
-    //         m_ongoingEditCornersHeightCommand->addHeight(m_heightStep  * static_cast<int>(event.mouseWheelScroll.delta), model, view);
+    //         m_ongoingEditCornersHeightCommand->addCorners(m_heightStep  * static_cast<int>(event.mouseWheelScroll.delta), model, view);
     // }
     // // register the last control used in the previous if and use it here and then reset
     // if (event.type == sf::Event::KeyReleased
@@ -86,7 +74,8 @@ void ElevationTool::handleHeightEditingEvents(const sf::Event& event, WorldModel
 void ElevationTool::handleKeyBoardHeightEditingEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view,
     const SelectionController &selectionController, CommandHistory &history)
 {
-    const bool isRaising = sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || sf::Keyboard::isKeyPressed(sf::Keyboard::P);
+    const bool isRaising = sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || sf::Keyboard::isKeyPressed(sf::Keyboard::P)
+    || sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
     const bool isLowering = sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || sf::Keyboard::isKeyPressed(sf::Keyboard::M);
 
     if (isRaising || isLowering) {
@@ -106,8 +95,9 @@ void ElevationTool::startContinuousElevation(const sf::RenderWindow& window, Wor
 {
     const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
     if (selectedCorners.empty()) return;
-    m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(selectedCorners, heightStep);
-    m_ongoingEditCornersHeightCommand->execute(model, view);
+    m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(/*selectedCorners, heightStep*/);
+    m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+    // m_ongoingEditCornersHeightCommand->execute(model, view);
     m_isSelectionLocked = true;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Mouse::getPosition(window);
@@ -119,29 +109,33 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
     if (m_ongoingEditCornersHeightCommand == nullptr)
         return;
     sf::Vector2i currentMouseScreenPosition = sf::Mouse::getPosition(window);
-    bool hasMouseMoved = MathUtils::distanceBetweenPoints(static_cast<sf::Vector2f>(m_lastMouseScreenPosition), static_cast<sf::Vector2f>(currentMouseScreenPosition)) > 2;
+    bool hasMouseMoved = m_lastMouseScreenPosition != currentMouseScreenPosition;
+    hasMouseMoved = MathUtils::distanceBetweenPoints(static_cast<sf::Vector2f>(m_lastMouseScreenPosition),
+                                static_cast<sf::Vector2f>(currentMouseScreenPosition)) > m_mouseMovementThreshold;
+
     if (hasMouseMoved) {
-        // use bressham's line algorithm to get the corners between the last mouse position and 
-        // the current one and add them to the command but where should I take the last tile corner from ? 
+        if (!m_isSelectionLocked) {
+        // if selection is not locked and the mouse has moved it means that the user want to edit other corners
+
+        // use bressham's line algorithm to get the corners between the last mouse position and
+        // the current one and add them to the command but where should I take the last tile corner from ?
         // should i take it from the command , the issue with that option iss that i f i were to add a dict in the command
-        // to avoid duplicate when the user when to update with the mousea tile height already update with the current command 
-        // it would be a bit more complex to implement and to maintain 
-        const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-        if (selectedCorners.empty()) return;
-        m_ongoingEditCornersHeightCommand->addHeight(selectedCorners, heightStep, model, view);
+        // to avoid duplicate when the user when to update with the mousea tile height already update with the current command
+        // it would be a bit more complex to implement and to maintain
+            const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+            if (selectedCorners.empty()) return;
+            m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+        }
         m_isSelectionLocked = false;
         m_lastMouseScreenPosition = currentMouseScreenPosition;
     } else {
+        m_isSelectionLocked = true;
         if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-            // it will added to all corner,
-            // but we anly want to add it to the selected ones,
-            // so we need to get the selected corners and add the height only to them
             std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
             if (selectedCorners.empty()) return;
-            m_ongoingEditCornersHeightCommand->addHeight(selectedCorners, heightStep, model, view);
+            m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
             m_continuousElevationClock.restart();
         }
-        m_isSelectionLocked = true;
     }
 }
 
@@ -152,4 +146,5 @@ void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, 
     m_isSelectionLocked = false;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Vector2i(-1, -1);
+    model.onTileCornerHeightChanged();
 }

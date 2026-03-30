@@ -10,16 +10,13 @@
 class EditTilesCornersHeightCommand : public ICommand
 {
 public:
-    EditTilesCornersHeightCommand(const std::vector<TileCorner *> &corners, float heightStep);
-    void addHeight(const std::vector<TileCorner *> &corners, float heightStep, WorldModel &model, const WorldView &view);
+    EditTilesCornersHeightCommand();
+    void addCorners(const std::vector<TileCorner *> &corners, float heightStep, WorldModel &model, const WorldView &view);
     void execute(WorldModel& model, WorldView& view) override;
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;
 private:
     std::map<TileCorner *, float> m_cornersHeightStep;
-    // std::vector<TileCorner *> m_corners;
-    // std::vector<float> m_cornersHeightStep;
-    // may add a map of corners world posiition to their addresses
 };
 
 

@@ -39,7 +39,7 @@ public:
      *
      * @param point2dX The X position on the screen (pixels).
      * @param point2dY The Y position on the screen (pixels).
-     * @param point2dZ The assumed Z plane for the intersection (usually 0 for ground picking).
+     * @param point2dZ The assumed Z plane (in world coordinates) for the intersection (usually 0 for ground picking).
      * @return The unscaled world coordinates (tile indices).
      */
     sf::Vector2f screen_to_world(float point2dX, float point2dY, float point2dZ) const;
@@ -66,6 +66,7 @@ public:
 
     float getTileSizeX() const { return m_tileSizeX; }
     float getTileSizeY() const { return m_tileSizeY; }
+    float getHeightScale() const { return m_heightScale; }
 
 private:
     /**

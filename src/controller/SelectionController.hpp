@@ -30,7 +30,7 @@ private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void getSelectedTiles(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
-
+    int getSearchRadius(const Camera &camera, const WorldModel &worldModel) const;
     TileCorner *getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition, 
                                                 sf::Vector2f pointScreenPosition, int radius) const;
     std::vector<TileCorner *> getPointNeighborsInRadius(const Camera &camera, WorldModel &worldModel, int x, int y, int radius) const;

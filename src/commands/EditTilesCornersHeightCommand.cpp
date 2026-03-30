@@ -4,17 +4,16 @@
 
 #include "EditTilesCornersHeightCommand.hpp"
 
-EditTilesCornersHeightCommand::EditTilesCornersHeightCommand(const std::vector<TileCorner *> &corners, const float heightStep)
+EditTilesCornersHeightCommand::EditTilesCornersHeightCommand()
 {
-    for (TileCorner * corner: corners)
-        m_cornersHeightStep.insert({corner, heightStep});
 }
 
-void EditTilesCornersHeightCommand::addHeight(const std::vector<TileCorner *> &corners, float heightStep, WorldModel &model, const WorldView &view)
+void EditTilesCornersHeightCommand::addCorners(const std::vector<TileCorner *> &corners, float heightStep, WorldModel &model, const WorldView &view)
 {
     std::vector<TileCorner *> cornersToUpdate;
     for (TileCorner * corner: corners) {
         corner->addHeight(heightStep);
+        model.onTileCornerHeightChanged(corner->getHeight());
         if (m_cornersHeightStep.find(corner) != m_cornersHeightStep.end())
             m_cornersHeightStep[corner] += heightStep;
         else
@@ -27,21 +26,23 @@ void EditTilesCornersHeightCommand::addHeight(const std::vector<TileCorner *> &c
 void EditTilesCornersHeightCommand::execute(WorldModel &model, WorldView &view)
 {
     std::vector<TileCorner *> cornersToUpdate;
-    for (const auto &pair : m_cornersHeightStep) {
-        pair.first->addHeight(pair.second);
-        cornersToUpdate.push_back(pair.first);
+    for (const auto &[corner, height] : m_cornersHeightStep) {
+        corner->addHeight(height);
+        cornersToUpdate.push_back(corner);
     }
     view.updateTileCorners(model.getTiles(), cornersToUpdate);
+    model.onTileCornerHeightChanged();
 }
 
 void EditTilesCornersHeightCommand::undo(WorldModel &model, WorldView &view)
 {
     std::vector<TileCorner *> cornersToUpdate;
-    for (const auto &pair : m_cornersHeightStep) {
-        pair.first->addHeight(-pair.second);
-        cornersToUpdate.push_back(pair.first);
+    for (const auto &[corner, height] : m_cornersHeightStep) {
+        corner->addHeight(-height);
+        cornersToUpdate.push_back(corner);
     }
     view.updateTileCorners(model.getTiles(), cornersToUpdate);
+    model.onTileCornerHeightChanged();
 }
 
 std::string EditTilesCornersHeightCommand::getName()

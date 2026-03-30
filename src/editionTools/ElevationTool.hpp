@@ -32,6 +32,7 @@ private:
     float m_continuousElevationInterval;
     sf::Clock m_continuousElevationClock;
     sf::Vector2i m_lastMouseScreenPosition;
+    float m_mouseMovementThreshold;
 };
 
 

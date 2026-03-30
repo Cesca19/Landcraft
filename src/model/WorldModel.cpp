@@ -5,6 +5,7 @@
 #include "WorldModel.hpp"
 
 WorldModel::WorldModel()
+    : m_highestTileCornerHeight(0)
 {
 }
 
@@ -23,7 +24,7 @@ void WorldModel::loadMap(std::string mapName)
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -49,6 +50,7 @@ void WorldModel::loadMap(std::string mapName)
     };
     createWorldTileCorners();
     createWorldTiles();
+    onTileCornerHeightChanged();
 }
 
 std::vector<std::vector<Tile>> &WorldModel::getTiles()
@@ -67,6 +69,31 @@ sf::Vector2f WorldModel::getCenter() const
     const float centerY = (static_cast<float>(m_map.size()) - 1.0f) / 2.0f;
 
     return {centerX, centerY};
+}
+
+void WorldModel::onTileCornerHeightChanged()
+{
+    m_highestTileCornerHeight = 0;
+    if (m_corners.empty())
+        return;
+    for (auto & corners_list : m_corners) {
+        for (const auto & corner : corners_list) {
+            const float height = std::abs(corner.get()->getHeight());
+            if (height > m_highestTileCornerHeight)
+                m_highestTileCornerHeight = height;
+        }
+    }
+}
+
+void WorldModel::onTileCornerHeightChanged(const float height)
+{
+    if (std::abs(height) > m_highestTileCornerHeight)
+        m_highestTileCornerHeight = std::abs(height);
+}
+
+float WorldModel::getHighestTileCornerHeight() const
+{
+    return m_highestTileCornerHeight;
 }
 
 void WorldModel::createWorldTiles()
