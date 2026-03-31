@@ -19,7 +19,7 @@ public:
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
 private:
     int m_currentTextureId;
-    Tile* m_lastPaintedTile;
+    sf::Vector2i m_previousMousePosition;
     std::unique_ptr<PaintTilesCommand> m_ongoingPaintCommand;
     const sf::Mouse::Button m_paintMouseButton = sf::Mouse::Left;
 };

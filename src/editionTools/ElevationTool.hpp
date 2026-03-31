@@ -25,6 +25,7 @@ private:
     void updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, 
         const SelectionController &selectionController, float heightStep);
     void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
+    std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model);
     float m_heightStep;
     bool m_isSelectionLocked;
     SelectionMode m_currentSelectionMode;
@@ -32,6 +33,7 @@ private:
     float m_continuousElevationInterval;
     sf::Clock m_continuousElevationClock;
     sf::Vector2i m_lastMouseScreenPosition;
+    sf::Vector2i m_lastMouseWorldPosition;
     float m_mouseMovementThreshold;
 };
 

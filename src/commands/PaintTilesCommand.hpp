@@ -17,7 +17,6 @@ public:
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;
     bool isEmpty() const;
-    Tile* getLastPaintedTile() const;
 private:
     std::vector<Tile *> m_tiles;
     int m_textureId;

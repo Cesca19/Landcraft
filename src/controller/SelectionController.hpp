@@ -26,6 +26,7 @@ public:
 
     std::vector<TileCorner *> getSelectedTileCorners() const;
     const std::vector<Tile *> &getSelectedTiles() const;
+    sf::Vector2i getMouseWorldPosition() const;
 private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
@@ -43,6 +44,7 @@ private:
     SelectionView m_selectionView;
     std::vector<TileCorner *> m_selectedTileCorners;
     std::vector<Tile *> m_selectedTiles;
+    sf::Vector2i m_mouseWorldPosition;
 };
 
 #endif //LANDCRAFT_SELECTIONCONTROLLER_HPP

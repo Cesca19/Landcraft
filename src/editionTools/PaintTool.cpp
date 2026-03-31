@@ -6,7 +6,7 @@
 
 PaintTool::PaintTool()
     : m_currentTextureId(1)
-    , m_lastPaintedTile(nullptr)
+    , m_previousMousePosition(-1, -1)
     , m_ongoingPaintCommand(nullptr)
 {
 }
@@ -38,35 +38,35 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
         && m_ongoingPaintCommand == nullptr) {
         m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(selectionController.getSelectedTiles(), m_currentTextureId);
         m_ongoingPaintCommand->execute(model, view);
-        m_lastPaintedTile = m_ongoingPaintCommand->getLastPaintedTile();
-        }
+        m_previousMousePosition = selectionController.getMouseWorldPosition();
+    }
     // paint ending
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == m_paintMouseButton
         && m_ongoingPaintCommand != nullptr) {
         if (!m_ongoingPaintCommand->isEmpty())
             history.addCommand(std::move(m_ongoingPaintCommand), model, view);
         m_ongoingPaintCommand = nullptr;
-        m_lastPaintedTile = nullptr;
-        }
+        m_previousMousePosition = {-1, -1};
+    }
 }
 
 void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
     CommandHistory &history)
 {
     // tiles painting
-    const std::vector<Tile *> selectedTiles = selectionController.getSelectedTiles();
+    const std::vector<Tile *>& selectedTiles = selectionController.getSelectedTiles();
     if (!sf::Mouse::isButtonPressed(m_paintMouseButton)
         || m_ongoingPaintCommand == nullptr
         || selectedTiles.empty())
         return;
 
-    const Tile *currentTile = selectedTiles[0];
-    if (currentTile == m_lastPaintedTile)
+    const sf::Vector2i currentMousePosition = selectionController.getMouseWorldPosition();
+    if (currentMousePosition == m_previousMousePosition)
         return;
 
-    if (m_lastPaintedTile == nullptr) {
+    if (m_previousMousePosition == sf::Vector2i{-1, -1}) {
         m_ongoingPaintCommand->AddTiles(selectedTiles, model, view);
-        m_lastPaintedTile = m_ongoingPaintCommand->getLastPaintedTile();
+        m_previousMousePosition = currentMousePosition;
         return;
     }
 
@@ -75,11 +75,11 @@ void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldMode
         return;
 
     const std::vector<sf::Vector2i> lineTilesPositions =
-            MathUtils::getBresenhamLine(m_lastPaintedTile->getGridPosition(), currentTile->getGridPosition());
+            MathUtils::getBresenhamLine(m_previousMousePosition, currentMousePosition);
     for (const sf::Vector2i& pos : lineTilesPositions)
         if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
         && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
             m_ongoingPaintCommand->AddTile(&worldTiles[pos.y][pos.x], model, view);
         }
-    m_lastPaintedTile = m_ongoingPaintCommand->getLastPaintedTile();
+    m_previousMousePosition = currentMousePosition;
 }

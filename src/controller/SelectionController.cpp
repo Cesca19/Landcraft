@@ -5,6 +5,7 @@
 #include "SelectionController.hpp"
 
 SelectionController::SelectionController()
+    : m_mouseWorldPosition(-1, -1)
 {
 }
 
@@ -44,22 +45,27 @@ const std::vector<Tile *> & SelectionController::getSelectedTiles() const
     return m_selectedTiles;
 }
 
+sf::Vector2i SelectionController::getMouseWorldPosition() const {
+    return m_mouseWorldPosition;
+}
+
 void SelectionController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
     m_selectedTileCorners.clear();
     m_selectedTiles.clear();
+    m_mouseWorldPosition = sf::Vector2i(-1, -1);
     // get the current mouse position in the window in pixels
     const sf::Vector2i mousePixelScreenPosition = sf::Mouse::getPosition(window);
     // get it's real coordinates in the current view
     const sf::Vector2f mouseScreenPosition = window.mapPixelToCoords(mousePixelScreenPosition);
     // convert screen-space → isometric world → tile coords
     const sf::Vector2f tempPos = camera.screen_to_world(mouseScreenPosition.x, mouseScreenPosition.y, 0); //getPointTileCoordinates(mouseScreenPosition);
-    const sf::Vector2i mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
+    m_mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
 
     if (selectionMode == SelectionMode::TILE_CORNER)
-        getSelectedTilesCorners(camera, worldModel, mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
+        getSelectedTilesCorners(camera, worldModel, m_mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
     else
-        getSelectedTiles(camera, worldModel, mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
+        getSelectedTiles(camera, worldModel, m_mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
     
 }
 

@@ -54,9 +54,3 @@ bool PaintTilesCommand::isEmpty() const
 {
     return m_tiles.empty();
 }
-
-Tile *PaintTilesCommand::getLastPaintedTile() const
-{
-    if (m_tiles.empty()) return nullptr;
-    return m_tiles.back();
-}

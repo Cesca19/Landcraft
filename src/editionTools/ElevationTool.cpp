@@ -11,7 +11,8 @@ ElevationTool::ElevationTool()
     , m_ongoingEditCornersHeightCommand(nullptr)
     , m_continuousElevationInterval(0.25f)
     , m_lastMouseScreenPosition(-1, -1)
-    , m_mouseMovementThreshold(5.0f)
+    , m_lastMouseWorldPosition(-1, -1)
+    , m_mouseMovementThreshold(2.5f)
 {
 }
 
@@ -101,6 +102,7 @@ void ElevationTool::startContinuousElevation(const sf::RenderWindow& window, Wor
     m_isSelectionLocked = true;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Mouse::getPosition(window);
+    m_lastMouseWorldPosition = selectionController.getMouseWorldPosition();
 }
 
 void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
@@ -114,19 +116,18 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
 
     if (hasMouseMoved) {
         if (!m_isSelectionLocked) {
-        // if selection is not locked and the mouse has moved it means that the user want to edit other corners
-
-        // use bressham's line algorithm to get the corners between the last mouse position and
-        // the current one and add them to the command but where should I take the last tile corner from ?
-        // should i take it from the command , the issue with that option iss that i f i were to add a dict in the command
-        // to avoid duplicate when the user when to update with the mousea tile height already update with the current command
-        // it would be a bit more complex to implement and to maintain
+            const sf::Vector2i currentMouseWorldPosition = selectionController.getMouseWorldPosition();
             const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-            if (selectedCorners.empty()) return;
-            m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+            std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
+            std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentMouseWorldPosition, model);
+
+            cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
+            if (!cornersToElevate.empty())
+                m_ongoingEditCornersHeightCommand->addCorners({cornersToElevate.begin(), cornersToElevate.end()}, heightStep, model, view);
+            m_lastMouseWorldPosition = currentMouseWorldPosition;
+            m_lastMouseScreenPosition = currentMouseScreenPosition;
         }
         m_isSelectionLocked = false;
-        m_lastMouseScreenPosition = currentMouseScreenPosition;
     } else {
         m_isSelectionLocked = true;
         if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
@@ -146,4 +147,36 @@ void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, 
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Vector2i(-1, -1);
     model.onTileCornerHeightChanged();
+}
+
+std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(sf::Vector2i startPosition,
+    sf::Vector2i endPosition, WorldModel &model)
+{
+    std::set<TileCorner *> cornersToElevate = {};
+    if (m_currentSelectionMode == SelectionMode::TILE_CORNER) {
+        const std::vector<std::vector<std::unique_ptr<TileCorner>>> &worldTilesCorners = model.getCorners();
+        if (worldTilesCorners.empty() || worldTilesCorners[0].empty())
+            return cornersToElevate;
+        const std::vector<sf::Vector2i> lineTilesPositions =
+                MathUtils::getBresenhamLine(startPosition, endPosition);
+        for (const sf::Vector2i& pos : lineTilesPositions)
+            if (pos.y >= 0 && pos.y < static_cast<int>(worldTilesCorners.size())
+            && pos.x >= 0 && pos.x < static_cast<int>(worldTilesCorners[0].size())) {
+                cornersToElevate.insert(worldTilesCorners[pos.y][pos.x].get());
+            }
+    } else {
+        const std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
+        if (worldTiles.empty() || worldTiles[0].empty())
+            return cornersToElevate;
+
+        const std::vector<sf::Vector2i> lineTilesPositions =
+                MathUtils::getBresenhamLine(startPosition, endPosition);
+        for (const sf::Vector2i& pos : lineTilesPositions)
+            if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
+            && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
+                const std::vector<TileCorner *>  corners = worldTiles[pos.y][pos.x].getCorners();
+                cornersToElevate.insert(corners.begin(), corners.end());
+            }
+    }
+    return cornersToElevate;
 }
