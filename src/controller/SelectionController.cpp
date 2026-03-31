@@ -16,6 +16,7 @@ void SelectionController::update(float deltaTime, sf::RenderWindow &window, Sele
                                 WorldModel &worldModel, const Camera &camera, bool &hasModelChanged)
 {
     getSelectedCorners(window, camera, worldModel, selectionMode);
+    // should we hide the mouse cursor when something is hovered inside the map
 }
 
 void SelectionController::draw(sf::RenderWindow &window, const Camera &camera)

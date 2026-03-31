@@ -8,8 +8,9 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     : m_tilesSize(tilesSize)
     , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
-    , m_shadedTileColor(sf::Color(150, 150, 150, 75))
-    , m_wireframeTileColor(sf::Color::White)
+    , m_shadedTileColor(sf::Color(205, 185, 220))
+    // , m_shadedTileColor(sf::Color(200, 180, 220))
+    , m_wireframeTileColor(sf::Color(255, 255, 255, 100))
 {
     m_tilesetTexture.loadFromFile(tilesetFilepath);
 }
