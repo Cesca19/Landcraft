@@ -101,10 +101,10 @@ TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &
         return nullptr;
     TileCorner* closestNeighbor = neighbors[0];
     float minDistance = MathUtils::distanceBetweenPoints(getTileCornerScreenCoordinates(camera, neighbors[0]), pointScreenPosition);
-    float refMinDistance = std::max(camera.getTileSizeX(), camera.getTileSizeY());
+    const float refMinDistance = std::max(camera.getTileSizeX(), camera.getTileSizeY());
 
     for ( TileCorner* neighbor : neighbors) {
-        if (float dist = MathUtils::distanceBetweenPoints(getTileCornerScreenCoordinates(camera, neighbor), pointScreenPosition); dist < minDistance)
+        if (const float dist = MathUtils::distanceBetweenPoints(getTileCornerScreenCoordinates(camera, neighbor), pointScreenPosition); dist < minDistance)
         {
             minDistance = dist;
             closestNeighbor = neighbor;
@@ -195,7 +195,7 @@ bool SelectionController::isPointInsideTile(const Camera &camera, Tile *tile, sf
     return false;
 }
 
-sf::Vector2f SelectionController::getTileCornerScreenCoordinates(const Camera &camera, TileCorner *corner) const
+sf::Vector2f SelectionController::getTileCornerScreenCoordinates(const Camera &camera, const TileCorner *corner) const
 {
     return camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
 }

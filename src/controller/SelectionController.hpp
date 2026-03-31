@@ -38,7 +38,7 @@ private:
     Tile *getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius) const;
     std::vector<Tile *> getClosestTilesInRadius(const Camera &camera, WorldModel &worldModel, int x, int y, int radius) const;
     bool isPointInsideTile(const Camera &camera, Tile *tile, sf::Vector2f pointScreenPosition) const;
-    sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, TileCorner* corner) const;
+    sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner) const;
 
     SelectionView m_selectionView;
     std::vector<TileCorner *> m_selectedTileCorners;

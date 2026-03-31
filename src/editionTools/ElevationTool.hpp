@@ -21,7 +21,7 @@ private:
     void handleHeightEditingEvents(const sf::Event& event, WorldModel& model, WorldView& view,
                                  const SelectionController &selectionController, CommandHistory &history);
     void handleKeyBoardHeightEditingEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, const SelectionController &selectionController, CommandHistory &history);
-    void startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, WorldView &view, const SelectionController &selectionController, float heightStep);
+    void startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep);
     void updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, 
         const SelectionController &selectionController, float heightStep);
     void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
