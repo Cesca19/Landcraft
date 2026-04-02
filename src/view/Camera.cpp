@@ -20,6 +20,7 @@ Camera::Camera(const float tileSizeX, const float tileSizeY, const float heightS
     , m_mouseLastDragPosition({0, 0})
     , m_isDraggingForRotation(false)
     , m_continuousRotationSpeed(0.15f)
+    , m_isRotating(false)
 {
 }
 
@@ -78,32 +79,32 @@ sf::Vector2f Camera::getWorldPivotInWorldCoordinates() const
     return m_worldPivot;
 }
 
-void Camera::update(const float deltaTime, bool &hasMoved)
+void Camera::update(const float deltaTime)
 {
-    hasMoved = false;
+    m_isRotating = false;
     //upd pitch rotation
     if (std::abs(m_targetPitchRotationAngle - m_currentPitchRotationAngle) > m_epsilon) {
         m_currentPitchRotationAngle = m_currentPitchRotationAngle +
                                         (m_targetPitchRotationAngle - m_currentPitchRotationAngle)
                                         * m_pitchRotationSpeed * deltaTime;
         rotateAroundXAxis(m_currentPitchRotationAngle);
-        hasMoved = true;
+        m_isRotating = true;
     } else
         if (m_currentPitchRotationAngle != m_targetPitchRotationAngle) {
             m_currentPitchRotationAngle = m_targetPitchRotationAngle;
             rotateAroundXAxis(m_currentPitchRotationAngle);
-            hasMoved = true;
+            m_isRotating = true;
         }
 
     // upd yaw rotation
     if (std::abs(m_targetYawRotationAngle - m_currentYawRotationAngle) > m_epsilon) {
         m_currentYawRotationAngle = m_currentYawRotationAngle +
             (m_targetYawRotationAngle - m_currentYawRotationAngle) * m_yawRotationSpeed * deltaTime;
-        hasMoved = true;
+        m_isRotating = true;
     } else
         if (m_currentYawRotationAngle != m_targetYawRotationAngle) {
             m_currentYawRotationAngle = m_targetYawRotationAngle;
-            hasMoved = true;
+            m_isRotating = true;
         }
 }
 

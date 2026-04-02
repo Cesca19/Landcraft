@@ -12,6 +12,7 @@ class ElevationTool : public IEditionTool
 {
 public:
     ElevationTool();
+    bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
     void handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
@@ -24,16 +25,22 @@ private:
         const SelectionController &selectionController, float heightStep);
     void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
     std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model) const;
+
     float m_heightStep;
+
+    bool m_isEditing;
     bool m_isSelectionLocked;
     SelectionMode m_currentSelectionMode;
-    std::unique_ptr<EditTilesCornersHeightCommand> m_ongoingEditCornersHeightCommand;
+
     float m_continuousElevationInterval;
     sf::Clock m_continuousElevationClock;
+
     sf::Vector2i m_lastMouseScreenPosition;
     sf::Vector2i m_lastMouseWorldPosition;
+
     float m_mouseMovementThreshold;
-    bool m_isEditing;
+    const sf::Mouse::Button m_editingMouseButton = sf::Mouse::Left;
+    std::unique_ptr<EditTilesCornersHeightCommand> m_ongoingEditCornersHeightCommand;
 };
 
 

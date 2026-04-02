@@ -14,8 +14,9 @@
 class IEditionTool {
 public:
     virtual ~IEditionTool() = default;
-    virtual SelectionMode getRequiredSelectionMode() const = 0;
+    virtual bool isEditing() const = 0;
     virtual bool isSelectionLocked() const = 0;
+    virtual SelectionMode getRequiredSelectionMode() const = 0;
     virtual void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
                               SelectionController& selectionController, CommandHistory& history) = 0;
     virtual void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view,

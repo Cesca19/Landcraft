@@ -10,16 +10,18 @@ NavigationController::NavigationController()
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
     , m_isRotating(false)
-    , m_isMovementKeyPressed(false)
+    , m_isNavigationKeyPressed(false)
 {
 }
 
 void NavigationController::handleEvents(const sf::RenderWindow &window, const sf::Event &event, WorldModel &model,
-    WorldView &view)
+    WorldView &view, const bool isEditing)
 {
     handlePanEvents(window, event, view);
-    handleZoomEvents(window, event, view);
-    handleRotationEvents(window, event, model, view);
+    if (!isEditing) {
+        handleZoomEvents(window, event, view);
+        handleRotationEvents(window, event, model, view);
+    }
 }
 
 void NavigationController::handleContinuousEvents(WorldView &view)
@@ -27,14 +29,9 @@ void NavigationController::handleContinuousEvents(WorldView &view)
     handleContinuousPanEvents(view);
 }
 
-bool NavigationController::isNavigating(const WorldView &view) const
-{
-    return m_isMovementKeyPressed || m_isRotating || view.isMoving();
-}
-
 void NavigationController::resetKeyPressedEvents()
 {
-    m_isMovementKeyPressed = false;
+    m_isNavigationKeyPressed = false;
 }
 
 void NavigationController::handlePanEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView& view)
@@ -68,7 +65,7 @@ void NavigationController::handleContinuousPanEvents(WorldView& view)
         // float currentZoom = view->getTargetZoom();
         // float adjustedSpeed = m_movementStep * currentZoom;
         view.moveTarget(moveVector * m_movementStep);
-        m_isMovementKeyPressed = true;
+        m_isNavigationKeyPressed = true;
     }
 }
 
@@ -93,20 +90,20 @@ void NavigationController::handleRotationEvents(const sf::RenderWindow &window, 
     // yaw
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
         view.rotateYaw(m_yawRotationStep);
-        m_isMovementKeyPressed = true;
+        m_isNavigationKeyPressed = true;
     }
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E) {
         view.rotateYaw(-m_yawRotationStep);
-        m_isMovementKeyPressed = true;
+        m_isNavigationKeyPressed = true;
     }
     // pitch
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
         view.rotatePitch(m_pitchRotationStep);
-        m_isMovementKeyPressed = true;
+        m_isNavigationKeyPressed = true;
     }
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F) {
         view.rotatePitch(-m_pitchRotationStep);
-        m_isMovementKeyPressed = true;
+        m_isNavigationKeyPressed = true;
     }
     
     // add gizmo axes click like blender

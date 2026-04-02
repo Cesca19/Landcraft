@@ -54,5 +54,5 @@ void CommandHistory::redoCommand(WorldModel &model, WorldView &view)
 void CommandHistory::addHistoryMessage(const std::string &message)
 {
     m_historyMessages.push_back(message);
-    // std::cout << "Command history : " << message << std::endl;
+    std::cout << "Command history : " << message << std::endl;
 }

@@ -11,9 +11,8 @@
 class NavigationController {
 public:
     NavigationController();
-    void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
+    void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
     void handleContinuousEvents(WorldView& view);
-    bool isNavigating(const WorldView& view) const;
     void resetKeyPressedEvents();
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
@@ -26,7 +25,7 @@ private:
     float m_pitchRotationStep;
     float m_yawRotationStep;
     bool m_isRotating;
-    bool m_isMovementKeyPressed;
+    bool m_isNavigationKeyPressed;
 };
 
 

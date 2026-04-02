@@ -19,10 +19,10 @@ void EnvironmentView::init(const sf::Vector2u windowSize)
 }
 
 void EnvironmentView::update(const Camera &camera, const sf::Vector2f viewCenter,
-    const sf::Vector2f viewSize, const sf::Vector2f &gizmoPosition, float gizmoSize, const bool isViewMoving)
+    const sf::Vector2f viewSize, const sf::Vector2f &gizmoPosition, const float gizmoSize, const bool isViewChanging)
 {
-    updateWorldReference(camera, viewCenter, viewSize, isViewMoving);
-    updateWorldGizmo(camera, gizmoPosition, gizmoSize, isViewMoving);
+    updateWorldReference(camera, viewCenter, viewSize, isViewChanging);
+    updateWorldGizmo(camera, gizmoPosition, gizmoSize, isViewChanging);
 }
 
 void EnvironmentView::drawSkyBox(sf::RenderWindow &window) const

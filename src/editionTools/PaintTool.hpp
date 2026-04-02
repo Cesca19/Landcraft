@@ -12,12 +12,14 @@ class PaintTool : public IEditionTool
 {
 public:
     PaintTool();
+    bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
                               SelectionController& selectionController, CommandHistory& history) override;
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
 private:
+    bool m_isEditing;
     int m_currentTextureId;
     sf::Vector2i m_previousMousePosition;
     std::unique_ptr<PaintTilesCommand> m_ongoingPaintCommand;

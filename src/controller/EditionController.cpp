@@ -23,18 +23,23 @@ void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldMo
     m_editionTools[m_currentEditionTool]->handleContinuousEvents(window, model, view, m_selectionController, m_commandHistory);
 }
 
-void EditionController::update(const float deltaTime, sf::RenderWindow &window, WorldModel &model, const WorldView &view, const bool isNavigating)
+void EditionController::update(const float deltaTime, sf::RenderWindow &window, WorldModel &model, const WorldView &view)
 {
     bool hasModelChanged = false;
-    if (!isNavigating && !m_editionTools[m_currentEditionTool]->isSelectionLocked())
+    if (!m_editionTools[m_currentEditionTool]->isSelectionLocked())
         m_selectionController.update(deltaTime, window, m_editionTools[m_currentEditionTool]->getRequiredSelectionMode(),
             model, view.getCamera(), hasModelChanged);
 }
 
-void EditionController::draw(sf::RenderWindow &window, const Camera &camera, bool isNavigating)
+void EditionController::draw(sf::RenderWindow &window, const Camera &camera)
 {
-    if (!isNavigating) // only draw selection when not panning or rotating to avoid visual clutter
+    if (!camera.isRotating()) // only draw selection when not rotating to avoid visual clutter
         m_selectionController.draw(window, camera);
+}
+
+bool EditionController::isEditing() const
+{
+    return m_editionTools[m_currentEditionTool]->isEditing();
 }
 
 void EditionController::handleUndoRedoEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view)
@@ -49,7 +54,7 @@ void EditionController::handleUndoRedoEvents(sf::RenderWindow &window, const sf:
 void EditionController::handleEditionToolSwitchEvents(const sf::Event &event)
 {
     // keyboard
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab) {
+    if (!isEditing() && event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Tab) {
         m_currentEditionTool ++;
         if (m_currentEditionTool > m_editionTools.size() - 1)
             m_currentEditionTool = 0;

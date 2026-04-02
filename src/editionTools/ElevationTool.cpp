@@ -6,15 +6,20 @@
 
 ElevationTool::ElevationTool()
     : m_heightStep(1)
+    , m_isEditing(false)
     , m_isSelectionLocked(false)
     , m_currentSelectionMode(SelectionMode::TILE_CORNER)
-    , m_ongoingEditCornersHeightCommand(nullptr)
     , m_continuousElevationInterval(0.25f)
     , m_lastMouseScreenPosition(-1, -1)
     , m_lastMouseWorldPosition(-1, -1)
     , m_mouseMovementThreshold(2.5f)
-    , m_isEditing(false)
+    , m_ongoingEditCornersHeightCommand(nullptr)
 {
+}
+
+bool ElevationTool::isEditing() const
+{
+    return m_isEditing;
 }
 
 bool ElevationTool::isSelectionLocked() const
@@ -53,8 +58,8 @@ void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, Wo
     const SelectionController &selectionController, CommandHistory &history)
 {
     const bool isShiftPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-    const bool isRaising = sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || (!isShiftPressed && sf::Mouse::isButtonPressed(sf::Mouse::Left));;
-    const bool isLowering = sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || ( isShiftPressed && sf::Mouse::isButtonPressed(sf::Mouse::Left));
+    const bool isRaising = sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || (!isShiftPressed && sf::Mouse::isButtonPressed(m_editingMouseButton));;
+    const bool isLowering = sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || ( isShiftPressed && sf::Mouse::isButtonPressed(m_editingMouseButton));
 
     if (isRaising || isLowering) {
         const float heightFactor = (isRaising ? 1.0f : -1.0f ) * m_heightStep;
@@ -89,23 +94,37 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
     if (m_ongoingEditCornersHeightCommand == nullptr)
         return;
     const sf::Vector2i currentMouseScreenPosition = sf::Mouse::getPosition(window);
-    const bool hasMouseMoved = MathUtils::distanceBetweenPoints(static_cast<sf::Vector2f>(m_lastMouseScreenPosition),
+    const bool hasScreenMouseMoved = MathUtils::distanceBetweenPoints(static_cast<sf::Vector2f>(m_lastMouseScreenPosition),
                                 static_cast<sf::Vector2f>(currentMouseScreenPosition)) > m_mouseMovementThreshold;
+    const sf::Vector2i currentMouseWorldPosition = selectionController.getMouseWorldPosition();
+    const bool hasAnyMouseMoved = hasScreenMouseMoved || view.isMoving();
 
-    if (hasMouseMoved) {
+    if (hasAnyMouseMoved) {
         if (!m_isSelectionLocked) {
-            const sf::Vector2i currentMouseWorldPosition = selectionController.getMouseWorldPosition();
-            const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-            std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
-            std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentMouseWorldPosition, model);
+            if (m_lastMouseWorldPosition != currentMouseWorldPosition) {
+                const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+                std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
+                std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentMouseWorldPosition, model);
 
-            cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
-            if (!cornersToElevate.empty())
-                m_ongoingEditCornersHeightCommand->addCorners({cornersToElevate.begin(), cornersToElevate.end()}, heightStep, model, view);
-            m_lastMouseWorldPosition = currentMouseWorldPosition;
-            m_lastMouseScreenPosition = currentMouseScreenPosition;
+                cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
+                if (!cornersToElevate.empty())
+                    m_ongoingEditCornersHeightCommand->addCorners({cornersToElevate.begin(), cornersToElevate.end()}, heightStep, model, view);
+                m_lastMouseWorldPosition = currentMouseWorldPosition;
+                m_lastMouseScreenPosition = currentMouseScreenPosition;
+                m_continuousElevationClock.restart();
+                m_isSelectionLocked = true;
+            } else if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
+                const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+                if (!selectedCorners.empty())
+                    m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+                m_continuousElevationClock.restart();
+                m_lastMouseScreenPosition = currentMouseScreenPosition;
+                m_isSelectionLocked = true;
+            } else
+                m_isSelectionLocked = false;
+        } else {
+            m_isSelectionLocked = false;
         }
-        m_isSelectionLocked = false;
     } else {
         m_isSelectionLocked = true;
         if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {

@@ -57,7 +57,7 @@ public:
      */
     sf::Vector2f getWorldPivotInWorldCoordinates() const;
 
-    void update(float deltaTime, bool &hasMoved);
+    void update(float deltaTime);
     void rotatePitch(float angle);
     void rotateYaw(float angle);
     void startContinuousRotation(sf::Vector2i mousePosition);
@@ -67,6 +67,7 @@ public:
     float getTileSizeX() const { return m_tileSizeX; }
     float getTileSizeY() const { return m_tileSizeY; }
     float getHeightScale() const { return m_heightScale; }
+    bool isRotating() const { return m_isRotating; }
 
 private:
     /**
@@ -84,6 +85,7 @@ private:
      *      -> it's similar to turning the head left or right (rotating the map on itself).
      * @param angle The rotation angle in RADIANS.
      * @param point The point to rotate.
+     * @param rotationCenter
      * @return The new rotated coordinates.
      */
     static sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point, sf::Vector2f rotationCenter);
@@ -107,6 +109,8 @@ private:
     sf::Vector2i m_mouseLastDragPosition;
     bool m_isDraggingForRotation;
     float m_continuousRotationSpeed;
+
+    bool m_isRotating;
 };
 
 

@@ -16,8 +16,9 @@ public:
     EditionController();
     void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void handleContinuousEvents(sf::RenderWindow& window, WorldModel& model, WorldView& view);
-    void update(float deltaTime, sf::RenderWindow& window, WorldModel& model, const WorldView& view, bool isNavigating);
-    void draw(sf::RenderWindow& window, const Camera& camera, bool isNavigating);
+    void update(float deltaTime, sf::RenderWindow& window, WorldModel& model, const WorldView& view);
+    void draw(sf::RenderWindow& window, const Camera& camera);
+    bool isEditing() const;
 private:
     void handleUndoRedoEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void handleEditionToolSwitchEvents(const sf::Event& event);

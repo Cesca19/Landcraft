@@ -5,10 +5,16 @@
 #include "PaintTool.hpp"
 
 PaintTool::PaintTool()
-    : m_currentTextureId(1)
+    : m_isEditing(false)
+    , m_currentTextureId(1)
     , m_previousMousePosition(-1, -1)
     , m_ongoingPaintCommand(nullptr)
 {
+}
+
+bool PaintTool::isEditing() const
+{
+    return m_isEditing;
 }
 
 bool PaintTool::isSelectionLocked() const
@@ -39,6 +45,7 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
         m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(selectionController.getSelectedTiles(), m_currentTextureId);
         m_ongoingPaintCommand->execute(model, view);
         m_previousMousePosition = selectionController.getMouseWorldPosition();
+        m_isEditing = true;
     }
     // paint ending
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == m_paintMouseButton
@@ -47,6 +54,7 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
             history.addCommand(std::move(m_ongoingPaintCommand), model, view);
         m_ongoingPaintCommand = nullptr;
         m_previousMousePosition = {-1, -1};
+        m_isEditing = false;
     }
 }
 

@@ -22,6 +22,7 @@ public:
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
     bool isMoving() const;
+    bool isRotating() const;
 
     void setSize(sf::Vector2f size);
     void setCenter(sf::Vector2f center);

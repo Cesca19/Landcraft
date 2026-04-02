@@ -81,13 +81,11 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
             m_isMoving = true;
         }
 
-    bool hasCameraMoved = false;
-    m_camera->update(deltaTime, hasCameraMoved);
-    if (hasCameraMoved)
+    m_camera->update(deltaTime);
+    if (m_camera->isRotating())
         m_tileMap->updatePositions(tiles, *m_camera);
-    m_isMoving = m_isMoving || hasCameraMoved;
     m_environmentView->update(*m_camera, m_view.getCenter(), m_view.getSize(),
-        {window.getSize().x - 50.0f, 100.0f}, 40, isMoving());
+        {window.getSize().x - 50.0f, 100.0f}, 40, isMoving() || isRotating());
 }
 
 void WorldView::draw(sf::RenderWindow &window) const
@@ -102,6 +100,11 @@ void WorldView::draw(sf::RenderWindow &window) const
 bool WorldView::isMoving() const
 {
     return m_isMoving || m_isDragging;
+}
+
+bool WorldView::isRotating() const
+{
+    return m_camera->isRotating();
 }
 
 void WorldView::setSize(const sf::Vector2f size)

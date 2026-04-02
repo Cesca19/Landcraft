@@ -13,7 +13,7 @@ public:
     EnvironmentView();
     void init(sf::Vector2u windowSize);
     void update(const Camera &camera, sf::Vector2f viewCenter, sf::Vector2f viewSize,
-        const sf::Vector2f& gizmoPosition, float gizmoSize, bool isViewMoving);
+        const sf::Vector2f& gizmoPosition, float gizmoSize, bool isViewChanging);
     void drawSkyBox(sf::RenderWindow& window) const;
     void drawWorldReference(sf::RenderWindow& window) const;
     void drawWorldGizmo(sf::RenderWindow& window) const;
