@@ -47,3 +47,8 @@ void WorldController::draw(sf::RenderWindow &window)
     if (!m_worldView.getCamera().isRotating()) // only draw selection when not rotating to avoid visual clutter
         m_selectionController.draw(window, m_worldView.getCamera());
 }
+
+void WorldController::onWindowResized(const sf::Vector2u windowSize)
+{
+    m_worldView.onWindowResized(windowSize);
+}

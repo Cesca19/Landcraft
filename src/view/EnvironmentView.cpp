@@ -5,15 +5,17 @@
 #include "EnvironmentView.hpp"
 
 EnvironmentView::EnvironmentView()
-    : m_skyBox(sf::Quads, 4)
+    : m_maxScreenViewRadius(200)
+    , m_skyBox(sf::Quads, 4)
     , m_worldReferenceVertexArray(sf::Lines)
     , m_gizmoVertexArray(sf::Lines)
-    , m_maxScreenViewRadius(200)
+    , m_wasViewResized(false)
 {
 }
 
 void EnvironmentView::init(const sf::Vector2u windowSize)
 {
+    m_view.reset({0, 0, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
     initSkyBox(windowSize);
     initWorldGizmo();
 }
@@ -21,14 +23,15 @@ void EnvironmentView::init(const sf::Vector2u windowSize)
 void EnvironmentView::update(const Camera &camera, const sf::Vector2f viewCenter,
     const sf::Vector2f viewSize, const sf::Vector2f &gizmoPosition, const float gizmoSize, const bool isViewChanging)
 {
-    updateWorldReference(camera, viewCenter, viewSize, isViewChanging);
-    updateWorldGizmo(camera, gizmoPosition, gizmoSize, isViewChanging);
+    updateWorldReference(camera, viewCenter, viewSize, isViewChanging || m_wasViewResized);
+    updateWorldGizmo(camera, gizmoPosition, gizmoSize);
+    m_wasViewResized = false;
 }
 
 void EnvironmentView::drawSkyBox(sf::RenderWindow &window) const
 {
     const sf::View previousView = window.getView();
-    window.setView(window.getDefaultView());
+    window.setView(m_view);
     window.draw(m_skyBox);
     window.setView(previousView);
 }
@@ -41,14 +44,25 @@ void EnvironmentView::drawWorldReference(sf::RenderWindow &window) const
 void EnvironmentView::drawWorldGizmo(sf::RenderWindow &window) const
 {
     const sf::View previousView = window.getView();
-    window.setView(window.getDefaultView());
+    window.setView(m_view);
     window.draw(m_gizmoVertexArray);
     window.setView(previousView);
 }
 
-void EnvironmentView::updateWorldReference(const Camera &camera, const sf::Vector2f viewCenter, const sf::Vector2f viewSize, const bool isViewMoving)
+void EnvironmentView::onWindowResized(const sf::Vector2u windowSize)
 {
-    if (!isViewMoving && m_worldReferenceVertexArray.getVertexCount() > 0)
+    m_view.reset({0, 0, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)});
+    // upd skybox
+    m_skyBox[0].position = sf::Vector2f(0, 0);
+    m_skyBox[1].position = sf::Vector2f(static_cast<float>(windowSize.x), 0);
+    m_skyBox[2].position = sf::Vector2f(static_cast<float>(windowSize.x), static_cast<float>(windowSize.y));
+    m_skyBox[3].position = sf::Vector2f(0, static_cast<float>(windowSize.y));
+    m_wasViewResized = true;
+}
+
+void EnvironmentView::updateWorldReference(const Camera &camera, const sf::Vector2f viewCenter, const sf::Vector2f viewSize, const bool shouldUpdate)
+{
+    if (!shouldUpdate && m_worldReferenceVertexArray.getVertexCount() > 0)
         return;
     constexpr float height = 0.0f;
     // get the unrotated world coordinate of the view center
@@ -81,10 +95,8 @@ void EnvironmentView::updateWorldReference(const Camera &camera, const sf::Vecto
 }
 
 void EnvironmentView::updateWorldGizmo(const Camera &camera, const sf::Vector2f &gizmoPosition,
-    const float size, const bool isViewMoving)
+    const float size)
 {
-    if (!isViewMoving)
-        return;
     // projected origin point
     const sf::Vector2f origin = camera.world_to_screen(sf::Vector2f(0, 0), 0);
     const sf::Vector2f pX = camera.world_to_screen({1.0f, 0.0f}, 0);
@@ -116,16 +128,16 @@ void EnvironmentView::initSkyBox(const sf::Vector2u windowSize)
     // may be create a shader and add some particles for night or day
     // sf::Color bottomColor(120, 72, 153);   // purple
     // sf::Color topColor(255, 179, 193);  // pink
-    sf::Color bottomColor(255, 179, 193);  // pink
-    sf::Color topColor(196, 218, 242);
+    const sf::Color bottomColor(255, 179, 193);  // pink
+    const sf::Color topColor(196, 218, 242);
 
     m_skyBox[0].position = sf::Vector2f(0, 0);
     m_skyBox[0].color = topColor;
-    m_skyBox[1].position = sf::Vector2f(windowSize.x, 0);
+    m_skyBox[1].position = sf::Vector2f(static_cast<float>(windowSize.x), 0);
     m_skyBox[1].color = topColor;
-    m_skyBox[2].position = sf::Vector2f(windowSize.x, windowSize.y);
+    m_skyBox[2].position = sf::Vector2f(static_cast<float>(windowSize.x), static_cast<float>(windowSize.y));
     m_skyBox[2].color = bottomColor;
-    m_skyBox[3].position = sf::Vector2f(0, windowSize.y);
+    m_skyBox[3].position = sf::Vector2f(0, static_cast<float>(windowSize.y));
     m_skyBox[3].color = bottomColor;
 }
 

@@ -60,6 +60,9 @@ void LandcraftEditor::handleEvents()
                 m_hasFocus = true;
 				m_clock.restart();
                 break;
+            case sf::Event::Resized:
+                m_worldController.onWindowResized(sf::Vector2u(event.size.width, event.size.height));
+                break;
             default:
                 break;
         }

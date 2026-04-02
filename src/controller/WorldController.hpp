@@ -36,6 +36,7 @@ public:
     void handleContinuousEvents(float deltaTime, const sf::RenderWindow& window);
     void update(float deltaTime, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
+    void onWindowResized(sf::Vector2u windowSize);
 private:
     // add event for turn on/off wireframe, shaded mode,
 
