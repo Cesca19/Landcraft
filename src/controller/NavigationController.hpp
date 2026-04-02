@@ -13,7 +13,6 @@ public:
     NavigationController();
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
     void handleContinuousEvents(WorldView& view) const;
-    // void resetKeyPressedEvents();
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
     void handleContinuousPanEvents(WorldView& view) const;

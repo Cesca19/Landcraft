@@ -5,7 +5,7 @@
 #include "LandcraftEditor.hpp"
 
 LandcraftEditor::LandcraftEditor()
-    : m_hasFocus(false)
+    : m_hasFocus(true)
     , m_windowSize(sf::Vector2f(1200, 800))
     , m_viewSize(m_windowSize)
     , m_tileSizeX(64)
@@ -15,6 +15,7 @@ LandcraftEditor::LandcraftEditor()
     , m_projectionAngleY(15) // 35.264 realistic isometric angle
     , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft")
 {
+	m_window.setVerticalSyncEnabled(true);
     m_worldController.init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
         {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}, m_windowSize});
@@ -26,13 +27,17 @@ void LandcraftEditor::run()
     float deltaTime = 0;
     while (m_window.isOpen())
     {
-        deltaTime = m_clock.restart().asSeconds();
         handleEvents();
+        deltaTime = m_clock.restart().asSeconds();
+		if (deltaTime > 0.1f) deltaTime = 0.1f;
+
+		if (m_hasFocus) {
+			// to do handle continous events here with deltatime
+        	m_worldController.update(deltaTime, m_window);
+		}
 
         m_window.clear(sf::Color(196, 218, 242));
-        m_worldController.update(deltaTime, m_window);
         m_worldController.draw(m_window);
-
         m_window.display();
     }
 }
@@ -53,16 +58,17 @@ void LandcraftEditor::handleEvents()
                 break;
             case sf::Event::GainedFocus:
                 m_hasFocus = true;
+				m_clock.restart();
                 break;
             default:
                 break;
         }
-        // if (m_hasFocus) {
+        if (m_hasFocus) {
             // ui ctrl events
             m_worldController.handleEvents(event, m_window);
-        // }
+        }
     }
-    // if (m_hasFocus) {
+    if (m_hasFocus) {
         m_worldController.handleContinuousEvents(m_window);
-    // }
+    }
 }

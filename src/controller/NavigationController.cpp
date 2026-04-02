@@ -58,7 +58,6 @@ void NavigationController::handleContinuousPanEvents(WorldView& view) const
         // float currentZoom = view->getTargetZoom();
         // float adjustedSpeed = m_movementStep * currentZoom;
         view.moveTarget(moveVector * m_movementStep);
-        // m_isNavigationKeyPressed = true;
     }
 }
 
