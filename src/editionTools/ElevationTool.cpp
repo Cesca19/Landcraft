@@ -99,41 +99,52 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
     const sf::Vector2i currentMouseWorldPosition = selectionController.getMouseWorldPosition();
     const bool hasAnyMouseMoved = hasScreenMouseMoved || view.isMoving();
 
-    if (hasAnyMouseMoved) {
-        if (!m_isSelectionLocked) {
-            if (m_lastMouseWorldPosition != currentMouseWorldPosition) {
-                const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-                std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
-                std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentMouseWorldPosition, model);
-
-                cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
-                if (!cornersToElevate.empty())
-                    m_ongoingEditCornersHeightCommand->addCorners({cornersToElevate.begin(), cornersToElevate.end()}, heightStep, model, view);
-                m_lastMouseWorldPosition = currentMouseWorldPosition;
-                m_lastMouseScreenPosition = currentMouseScreenPosition;
-                m_continuousElevationClock.restart();
-                m_isSelectionLocked = true;
-            } else if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-                const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-                if (!selectedCorners.empty())
-                    m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
-                m_continuousElevationClock.restart();
-                m_lastMouseScreenPosition = currentMouseScreenPosition;
-                m_isSelectionLocked = true;
-            } else
-                m_isSelectionLocked = false;
-        } else {
-            m_isSelectionLocked = false;
-        }
-    } else {
+    if (!hasAnyMouseMoved) {
         m_isSelectionLocked = true;
         if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-            const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-            if (selectedCorners.empty()) return;
-            m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+            applyElevationOnCurrentSelection(model, view, selectionController, heightStep);
             m_continuousElevationClock.restart();
         }
+        return;
     }
+    // here the mouse is moving
+    if (m_isSelectionLocked) { // wait for the next frame to let selection controller upd
+        m_isSelectionLocked = false;
+        return;
+    }
+    if (m_lastMouseWorldPosition != currentMouseWorldPosition) {
+        applyElevationAlongPath(currentMouseWorldPosition, model, view, selectionController, heightStep);
+        m_lastMouseWorldPosition = currentMouseWorldPosition;
+        m_lastMouseScreenPosition = currentMouseScreenPosition;
+        m_continuousElevationClock.restart();
+        m_isSelectionLocked = true;
+    } else if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
+        applyElevationOnCurrentSelection(model, view, selectionController, heightStep);
+        m_continuousElevationClock.restart();
+        m_lastMouseScreenPosition = currentMouseScreenPosition;
+        m_isSelectionLocked = true;
+    } else
+        m_isSelectionLocked = false;
+}
+
+void ElevationTool::applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view,
+    const SelectionController &selectionController, const float heightStep) const
+{
+    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+    if (selectedCorners.empty()) return;
+    m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+}
+
+void ElevationTool::applyElevationAlongPath(const sf::Vector2i &currentWorldPosition, WorldModel &model,
+    const WorldView &view, const SelectionController &selectionController, const float heightStep) const
+{
+    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+    std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
+    std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition, model);
+
+    cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
+    if (!cornersToElevate.empty())
+        m_ongoingEditCornersHeightCommand->addCorners({cornersToElevate.begin(), cornersToElevate.end()}, heightStep, model, view);
 }
 
 void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history)
