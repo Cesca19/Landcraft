@@ -8,6 +8,7 @@
 #include "../model/WorldModel.hpp"
 #include "../view/WorldView.hpp"
 #include "EditionController.hpp"
+#include "SelectionController.hpp"
 #include "NavigationController.hpp"
 
 
@@ -32,14 +33,15 @@ public:
     void init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings);
     void handleEvents(sf::RenderWindow& window);
-    void update(float deltaTime, sf::RenderWindow& window);
+    void update(float deltaTime, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 private:
     // add event for turn on/off wireframe, shaded mode,
 
-    WorldModel m_worldModel;
     WorldView m_worldView;
+    WorldModel m_worldModel;
     EditionController m_editionController;
+    SelectionController m_selectionController;
     NavigationController m_navigationController;
 };
 

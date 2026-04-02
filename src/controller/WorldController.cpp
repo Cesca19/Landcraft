@@ -29,22 +29,25 @@ void WorldController::handleEvents(sf::RenderWindow &window)
         if (event.type == sf::Event::Closed 
             || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
             window.close();
-        m_editionController.handleEvents(window, event, m_worldModel, m_worldView);
         // navigation events like zoom and rotate will only happen when we're not in edition mode
         m_navigationController.handleEvents(window, event, m_worldModel, m_worldView, m_editionController.isEditing());
+        m_editionController.handleEvents(window, event, m_worldModel, m_worldView, m_selectionController);
     }
     m_navigationController.handleContinuousEvents(m_worldView);
-    m_editionController.handleContinuousEvents(window, m_worldModel, m_worldView);
+    m_editionController.handleContinuousEvents(window, m_worldModel, m_worldView, m_selectionController);
 }
 
-void WorldController::update(const float deltaTime, sf::RenderWindow &window)
+void WorldController::update(const float deltaTime, const sf::RenderWindow &window)
 {
     m_worldView.update(deltaTime, m_worldModel.getTiles(), window);
-    m_editionController.update(deltaTime, window, m_worldModel, m_worldView);
+    if (!m_editionController.isSelectionLocked())
+        m_selectionController.update(deltaTime, window, m_editionController.getSelectionMode(),
+            m_worldModel, m_worldView.getCamera());
 }
 
 void WorldController::draw(sf::RenderWindow &window)
 {
     m_worldView.draw(window);
-    m_editionController.draw(window, m_worldView.getCamera());
+    if (!m_worldView.getCamera().isRotating()) // only draw selection when not rotating to avoid visual clutter
+        m_selectionController.draw(window, m_worldView.getCamera());
 }

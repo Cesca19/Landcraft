@@ -13,8 +13,8 @@ SelectionController::~SelectionController()
 {
 }
 
-void SelectionController::update(float deltaTime, sf::RenderWindow &window, SelectionMode selectionMode,
-                                WorldModel &worldModel, const Camera &camera, bool &hasModelChanged)
+void SelectionController::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode,
+                                WorldModel &worldModel, const Camera &camera)
 {
     getSelectedCorners(window, camera, worldModel, selectionMode);
     // should we hide the mouse cursor when something is hovered inside the map
@@ -47,6 +47,11 @@ const std::vector<Tile *> & SelectionController::getSelectedTiles() const
 
 sf::Vector2i SelectionController::getMouseWorldPosition() const {
     return m_mouseWorldPosition;
+}
+
+bool SelectionController::isAnyTileCornerSelected() const
+{
+    return !m_selectedTileCorners.empty() || !m_selectedTiles.empty();
 }
 
 void SelectionController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)

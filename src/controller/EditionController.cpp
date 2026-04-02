@@ -11,35 +11,31 @@ EditionController::EditionController()
     m_editionTools.emplace_back(std::make_unique<PaintTool>());
 }
 
-void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view)
+void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController)
 {
     handleEditionToolSwitchEvents(event);
-    m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, m_selectionController, m_commandHistory);
+    m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, selectionController, m_commandHistory);
     handleUndoRedoEvents(window, event, model, view);
 }
 
-void EditionController::handleContinuousEvents(sf::RenderWindow &window, WorldModel &model, WorldView &view)
+void EditionController::handleContinuousEvents(const sf::RenderWindow &window, WorldModel &model, WorldView &view, SelectionController &selectionController)
 {
-    m_editionTools[m_currentEditionTool]->handleContinuousEvents(window, model, view, m_selectionController, m_commandHistory);
-}
-
-void EditionController::update(const float deltaTime, sf::RenderWindow &window, WorldModel &model, const WorldView &view)
-{
-    bool hasModelChanged = false;
-    if (!m_editionTools[m_currentEditionTool]->isSelectionLocked())
-        m_selectionController.update(deltaTime, window, m_editionTools[m_currentEditionTool]->getRequiredSelectionMode(),
-            model, view.getCamera(), hasModelChanged);
-}
-
-void EditionController::draw(sf::RenderWindow &window, const Camera &camera)
-{
-    if (!camera.isRotating()) // only draw selection when not rotating to avoid visual clutter
-        m_selectionController.draw(window, camera);
+    m_editionTools[m_currentEditionTool]->handleContinuousEvents(window, model, view, selectionController, m_commandHistory);
 }
 
 bool EditionController::isEditing() const
 {
     return m_editionTools[m_currentEditionTool]->isEditing();
+}
+
+bool EditionController::isSelectionLocked() const
+{
+    return m_editionTools[m_currentEditionTool]->isSelectionLocked();
+}
+
+SelectionMode EditionController::getSelectionMode() const
+{
+    return m_editionTools[m_currentEditionTool]->getRequiredSelectionMode();
 }
 
 void EditionController::handleUndoRedoEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view)
