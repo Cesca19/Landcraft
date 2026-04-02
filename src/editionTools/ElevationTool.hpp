@@ -19,6 +19,7 @@ public:
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
 private:
     void handleSelectionModeEditingEvents(const sf::Event& event);
+    void handleHeightStepEditingEvents(const sf::Event& event);
     void handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, const SelectionController &selectionController, CommandHistory &history);
     void startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep);
     void updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep);
@@ -28,6 +29,8 @@ private:
     std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model) const;
 
     float m_heightStep;
+    int m_heightStepFactor;
+    int m_maxHeightStepFactor;
 
     bool m_isEditing;
     bool m_isSelectionLocked;
