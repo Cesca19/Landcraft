@@ -12,10 +12,10 @@ class NavigationController {
 public:
     NavigationController();
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
-    void handleContinuousEvents(WorldView& view) const;
+    void handleContinuousEvents(float deltaTime, WorldView& view) const;
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
-    void handleContinuousPanEvents(WorldView& view) const;
+    void handleContinuousPanEvents(float deltaTime, WorldView& view) const;
     void handleRotationEvents(const sf::RenderWindow& window, const sf::Event &event,  WorldModel& model, const WorldView& view);
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view) const;
 

@@ -32,7 +32,7 @@ void LandcraftEditor::run()
 		if (deltaTime > 0.1f) deltaTime = 0.1f;
 
 		if (m_hasFocus) {
-			// to do handle continous events here with deltatime
+			handleContinuousEvents(deltaTime);
         	m_worldController.update(deltaTime, m_window);
 		}
 
@@ -68,7 +68,9 @@ void LandcraftEditor::handleEvents()
             m_worldController.handleEvents(event, m_window);
         }
     }
-    if (m_hasFocus) {
-        m_worldController.handleContinuousEvents(m_window);
-    }
+}
+
+void LandcraftEditor::handleContinuousEvents(float deltaTime)
+{
+	m_worldController.handleContinuousEvents(deltaTime, m_window);
 }

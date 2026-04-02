@@ -13,6 +13,7 @@ public:
     void run();
 private:
     void handleEvents();
+    void handleContinuousEvents(float deltaTime);
 
     bool m_hasFocus;
     sf::Vector2u m_windowSize;

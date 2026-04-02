@@ -5,7 +5,7 @@
 #include "NavigationController.hpp"
 
 NavigationController::NavigationController()
-    : m_movementStep(2)
+    : m_movementStep(200)
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
@@ -22,9 +22,9 @@ void NavigationController::handleEvents(const sf::RenderWindow &window, const sf
     }
 }
 
-void NavigationController::handleContinuousEvents(WorldView &view) const
+void NavigationController::handleContinuousEvents(const float deltaTime, WorldView &view) const
 {
-    handleContinuousPanEvents(view);
+    handleContinuousPanEvents(deltaTime, view);
 }
 
 void NavigationController::handlePanEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView& view)
@@ -39,7 +39,7 @@ void NavigationController::handlePanEvents(const sf::RenderWindow &window, const
         view.updateDragging(window);
 }
 
-void NavigationController::handleContinuousPanEvents(WorldView& view) const
+void NavigationController::handleContinuousPanEvents(const float deltaTime, WorldView& view) const
 {
     if (const bool isCtrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) return;
     // keyboard
@@ -57,7 +57,7 @@ void NavigationController::handleContinuousPanEvents(WorldView& view) const
         // adapt movement speed based on zoom level to maintain a consistent feel
         // float currentZoom = view->getTargetZoom();
         // float adjustedSpeed = m_movementStep * currentZoom;
-        view.moveTarget(moveVector * m_movementStep);
+        view.moveTarget(moveVector * m_movementStep * deltaTime);
     }
 }
 

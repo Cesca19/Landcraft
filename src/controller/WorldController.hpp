@@ -33,7 +33,7 @@ public:
     void init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings);
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
-    void handleContinuousEvents(const sf::RenderWindow& window);
+    void handleContinuousEvents(float deltaTime, const sf::RenderWindow& window);
     void update(float deltaTime, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 private:
