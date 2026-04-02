@@ -8,8 +8,9 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     : m_tilesSize(tilesSize)
     , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
-    , m_shadedTileColor(sf::Color(150, 150, 150, 75))
-    , m_wireframeTileColor(sf::Color::White)
+    , m_shadedTileColor(sf::Color(205, 185, 220))
+    // , m_shadedTileColor(sf::Color(200, 180, 220))
+    , m_wireframeTileColor(sf::Color(255, 255, 255, 100))
 {
     m_tilesetTexture.loadFromFile(tilesetFilepath);
 }
@@ -102,6 +103,17 @@ void TileMap::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, const
         const int tileIndex = static_cast<int>(tilePosition.y * nbCols + tilePosition.x);
         paintTile(tileIndex * 6, textureId);
     }
+}
+
+void TileMap::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile *tileToPaint, int textureId)
+{
+    if (worldTiles.empty() || worldTiles[0].empty() || tileToPaint == nullptr) return;
+    const int nbCols = static_cast<int>(worldTiles[0].size());
+    sf::Vector2f tilePosition = tileToPaint->getPosition();
+    if (tilePosition == sf::Vector2f{-1, -1})
+        return;
+    const int tileIndex = static_cast<int>(tilePosition.y * nbCols + tilePosition.x);
+    paintTile(tileIndex * 6, textureId);
 }
 
 void TileMap::addShadedTile(const Tile &tile, const Camera &camera)

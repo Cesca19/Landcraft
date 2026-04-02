@@ -16,12 +16,12 @@ public:
     float getHeight() const;
     int getTextureID() const;
     sf::Vector2f getPosition() const;
-    void addHeight(int heightStep);
+    void addHeight(float heightStep);
     void setTextureId(int textureId);
 private:    
     int m_row;
     int m_col;
-    int m_height;
+    float m_height;
     int m_textureID;
 };
 

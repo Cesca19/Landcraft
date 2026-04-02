@@ -6,10 +6,12 @@
 
 Tile::Tile()
 {
+    m_corners.clear();
 }
 
-Tile::Tile(const std::vector<TileCorner*> &corners) 
+Tile::Tile(const std::vector<TileCorner*> &corners, const int textureId)
     : m_corners(corners)
+    , m_textureId(textureId)
 {
     // TODO: Add proper error handling with exceptions or assertions
     if (corners.size() != 4)
@@ -48,17 +50,25 @@ sf::Vector2f Tile::getPosition() const
     return m_corners[0]->getPosition();
 }
 
-int Tile::getTextureId() const
+sf::Vector2i Tile::getGridPosition() const
 {
     if (m_corners.empty())
-        return -1;
-    return m_corners[0]->getTextureID();
+        return {-1, -1};
+    return sf::Vector2i(
+        static_cast<int>(m_corners[0]->getColumn()),
+        static_cast<int>(m_corners[0]->getRow())
+    );
 }
 
-void Tile::setTextureId(const int textureId) const
+int Tile::getTextureId() const
 {
+    return m_textureId;
+}
+
+void Tile::setTextureId(const int textureId) {
     for (TileCorner* corner : m_corners)
         corner->setTextureId(textureId);
+    m_textureId = textureId;
 }
 
 void Tile::updateTriangleCorners()

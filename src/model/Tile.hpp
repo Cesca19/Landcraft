@@ -12,19 +12,21 @@
 class Tile {
 public:
     Tile();
-    Tile(const std::vector<TileCorner*>& corners);
+    Tile(const std::vector<TileCorner*>& corners, int textureId);
     void setCorners(const std::vector<TileCorner*>& corners);
     std::vector<TileCorner*> getCorners() const;
     std::vector<TileCorner*> getUpRightTriangleCorners() const;
     std::vector<TileCorner*> getDownLeftTriangleCorners() const;
     sf::Vector2f getPosition() const;
+    sf::Vector2i getGridPosition() const;
     int getTextureId() const;
-    void setTextureId(int textureId) const;
+    void setTextureId(int textureId);
 private:
     void updateTriangleCorners();
     std::vector<TileCorner*> m_corners;
     std::vector<TileCorner*> m_upRightTriangleCorners;
     std::vector<TileCorner*> m_downLeftTriangleCorners;
+    int m_textureId;
 };
 
 

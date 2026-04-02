@@ -5,6 +5,7 @@
 #include "WorldModel.hpp"
 
 WorldModel::WorldModel()
+    : m_highestTileCornerHeight(0)
 {
 }
 
@@ -23,7 +24,7 @@ void WorldModel::loadMap(std::string mapName)
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -49,6 +50,7 @@ void WorldModel::loadMap(std::string mapName)
     };
     createWorldTileCorners();
     createWorldTiles();
+    onTileCornerHeightChanged();
 }
 
 std::vector<std::vector<Tile>> &WorldModel::getTiles()
@@ -69,10 +71,29 @@ sf::Vector2f WorldModel::getCenter() const
     return {centerX, centerY};
 }
 
-void WorldModel::setTilesTextureId(const std::vector<Tile *> &tilesToPaint, const int textureId)
+void WorldModel::onTileCornerHeightChanged()
 {
-    for (const Tile *tile : tilesToPaint)
-        tile->setTextureId(textureId);
+    m_highestTileCornerHeight = 0;
+    if (m_corners.empty())
+        return;
+    for (auto & corners_list : m_corners) {
+        for (const auto & corner : corners_list) {
+            const float height = std::abs(corner.get()->getHeight());
+            if (height > m_highestTileCornerHeight)
+                m_highestTileCornerHeight = height;
+        }
+    }
+}
+
+void WorldModel::onTileCornerHeightChanged(const float height)
+{
+    if (std::abs(height) > m_highestTileCornerHeight)
+        m_highestTileCornerHeight = std::abs(height);
+}
+
+float WorldModel::getHighestTileCornerHeight() const
+{
+    return m_highestTileCornerHeight;
 }
 
 void WorldModel::createWorldTiles()
@@ -97,7 +118,7 @@ void WorldModel::createTileFromTileCorner(const int row, const int col)
     };
     if (m_tiles.size() < row + 1)
         m_tiles.emplace_back();
-    m_tiles[row].emplace_back(tileCorners);
+    m_tiles[row].emplace_back(tileCorners, 0);
 }
 
 void WorldModel::createWorldTileCorners()

@@ -22,6 +22,7 @@ public:
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
     bool isMoving() const;
+    bool isRotating() const;
 
     void setSize(sf::Vector2f size);
     void setCenter(sf::Vector2f center);
@@ -47,6 +48,7 @@ public:
 
     void updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const;
     void paintTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<Tile *> & tilesToPaint, int textureId) const;
+    void paintTile(const std::vector<std::vector<Tile>>& worldTiles, Tile *tileToPaint, int textureId) const;
 private:
     void updateViewCenter(sf::Vector2f center);
 

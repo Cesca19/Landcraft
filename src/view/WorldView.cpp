@@ -54,7 +54,8 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
     // zoom lerping
     m_isMoving = false;
     if (std::abs(m_targetZoom - m_currentZoom) > m_zoomEpsilon) {
-        m_currentZoom += (m_targetZoom - m_currentZoom) * deltaTime * m_zoomSpeed;
+        float t = std::min(deltaTime * m_zoomSpeed, 1.0f);
+        m_currentZoom += (m_targetZoom - m_currentZoom) * t;
         m_view.setSize(m_baseSize * m_currentZoom);
         m_isMoving = true;
     } else
@@ -68,7 +69,9 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
     // To do : add drag speed multiplier to make the drag more responsive, and normal movement smoother
     if (MathUtils::distanceBetweenPoints(m_targetCenter, m_currentCenter) > m_movementEpsilon) {
         const float speed = m_isDragging ? 50.0f : m_movementSpeed;
-        m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
+        float t = std::min(deltaTime * speed, 1.0f);
+        m_currentCenter += (m_targetCenter - m_currentCenter) * t;
+        // m_currentCenter += (m_targetCenter - m_currentCenter) * deltaTime * speed;
         updateViewCenter(m_currentCenter);
         m_isMoving = true;
     } else
@@ -78,13 +81,11 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
             m_isMoving = true;
         }
 
-    bool hasCameraMoved = false;
-    m_camera->update(deltaTime, hasCameraMoved);
-    if (hasCameraMoved)
+    m_camera->update(deltaTime);
+    if (m_camera->isRotating())
         m_tileMap->updatePositions(tiles, *m_camera);
-    m_isMoving = m_isMoving || hasCameraMoved;
     m_environmentView->update(*m_camera, m_view.getCenter(), m_view.getSize(),
-        {window.getSize().x - 50.0f, 100.0f}, 40, isMoving());
+        {window.getSize().x - 50.0f, 100.0f}, 40, isMoving() || isRotating());
 }
 
 void WorldView::draw(sf::RenderWindow &window) const
@@ -99,6 +100,11 @@ void WorldView::draw(sf::RenderWindow &window) const
 bool WorldView::isMoving() const
 {
     return m_isMoving || m_isDragging;
+}
+
+bool WorldView::isRotating() const
+{
+    return m_camera->isRotating();
 }
 
 void WorldView::setSize(const sf::Vector2f size)
@@ -241,6 +247,11 @@ void WorldView::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, con
     const int textureId) const
 {
     m_tileMap->paintTiles(worldTiles, tilesToPaint, textureId);
+}
+
+void WorldView::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile *tileToPaint, int textureId) const
+{
+    m_tileMap->paintTile(worldTiles, tileToPaint, textureId);
 }
 
 void WorldView::updateViewCenter(const sf::Vector2f center)

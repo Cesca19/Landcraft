@@ -5,6 +5,7 @@
 #include "SelectionController.hpp"
 
 SelectionController::SelectionController()
+    : m_mouseWorldPosition(-1, -1)
 {
 }
 
@@ -16,6 +17,7 @@ void SelectionController::update(float deltaTime, sf::RenderWindow &window, Sele
                                 WorldModel &worldModel, const Camera &camera, bool &hasModelChanged)
 {
     getSelectedCorners(window, camera, worldModel, selectionMode);
+    // should we hide the mouse cursor when something is hovered inside the map
 }
 
 void SelectionController::draw(sf::RenderWindow &window, const Camera &camera)
@@ -25,27 +27,6 @@ void SelectionController::draw(sf::RenderWindow &window, const Camera &camera)
 
     if (!m_selectedTiles.empty())
         m_selectionView.drawTiles(window, m_selectedTiles, camera);
-}
-
-void SelectionController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode)
-{
-    // TO DO : radius should be at least equal to the highest tile height (abs)
-    
-    m_selectedTileCorners.clear();
-    m_selectedTiles.clear();
-    // get the current mouse position in the window in pixels
-    const sf::Vector2i mousePixelScreenPosition = sf::Mouse::getPosition(window);
-    // get it's real coordinates in the current view
-    const sf::Vector2f mouseScreenPosition = window.mapPixelToCoords(mousePixelScreenPosition);
-    // convert screen-space → isometric world → tile coords
-    const sf::Vector2f tempPos = camera.screen_to_world(mouseScreenPosition.x, mouseScreenPosition.y, 0); //getPointTileCoordinates(mouseScreenPosition);
-    const sf::Vector2i mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
-
-    if (selectionMode == SelectionMode::TILE_CORNER)
-        getSelectedTilesCorners(camera, worldModel, mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
-    else
-        getSelectedTiles(camera, worldModel, mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
-    
 }
 
 std::vector<TileCorner *> SelectionController::getSelectedTileCorners() const {
@@ -64,36 +45,73 @@ const std::vector<Tile *> & SelectionController::getSelectedTiles() const
     return m_selectedTiles;
 }
 
-void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition)
+sf::Vector2i SelectionController::getMouseWorldPosition() const {
+    return m_mouseWorldPosition;
+}
+
+void SelectionController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
-    // TO DO : radius should be at least equal to the highest tile height (abs)
-    TileCorner* closestCorner = getClosestNeighborCornerInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, 3);
+    m_selectedTileCorners.clear();
+    m_selectedTiles.clear();
+    m_mouseWorldPosition = sf::Vector2i(-1, -1);
+    // get the current mouse position in the window in pixels
+    const sf::Vector2i mousePixelScreenPosition = sf::Mouse::getPosition(window);
+    // get it's real coordinates in the current view
+    const sf::Vector2f mouseScreenPosition = window.mapPixelToCoords(mousePixelScreenPosition);
+    // convert screen-space → isometric world → tile coords
+    const sf::Vector2f tempPos = camera.screen_to_world(mouseScreenPosition.x, mouseScreenPosition.y, 0); //getPointTileCoordinates(mouseScreenPosition);
+    m_mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
+
+    if (selectionMode == SelectionMode::TILE_CORNER)
+        getSelectedTilesCorners(camera, worldModel, m_mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
+    else
+        getSelectedTiles(camera, worldModel, m_mouseWorldPosition, sf::Vector2f(mouseScreenPosition));
+    
+}
+
+void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
+{
+    const float searchRadius = getSearchRadius(camera, worldModel);
+    TileCorner* closestCorner = getClosestNeighborCornerInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (closestCorner == nullptr)
         return;
     m_selectedTileCorners.push_back(closestCorner);
 }
 
-void SelectionController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition)
+void SelectionController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
-    Tile *hoveredTile = getSelectedTileInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, 3);
+    const float searchRadius = getSearchRadius(camera, worldModel);
+    Tile *hoveredTile = getSelectedTileInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (hoveredTile == nullptr)
         return;
     m_selectedTiles.push_back(hoveredTile);
 }
 
-TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition, 
-                                                                    sf::Vector2f pointScreenPosition, int radius) const
+int SelectionController::getSearchRadius(const Camera &camera, const WorldModel &worldModel) const
+{
+    const float maxAbsZ = worldModel.getHighestTileCornerHeight();
+    const sf::Vector2f flatPos = camera.screen_to_world(0.0f, 0.0f, 0.0f);
+    const sf::Vector2f highPos = camera.screen_to_world(0.0f, 0.0f, maxAbsZ);
+
+    const float gridDistance = MathUtils::distanceBetweenPoints(flatPos, highPos);
+    const int optimalRadius = static_cast<int>(std::ceil(gridDistance));
+    constexpr int minRadius = 2;
+
+    return (minRadius > optimalRadius) ? minRadius : optimalRadius;
+}
+
+TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition,
+                                                                  const sf::Vector2f pointScreenPosition, const int radius) const
 {
     const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(camera, worldModel, pointWorldPosition.x, pointWorldPosition.y, radius);
     if (neighbors.empty())
         return nullptr;
     TileCorner* closestNeighbor = neighbors[0];
     float minDistance = MathUtils::distanceBetweenPoints(getTileCornerScreenCoordinates(camera, neighbors[0]), pointScreenPosition);
-    float refMinDistance = std::max(camera.getTileSizeX(), camera.getTileSizeY());
+    const float refMinDistance = std::max(camera.getTileSizeX(), camera.getTileSizeY());
 
     for ( TileCorner* neighbor : neighbors) {
-        float dist = MathUtils::distanceBetweenPoints(getTileCornerScreenCoordinates(camera, neighbor), pointScreenPosition);
-        if (dist < minDistance)
+        if (const float dist = MathUtils::distanceBetweenPoints(getTileCornerScreenCoordinates(camera, neighbor), pointScreenPosition); dist < minDistance)
         {
             minDistance = dist;
             closestNeighbor = neighbor;
@@ -104,26 +122,26 @@ TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &
     return closestNeighbor;
 }
 
-std::vector<TileCorner *> SelectionController::getPointNeighborsInRadius(const Camera &camera, WorldModel &worldModel, int x, int y, int radius ) const
+std::vector<TileCorner *> SelectionController::getPointNeighborsInRadius(const Camera &camera, WorldModel &worldModel, int x, int y, const int radius ) const
 {
     std::vector<TileCorner*> neighbors;
-    std::vector<std::vector<std::unique_ptr<TileCorner>>>& map = worldModel.getCorners();
+    const std::vector<std::vector<std::unique_ptr<TileCorner>>>& map = worldModel.getCorners();
     // prevent overflow when mouse is outside the screen
-    x = std::clamp(x, 0, static_cast<int>(map[0].size()));
-    y = std::clamp(y, 0, static_cast<int>(map.size()));
+    x = std::clamp(x, 0, static_cast<int>(map[0].size() - 1));
+    y = std::clamp(y, 0, static_cast<int>(map.size() - 1));
 
     int startX = std::max(0, x - radius);
-    int endX = std::min(static_cast<int>(map[0].size()), x + radius);
+    int endX = std::min(static_cast<int>(map[0].size() - 1), x + radius);
     int startY = std::max(0, y - radius);
-    int endY = std::min(static_cast<int>(map.size()), y + radius);
+    int endY = std::min(static_cast<int>(map.size() - 1), y + radius);
 
-    for (int j = startY; j < endY; j++)
-        for (int i = startX; i < endX; i++)
+    for (int j = startY; j <= endY; j++)
+        for (int i = startX; i <= endX; i++)
             neighbors.push_back(map[j][i].get());
     return neighbors;
 }
 
-Tile *SelectionController::getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius) const
+Tile *SelectionController::getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition, const sf::Vector2f pointScreenPosition, const int radius) const
 {
     //pointScreenPosition = camera.screen_to_world(pointScreenPosition.x, pointScreenPosition.y, 0);
     std::vector<std::vector<Tile>>& tilesMap = worldModel.getTiles();
@@ -184,7 +202,7 @@ bool SelectionController::isPointInsideTile(const Camera &camera, Tile *tile, sf
     return false;
 }
 
-sf::Vector2f SelectionController::getTileCornerScreenCoordinates(const Camera &camera, TileCorner *corner) const
+sf::Vector2f SelectionController::getTileCornerScreenCoordinates(const Camera &camera, const TileCorner *corner) const
 {
     return camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
 }

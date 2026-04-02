@@ -19,7 +19,9 @@ public:
     std::vector<std::vector<Tile>>& getTiles();
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
     sf::Vector2f getCenter() const;
-    void setTilesTextureId(const std::vector<Tile *> &tilesToPaint, int textureId);
+    void onTileCornerHeightChanged();
+    void onTileCornerHeightChanged(float height);
+    float getHighestTileCornerHeight() const;
 private:
     void createWorldTiles();
     void createTileFromTileCorner(int row, int col);
@@ -28,6 +30,7 @@ private:
     std::vector<std::vector<int>> m_map;
     std::vector<std::vector<std::unique_ptr<TileCorner>>> m_corners;
     std::vector<std::vector<Tile>> m_tiles;
+    float m_highestTileCornerHeight;
 };
 
 
