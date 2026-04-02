@@ -20,19 +20,15 @@ void WorldController::init(const std::string &mapName,
     m_worldView.zoom(10);
 }
 
-void WorldController::handleEvents(sf::RenderWindow &window)
+void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &window)
 {
-    sf::Event event;
-    m_navigationController.resetKeyPressedEvents();
-    while (window.pollEvent(event))
-    {
-        if (event.type == sf::Event::Closed 
-            || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-            window.close();
-        // navigation events like zoom and rotate will only happen when we're not in edition mode
-        m_navigationController.handleEvents(window, event, m_worldModel, m_worldView, m_editionController.isEditing());
-        m_editionController.handleEvents(window, event, m_worldModel, m_worldView, m_selectionController);
-    }
+    // navigation events like zoom and rotate will only happen when we're not in edition mode
+    m_navigationController.handleEvents(window, event, m_worldModel, m_worldView, m_editionController.isEditing());
+    m_editionController.handleEvents(window, event, m_worldModel, m_worldView, m_selectionController);
+}
+
+void WorldController::handleContinuousEvents(const sf::RenderWindow &window)
+{
     m_navigationController.handleContinuousEvents(m_worldView);
     m_editionController.handleContinuousEvents(window, m_worldModel, m_worldView, m_selectionController);
 }

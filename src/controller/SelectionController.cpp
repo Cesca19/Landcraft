@@ -76,7 +76,7 @@ void SelectionController::getSelectedCorners(const sf::RenderWindow &window, con
 
 void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
-    const float searchRadius = getSearchRadius(camera, worldModel);
+    const int searchRadius = getSearchRadius(camera, worldModel);
     TileCorner* closestCorner = getClosestNeighborCornerInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (closestCorner == nullptr)
         return;
@@ -85,7 +85,7 @@ void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldMod
 
 void SelectionController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
-    const float searchRadius = getSearchRadius(camera, worldModel);
+    const int searchRadius = getSearchRadius(camera, worldModel);
     Tile *hoveredTile = getSelectedTileInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (hoveredTile == nullptr)
         return;

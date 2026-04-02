@@ -12,11 +12,11 @@ class NavigationController {
 public:
     NavigationController();
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
-    void handleContinuousEvents(WorldView& view);
-    void resetKeyPressedEvents();
+    void handleContinuousEvents(WorldView& view) const;
+    // void resetKeyPressedEvents();
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
-    void handleContinuousPanEvents(WorldView& view);
+    void handleContinuousPanEvents(WorldView& view) const;
     void handleRotationEvents(const sf::RenderWindow& window, const sf::Event &event,  WorldModel& model, const WorldView& view);
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view) const;
 
@@ -24,8 +24,6 @@ private:
     int m_zoomStep;
     float m_pitchRotationStep;
     float m_yawRotationStep;
-    bool m_isRotating;
-    bool m_isNavigationKeyPressed;
 };
 
 
