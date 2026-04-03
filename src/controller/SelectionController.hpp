@@ -20,13 +20,14 @@ class SelectionController {
 public:
     SelectionController();
     ~SelectionController();
-    void update(float deltaTime, sf::RenderWindow &window, SelectionMode selectionMode,
-                 WorldModel &worldModel, const Camera &camera, bool &hasModelChanged);
+    void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
+                 WorldModel &worldModel, const Camera &camera);
     void draw(sf::RenderWindow &window, const Camera &camera);
 
     std::vector<TileCorner *> getSelectedTileCorners() const;
     const std::vector<Tile *> &getSelectedTiles() const;
     sf::Vector2i getMouseWorldPosition() const;
+    bool isAnyTileCornerSelected() const;
 private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);

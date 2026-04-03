@@ -6,6 +6,8 @@
 
 ElevationTool::ElevationTool()
     : m_heightStep(1)
+    , m_heightStepFactor(1)
+    , m_maxHeightStepFactor(10)
     , m_isEditing(false)
     , m_isSelectionLocked(false)
     , m_currentSelectionMode(SelectionMode::TILE_CORNER)
@@ -36,6 +38,7 @@ void ElevationTool::handleEvents(const sf::RenderWindow& window, const sf::Event
                                  SelectionController &selectionController, CommandHistory &history)
 {
     handleSelectionModeEditingEvents(event);
+    handleHeightStepEditingEvents(event);
 }
 
 void ElevationTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
@@ -54,15 +57,26 @@ void ElevationTool::handleSelectionModeEditingEvents(const sf::Event &event)
                         : SelectionMode::TILE;
 }
 
+void ElevationTool::handleHeightStepEditingEvents(const sf::Event &event)
+{
+    if (event.type == sf::Event::KeyPressed) {
+        if (event.key.code == sf::Keyboard::P)
+            m_heightStepFactor++;
+        if (event.key.code == sf::Keyboard::M)
+            m_heightStepFactor--;
+        m_heightStepFactor = std::clamp(m_heightStepFactor, 1, m_maxHeightStepFactor);
+    }
+}
+
 void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view,
-    const SelectionController &selectionController, CommandHistory &history)
+                                              const SelectionController &selectionController, CommandHistory &history)
 {
     const bool isShiftPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
     const bool isRaising = sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || (!isShiftPressed && sf::Mouse::isButtonPressed(m_editingMouseButton));;
     const bool isLowering = sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || ( isShiftPressed && sf::Mouse::isButtonPressed(m_editingMouseButton));
 
     if (isRaising || isLowering) {
-        const float heightFactor = (isRaising ? 1.0f : -1.0f ) * m_heightStep;
+        const float heightFactor = (isRaising ? 1.0f : -1.0f ) * m_heightStep * static_cast<float>(m_heightStepFactor);
         if (m_ongoingEditCornersHeightCommand == nullptr)
             startContinuousElevation(window, model, view, selectionController, heightFactor);
         else

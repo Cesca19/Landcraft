@@ -17,9 +17,11 @@ public:
     void drawSkyBox(sf::RenderWindow& window) const;
     void drawWorldReference(sf::RenderWindow& window) const;
     void drawWorldGizmo(sf::RenderWindow& window) const;
+    void onWindowResized(sf::Vector2u windowSize);
+
 private:
-    void updateWorldReference(const Camera &camera, sf::Vector2f viewCenter, sf::Vector2f viewSize, bool isViewMoving);
-    void updateWorldGizmo(const Camera &camera, const sf::Vector2f& gizmoPosition, float size, bool isViewMoving);
+    void updateWorldReference(const Camera &camera, sf::Vector2f viewCenter, sf::Vector2f viewSize, bool shouldUpdate);
+    void updateWorldGizmo(const Camera &camera, const sf::Vector2f& gizmoPosition, float size);
     // TO DO : update the skybox vertices pos on window size change
     void initSkyBox(sf::Vector2u windowSize);
     void initWorldGizmo();
@@ -29,6 +31,8 @@ private:
     sf::VertexArray m_worldReferenceVertexArray;
     // std::vector<sf::Vector2f> m_gizmoAxes;
     sf::VertexArray m_gizmoVertexArray;
+    sf::View m_view;
+    bool m_wasViewResized;
 };
 
 

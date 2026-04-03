@@ -13,8 +13,8 @@ SelectionController::~SelectionController()
 {
 }
 
-void SelectionController::update(float deltaTime, sf::RenderWindow &window, SelectionMode selectionMode,
-                                WorldModel &worldModel, const Camera &camera, bool &hasModelChanged)
+void SelectionController::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode,
+                                WorldModel &worldModel, const Camera &camera)
 {
     getSelectedCorners(window, camera, worldModel, selectionMode);
     // should we hide the mouse cursor when something is hovered inside the map
@@ -49,6 +49,11 @@ sf::Vector2i SelectionController::getMouseWorldPosition() const {
     return m_mouseWorldPosition;
 }
 
+bool SelectionController::isAnyTileCornerSelected() const
+{
+    return !m_selectedTileCorners.empty() || !m_selectedTiles.empty();
+}
+
 void SelectionController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
     m_selectedTileCorners.clear();
@@ -71,7 +76,7 @@ void SelectionController::getSelectedCorners(const sf::RenderWindow &window, con
 
 void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
-    const float searchRadius = getSearchRadius(camera, worldModel);
+    const int searchRadius = getSearchRadius(camera, worldModel);
     TileCorner* closestCorner = getClosestNeighborCornerInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (closestCorner == nullptr)
         return;
@@ -80,7 +85,7 @@ void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldMod
 
 void SelectionController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
-    const float searchRadius = getSearchRadius(camera, worldModel);
+    const int searchRadius = getSearchRadius(camera, worldModel);
     Tile *hoveredTile = getSelectedTileInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (hoveredTile == nullptr)
         return;

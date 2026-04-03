@@ -21,6 +21,8 @@ public:
     void initEnvironment(sf::Vector2u windowSize);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
+    void onWindowResized(sf::Vector2u windowSize);
+
     bool isMoving() const;
     bool isRotating() const;
 

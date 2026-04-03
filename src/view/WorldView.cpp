@@ -12,8 +12,8 @@ WorldView::WorldView()
     , m_zoomOffset(0.1f)
     , m_zoomSpeed(10.0f)
     , m_movementSpeed(10.0f)
-    , m_isDragging(false)
     , m_dragStartWorldPos({0, 0})
+    , m_isDragging(false)
     , m_isMoving(false)
 {
 }
@@ -95,6 +95,12 @@ void WorldView::draw(sf::RenderWindow &window) const
     window.setView(m_view);
     window.draw(*m_tileMap);
     m_environmentView->drawWorldGizmo(window);
+}
+
+void WorldView::onWindowResized(const sf::Vector2u windowSize)
+{
+    setSize(sf::Vector2f(static_cast<float>(windowSize.x), static_cast<float>(windowSize.y)));
+    m_environmentView->onWindowResized(windowSize);
 }
 
 bool WorldView::isMoving() const

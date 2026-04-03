@@ -20,31 +20,35 @@ void WorldController::init(const std::string &mapName,
     m_worldView.zoom(10);
 }
 
-void WorldController::handleEvents(sf::RenderWindow &window)
+void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &window)
 {
-    sf::Event event;
-    m_navigationController.resetKeyPressedEvents();
-    while (window.pollEvent(event))
-    {
-        if (event.type == sf::Event::Closed 
-            || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-            window.close();
-        m_editionController.handleEvents(window, event, m_worldModel, m_worldView);
-        // navigation events like zoom and rotate will only happen when we're not in edition mode
-        m_navigationController.handleEvents(window, event, m_worldModel, m_worldView, m_editionController.isEditing());
-    }
-    m_navigationController.handleContinuousEvents(m_worldView);
-    m_editionController.handleContinuousEvents(window, m_worldModel, m_worldView);
+    // navigation events like zoom and rotate will only happen when we're not in edition mode
+    m_navigationController.handleEvents(window, event, m_worldModel, m_worldView, m_editionController.isEditing());
+    m_editionController.handleEvents(window, event, m_worldModel, m_worldView, m_selectionController);
 }
 
-void WorldController::update(const float deltaTime, sf::RenderWindow &window)
+void WorldController::handleContinuousEvents(float deltaTime, const sf::RenderWindow &window)
+{
+    m_navigationController.handleContinuousEvents(deltaTime, m_worldView);
+    m_editionController.handleContinuousEvents(window, m_worldModel, m_worldView, m_selectionController);
+}
+
+void WorldController::update(const float deltaTime, const sf::RenderWindow &window)
 {
     m_worldView.update(deltaTime, m_worldModel.getTiles(), window);
-    m_editionController.update(deltaTime, window, m_worldModel, m_worldView);
+    if (!m_editionController.isSelectionLocked())
+        m_selectionController.update(deltaTime, window, m_editionController.getSelectionMode(),
+            m_worldModel, m_worldView.getCamera());
 }
 
 void WorldController::draw(sf::RenderWindow &window)
 {
     m_worldView.draw(window);
-    m_editionController.draw(window, m_worldView.getCamera());
+    if (!m_worldView.getCamera().isRotating()) // only draw selection when not rotating to avoid visual clutter
+        m_selectionController.draw(window, m_worldView.getCamera());
+}
+
+void WorldController::onWindowResized(const sf::Vector2u windowSize)
+{
+    m_worldView.onWindowResized(windowSize);
 }
