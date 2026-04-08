@@ -6,6 +6,7 @@
 #define LANDCRAFT_UIFACTORY_HPP
 
 #include <iostream>
+#include <memory>
 #include "widgets/Widgets.hpp"
 #include "UIController.hpp"
 

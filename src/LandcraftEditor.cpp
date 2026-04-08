@@ -25,8 +25,9 @@ LandcraftEditor::LandcraftEditor()
 void LandcraftEditor::run()
 {
     // test ui
-    auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
-    button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Green, sf::Color::Red);
+    const auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
+    button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green);
+    button->initOnClickCallback(  [] () {std::cout << "Button clicked" << std::endl; } );
 
     m_clock.restart();
     float deltaTime = 0;
@@ -38,6 +39,7 @@ void LandcraftEditor::run()
 
 		if (m_hasFocus) {
 			handleContinuousEvents(deltaTime);
+		    m_uiController.update(deltaTime, m_window);
         	m_worldController.update(deltaTime, m_window);
 		}
 
@@ -73,13 +75,14 @@ void LandcraftEditor::handleEvents()
                 break;
         }
         if (m_hasFocus) {
-            // ui ctrl events
+            m_uiController.handleEvents(event, m_window);
             m_worldController.handleEvents(event, m_window);
         }
     }
 }
 
-void LandcraftEditor::handleContinuousEvents(float deltaTime)
+void LandcraftEditor::handleContinuousEvents(const float deltaTime)
 {
+    m_uiController.handleContinuousEvents(deltaTime, m_window);
 	m_worldController.handleContinuousEvents(deltaTime, m_window);
 }

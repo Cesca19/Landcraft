@@ -83,6 +83,7 @@ add_executable(${MY_TARGET}
         src/ui/UIController.cpp
         src/ui/widgets/TextButton.cpp
         src/ui/widgets/SpriteButton.cpp
+        src/utils/ResourceManager.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

@@ -5,6 +5,7 @@
 #ifndef LANDCRAFT_TEXTBUTTON_HPP
 #define LANDCRAFT_TEXTBUTTON_HPP
 
+#include <functional>
 #include "IWidget.hpp"
 
 class TextButton : public IWidget
@@ -13,10 +14,13 @@ public:
     TextButton(sf::Vector2f position, const std::string& text, sf::Color textColor, unsigned int characterSize = 30);
     void initStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor, 
         const sf::Color& focusColor, const sf::Color& pressColor);
+    void initOnClickCallback(std::function<void()> callback);
 
     bool isInteractable() const override;
     sf::FloatRect getBounds() const override;
     sf::Vector2f getCenter() const override;
+
+    void update(float deltaTime) override;
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
 
@@ -37,6 +41,7 @@ protected:
     sf::Color m_focusColor;
     sf::Color m_pressColor;
     sf::Vector2f m_spacing;
+    std::function<void()> m_onClickCallback;
 };
 
 
