@@ -23,3 +23,18 @@ TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string
     s_uiController->addWidget(std::move(button));
     return buttonPtr;
 }
+
+SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size,
+    const std::string &highlightText, int highlightTextSize)
+{
+    if (!s_uiController) {
+        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        return nullptr;
+    }
+
+    std::unique_ptr<SpriteButton> button = std::make_unique<SpriteButton>(iconPath, position, size, highlightText, highlightTextSize);
+    SpriteButton* buttonPtr = button.get();
+    s_uiController->addWidget(std::move(button));
+    return buttonPtr;
+
+}

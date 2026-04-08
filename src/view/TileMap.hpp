@@ -37,7 +37,7 @@ private:
     sf::Color m_wireframeTileColor;
 
     sf::Vector2u m_tilesSize;
-    sf::Texture m_tilesetTexture;
+    const sf::Texture* m_tilesetTexture;
 };
 
 

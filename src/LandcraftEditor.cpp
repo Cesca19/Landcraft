@@ -29,6 +29,9 @@ void LandcraftEditor::run()
     button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green);
     button->initOnClickCallback(  [] () {std::cout << "Button clicked" << std::endl; } );
 
+    const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_32.png", {150, 20}, {32, 32}, "Brush", 15);
+    iconButton->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Black);
+    iconButton->initOnClickCallback([] () {std::cout << "icon Button clicked" << std::endl; } );
     m_clock.restart();
     float deltaTime = 0;
     while (m_window.isOpen())

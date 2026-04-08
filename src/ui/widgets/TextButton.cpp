@@ -7,21 +7,36 @@
 TextButton::TextButton(const sf::Vector2f position, const std::string &text, const sf::Color textColor, const unsigned int characterSize)
     : m_isInteractable(true)
     , m_currentState(WidgetState::Base)
-    , m_spacing(20, 20)
+    , m_padding(20, 20)
     , m_onClickCallback(nullptr)
 {
-    m_font = ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf");
     m_text.setFillColor(textColor);
-    m_text.setFont(m_font);
+    m_text.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
     m_text.setString(text);
     m_text.setCharacterSize(characterSize);
     m_text.setPosition(position);
 
-    const sf::FloatRect textBounds = m_text.getGlobalBounds();
-    m_background.setSize(textBounds.getSize() + m_spacing);
-    m_background.setPosition(textBounds.left - m_spacing.x / 2, textBounds.top - m_spacing.y / 2);
+    // const sf::FloatRect textBounds = m_text.getGlobalBounds();
+    // m_background.setSize(textBounds.getSize() + m_padding);
+    // m_background.setPosition(textBounds.left - m_padding.x / 2, textBounds.top - m_padding.y / 2);
+    // m_background.setFillColor(sf::Color::Transparent);
+    // m_background.setOutlineThickness(2);
+
+
+    sf::FloatRect textLocal = m_text.getLocalBounds();
+    m_text.setOrigin(textLocal.left + textLocal.width / 2.0f, textLocal.top + textLocal.height / 2.0f);
+
+    float bgWidth = textLocal.width + m_padding.x;
+    float bgHeight = textLocal.height + m_padding.y;
+
+    m_background.setSize(sf::Vector2f(bgWidth, bgHeight));
+    m_background.setPosition(position);
     m_background.setFillColor(sf::Color::Transparent);
-    m_background.setOutlineThickness(2);
+    m_background.setOutlineThickness(-2.f);
+
+    float centerX = position.x + (bgWidth / 2.0f);
+    float centerY = position.y + (bgHeight / 2.0f);
+    m_text.setPosition(centerX, centerY);
 }
 
 void TextButton::initStatesColors(const sf::Color &baseColor, const sf::Color &hoverColor, const sf::Color &focusColor, const sf::Color &pressColor)

@@ -34,13 +34,12 @@ protected:
     WidgetState m_currentState;
 
     sf::Text m_text;
-    sf::Font m_font;
     sf::RectangleShape m_background;
     sf::Color m_baseColor;
     sf::Color m_hoverColor;
     sf::Color m_focusColor;
     sf::Color m_pressColor;
-    sf::Vector2f m_spacing;
+    sf::Vector2f m_padding;
     std::function<void()> m_onClickCallback;
 };
 

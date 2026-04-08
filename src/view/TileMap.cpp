@@ -12,7 +12,7 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     // , m_shadedTileColor(sf::Color(200, 180, 220))
     , m_wireframeTileColor(sf::Color(255, 255, 255, 100))
 {
-    m_tilesetTexture = ResourceManager::getInstance().getTexture(tilesetFilepath);
+    m_tilesetTexture = &ResourceManager::getInstance().getTexture(tilesetFilepath);
 }
 
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
@@ -228,7 +228,7 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
     states.transform *= getTransform();
 
     // apply the tileset texture
-    states.texture = &m_tilesetTexture;
+    states.texture = m_tilesetTexture;
 
     // draw the vertex array
     target.draw(m_shadedTilesVertexArray, states);
