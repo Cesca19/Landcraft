@@ -79,6 +79,10 @@ add_executable(${MY_TARGET}
         src/editionTools/PaintTool.cpp
         src/editionTools/ElevationTool.cpp
         src/LandcraftEditor.cpp
+        src/ui/UIFactory.cpp
+        src/ui/UIController.cpp
+        src/ui/widgets/TextButton.cpp
+        src/ui/widgets/SpriteButton.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

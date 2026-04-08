@@ -1,0 +1,25 @@
+﻿//
+// Created by fran on 08/04/2026.
+//
+
+#include "UIFactory.hpp"
+
+UIController* UIFactory::s_uiController = nullptr;
+
+void UIFactory::init(UIController *uiController)
+{
+    s_uiController = uiController;
+}
+
+TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, sf::Color textColor, unsigned int characterSize)
+{
+    if (!s_uiController) {
+        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        return nullptr;
+    }
+
+    std::unique_ptr<TextButton> button = std::make_unique<TextButton>(position, text, textColor, characterSize);
+    TextButton* buttonPtr = button.get();
+    s_uiController->addWidget(std::move(button));
+    return buttonPtr;
+}

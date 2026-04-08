@@ -6,6 +6,8 @@
 #define LANDCRAFT_LANDCRAFTEDITOR_HPP
 
 #include "controller/WorldController.hpp"
+#include "ui/UIController.hpp"
+#include "ui/UIFactory.hpp"
 
 class LandcraftEditor {
 public:
@@ -26,6 +28,7 @@ private:
     sf::Clock m_clock;
     sf::RenderWindow m_window;
     WorldController m_worldController;
+    UIController m_uiController;
 };
 
 

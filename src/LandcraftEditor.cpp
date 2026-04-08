@@ -19,10 +19,15 @@ LandcraftEditor::LandcraftEditor()
     m_worldController.init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
         {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}, m_windowSize});
+    UIFactory::init(&m_uiController);
 }
 
 void LandcraftEditor::run()
 {
+    // test ui
+    auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
+    button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Green, sf::Color::Red);
+
     m_clock.restart();
     float deltaTime = 0;
     while (m_window.isOpen())
@@ -38,6 +43,7 @@ void LandcraftEditor::run()
 
         m_window.clear(sf::Color(196, 218, 242));
         m_worldController.draw(m_window);
+        m_uiController.draw(m_window);
         m_window.display();
     }
 }
