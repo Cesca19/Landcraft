@@ -28,6 +28,9 @@ public:
     void initHighlightTextAlign(HighlightTextAlign align);
 
     bool isInteractable() const override;
+    bool isVisible() const override;
+    void setVisibility(bool isVisible) override;
+
     sf::FloatRect getBounds() const override;
     sf::Vector2f getCenter() const override;
 
@@ -63,6 +66,7 @@ protected:
     sf::Color m_backgroundFocusColor;
     sf::Color m_backgroundPressColor;
 
+    bool m_isVisible;
     bool m_isInteractable;
     WidgetState m_currentState;
     std::function<void()> m_onClickCallback;

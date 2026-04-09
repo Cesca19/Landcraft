@@ -5,11 +5,12 @@
 #include "TextButton.hpp"
 
 TextButton::TextButton(const sf::Vector2f position, const std::string &text, const sf::Color textColor, const unsigned int characterSize)
-    : m_isInteractable(true)
+    : m_isVisible(true)
+    , m_isInteractable(true)
     , m_currentState(WidgetState::Base)
+    , m_backgroundColor(sf::Color::Transparent)
     , m_padding(20, 20)
     , m_onClickCallback(nullptr)
-    , m_backgroundColor(sf::Color::Transparent)
 {
     m_text.setFillColor(textColor);
     m_text.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
@@ -105,6 +106,16 @@ void TextButton::setState(const WidgetState state)
             break;
     }
     m_currentState = state;
+}
+
+bool TextButton::isVisible() const
+{
+    return m_isVisible;
+}
+
+void TextButton::setVisibility(const bool isVisible)
+{
+    m_isVisible = isVisible;
 }
 
 void TextButton::onBase()

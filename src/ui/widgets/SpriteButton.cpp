@@ -13,6 +13,7 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_isInteractable(true)
     , m_currentState(WidgetState::Base)
     , m_onClickCallback(nullptr)
+    , m_isVisible(true)
 {
     const float bgWidth = size.x + m_padding.x;
     const float bgHeight = size.y + m_padding.y;
@@ -109,6 +110,16 @@ void SpriteButton::initHighlightTextAlign(const HighlightTextAlign align)
 bool SpriteButton::isInteractable() const
 {
     return m_isInteractable;
+}
+
+bool SpriteButton::isVisible() const
+{
+    return m_isVisible;
+}
+
+void SpriteButton::setVisibility(const bool isVisible)
+{
+    m_isVisible = isVisible;
 }
 
 sf::FloatRect SpriteButton::getBounds() const

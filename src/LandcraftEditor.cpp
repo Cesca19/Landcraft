@@ -28,16 +28,17 @@ LandcraftEditor::LandcraftEditor()
 void LandcraftEditor::run()
 {
     // test ui
-    // const auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
-    // button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green);
-    // button->initOnClickCallback(  [] () {std::cout << "Button clicked" << std::endl; } );
-    // button->initBackgroundColor(sf::Color(95, 78, 121, 100));
+    const auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
+    button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green);
+    button->initOnClickCallback(  [] () {std::cout << "Button clicked" << std::endl; } );
+    button->initBackgroundColor(sf::Color(95, 78, 121, 100));
+    button->setVisibility(false);
 
-    // const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_512.png", {400, 20}, {32, 32}, "Brush", 15);
-    // iconButton->initStatesColors(sf::Color(183, 183, 183), sf::Color(153, 153, 153), sf::Color::Cyan, sf::Color(163, 163, 163), sf::Color::Black);
-    // iconButton->initOnClickCallback([] () {std::cout << "icon Button clicked" << std::endl; } );
-    // iconButton->initHighlightTextAlign(HighlightTextAlign::Down);
-    // iconButton->initBackgroundStatesColor(sf::Color(255, 255, 255), sf::Color(250, 250, 250), sf::Color(250, 239, 250), sf::Color(246, 246, 246));
+    const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_512.png", {400, 20}, {32, 32}, "Brush", 15);
+    iconButton->initStatesColors(sf::Color(183, 183, 183), sf::Color(153, 153, 153), sf::Color::Cyan, sf::Color(163, 163, 163), sf::Color::Black);
+    iconButton->initOnClickCallback([] () {std::cout << "icon Button clicked" << std::endl; } );
+    iconButton->initHighlightTextAlign(HighlightTextAlign::Down);
+    iconButton->initBackgroundStatesColor(sf::Color(255, 255, 255), sf::Color(250, 250, 250), sf::Color(250, 239, 250), sf::Color(246, 246, 246));
 
 
     m_clock.restart();

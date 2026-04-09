@@ -36,7 +36,8 @@ void UIController::handleContinuousEvents(float deltaTime, const sf::RenderWindo
 void UIController::update(const float deltaTime, sf::RenderWindow &window) const
 {
     for (const auto& widget : m_widgets)
-        widget->update(deltaTime);
+        if (widget->isVisible())
+            widget->update(deltaTime);
 }
 
 void UIController::draw(sf::RenderWindow &window) const
@@ -45,7 +46,8 @@ void UIController::draw(sf::RenderWindow &window) const
 
     window.setView(window.getDefaultView());
     for (const auto& widget : m_widgets)
-        widget->draw(window);
+        if (widget->isVisible())
+            widget->draw(window);
     window.setView(lastView);
 }
 

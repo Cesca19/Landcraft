@@ -25,12 +25,16 @@ public:
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
 
+    bool isVisible() const override;
+    void setVisibility(bool isVisible) override;
+
 protected:
     void onBase() override;
     void onHover() override;
     void onFocus() override;
     void onPress() override;
 
+    bool m_isVisible;
     bool m_isInteractable;
     WidgetState m_currentState;
 

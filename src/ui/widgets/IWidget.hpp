@@ -13,12 +13,15 @@ enum class WidgetState {
     Hovered,
     Focused,
     Pressed
+    // TO DO : add widget selected state
 };
 
 class IWidget {
 public:
     virtual ~IWidget() = default;
     virtual bool isInteractable() const = 0;
+    virtual bool isVisible() const = 0;
+    virtual void setVisibility(bool isVisible) = 0;
 
     virtual sf::FloatRect getBounds() const = 0;
     virtual sf::Vector2f getCenter() const = 0;
