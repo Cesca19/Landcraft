@@ -22,9 +22,10 @@ public:
     SpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size, const std::string &highlightText, int highlightTextSize);
     void initStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor,
         const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& highlightTextColor);
+    void initBackgroundStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor,
+        const sf::Color& focusColor, const sf::Color& pressColor);
     void initOnClickCallback(std::function<void()> callback);
     void initHighlightTextAlign(HighlightTextAlign align);
-    void initBackgroundColor(const sf::Color& color);
 
     bool isInteractable() const override;
     sf::FloatRect getBounds() const override;
@@ -50,8 +51,11 @@ protected:
     sf::Color m_hoverColor;
     sf::Color m_focusColor;
     sf::Color m_pressColor;
-    sf::Color m_backgroundColor;
     sf::Color m_highlightTextColor;
+    sf::Color m_backgroundBaseColor;
+    sf::Color m_backgroundHoverColor;
+    sf::Color m_backgroundFocusColor;
+    sf::Color m_backgroundPressColor;
     sf::Vector2f m_padding;
     float m_spacing;
     HighlightTextAlign m_highlightTextAlign;

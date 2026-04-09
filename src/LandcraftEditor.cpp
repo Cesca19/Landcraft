@@ -16,8 +16,8 @@ LandcraftEditor::LandcraftEditor()
     , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft")
 {
 	m_window.setVerticalSyncEnabled(true);
-    m_window.setIcon(256,256, ResourceManager::getInstance()
-            .getImage("assets/textures/ui/landcraft_icon_256.png").getPixelsPtr());
+    m_window.setIcon(512, 512, ResourceManager::getInstance()
+            .getImage("assets/textures/ui/landcraft_icon_512.png").getPixelsPtr());
 
     m_worldController.init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
@@ -31,21 +31,17 @@ void LandcraftEditor::run()
     const auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
     button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green);
     button->initOnClickCallback(  [] () {std::cout << "Button clicked" << std::endl; } );
-    button->initBackgroundColor(sf::Color(35, 30, 45, 100));
+    button->initBackgroundColor(sf::Color(95, 78, 121, 100));
 
-    const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_32.png", {400, 20}, {32, 32}, "Brush", 15);
-    iconButton->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Black);
+    const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_512.png", {400, 20}, {32, 32}, "Brush", 15);
+    iconButton->initStatesColors(sf::Color(183, 183, 183), sf::Color(153, 153, 153), sf::Color::Cyan, sf::Color(143, 143, 143), sf::Color::Black);
     iconButton->initOnClickCallback([] () {std::cout << "icon Button clicked" << std::endl; } );
     iconButton->initHighlightTextAlign(HighlightTextAlign::Down);
-    // iconButton->initBackgroundColor(sf::Color(35, 30, 45, 180));
-    iconButton->initBackgroundColor(sf::Color(45, 35, 60, 200));
+    // iconButton->initBackgroundStatesColor(sf::Color(255, 255, 255), sf::Color(250, 239, 250), sf::Color(250, 239, 250), sf::Color(246, 228, 246));
+    iconButton->initBackgroundStatesColor(sf::Color(255, 255, 255), sf::Color(250, 250, 250), sf::Color(250, 239, 250), sf::Color(246, 246, 246));
+    // icon2Button->initBackgroundColor(sf::Color(246, 228, 246));
+    // icon1Button->initBackgroundColor(sf::Color(250, 239, 250));
 
-    const auto icon1Button = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_32.png", {500, 20}, {32, 32}, "Paint Palette", 15);
-    icon1Button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Black);
-    icon1Button->initOnClickCallback([] () {std::cout << "icon 1 Button clicked" << std::endl; } );
-    icon1Button->initHighlightTextAlign(HighlightTextAlign::Down);
-    // icon1Button->initBackgroundColor(sf::Color(140, 120, 160, 220));
-    icon1Button->initBackgroundColor(sf::Color(25, 30, 45, 210));
 
     m_clock.restart();
     float deltaTime = 0;
