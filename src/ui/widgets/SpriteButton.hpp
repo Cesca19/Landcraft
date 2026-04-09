@@ -41,11 +41,17 @@ protected:
     void onFocus() override;
     void onPress() override;
 
-    bool m_isInteractable;
-    WidgetState m_currentState;
     sf::Sprite m_iconSprite;
     sf::Text m_highlightText;
     sf::RectangleShape m_background;
+
+    float m_spacing;
+    sf::Vector2f m_padding;
+    HighlightTextAlign m_highlightTextAlign;
+
+    sf::Vector2f m_baseScale;
+    sf::Vector2f m_hoverScale;
+    sf::Vector2f m_pressScale;
 
     sf::Color m_baseColor;
     sf::Color m_hoverColor;
@@ -56,12 +62,9 @@ protected:
     sf::Color m_backgroundHoverColor;
     sf::Color m_backgroundFocusColor;
     sf::Color m_backgroundPressColor;
-    sf::Vector2f m_padding;
-    float m_spacing;
-    HighlightTextAlign m_highlightTextAlign;
-    sf::Vector2f m_baseScale;
-    sf::Vector2f m_hoverScale;
-    sf::Vector2f m_pressScale;
+
+    bool m_isInteractable;
+    WidgetState m_currentState;
     std::function<void()> m_onClickCallback;
 };
 

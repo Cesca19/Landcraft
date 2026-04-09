@@ -6,29 +6,29 @@
 
 SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f position, const sf::Vector2f size, const std::string &highlightText,
     const int highlightTextSize)
-    : m_isInteractable(true)
-    , m_currentState(WidgetState::Base)
+    : m_spacing(5)
     , m_padding(20, 20)
-    , m_spacing(5)
-    , m_onClickCallback(nullptr)
     , m_highlightTextAlign(HighlightTextAlign::Top)
     , m_backgroundBaseColor(sf::Color::Transparent)
+    , m_isInteractable(true)
+    , m_currentState(WidgetState::Base)
+    , m_onClickCallback(nullptr)
 {
-    float bgWidth = size.x + m_padding.x;
-    float bgHeight = size.y + m_padding.y;
+    const float bgWidth = size.x + m_padding.x;
+    const float bgHeight = size.y + m_padding.y;
 
     m_iconSprite.setTexture(ResourceManager::getInstance().getTexture(iconPath));
-    sf::FloatRect iconLocal = m_iconSprite.getLocalBounds();
+    const sf::FloatRect iconLocal = m_iconSprite.getLocalBounds();
     m_iconSprite.setOrigin(iconLocal.width / 2.0f, iconLocal.height / 2.0f);
-    float centerX = position.x + (bgWidth / 2.0f);
-    float centerY = position.y + (bgHeight / 2.0f);
+    const float centerX = position.x + (bgWidth / 2.0f);
+    const float centerY = position.y + (bgHeight / 2.0f);
     m_iconSprite.setPosition(centerX, centerY);
 
     m_highlightText.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
     m_highlightText.setString(highlightText);
     m_highlightText.setCharacterSize(highlightTextSize);
     m_highlightText.setStyle(sf::Text::Bold | sf::Text::Italic);
-    sf::FloatRect textLocal = m_highlightText.getLocalBounds();
+    const sf::FloatRect textLocal = m_highlightText.getLocalBounds();
     m_highlightText.setOrigin(textLocal.left + textLocal.width / 2.0f, textLocal.top + textLocal.height);
 
     m_baseScale = sf::Vector2f(size.x / iconLocal.width, size.y / iconLocal.height);
@@ -39,7 +39,7 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     m_background.setPosition(position);
     m_background.setFillColor(m_backgroundBaseColor);
     m_background.setOutlineThickness(-2.f);
-    
+
     initHighlightTextAlign(m_highlightTextAlign);
 }
 
@@ -70,14 +70,14 @@ void SpriteButton::initOnClickCallback(std::function<void()> callback)
     m_onClickCallback = std::move(callback);
 }
 
-void SpriteButton::initHighlightTextAlign(HighlightTextAlign align)
+void SpriteButton::initHighlightTextAlign(const HighlightTextAlign align)
 {
     m_highlightTextAlign = align;
 
-    sf::FloatRect textLocal = m_highlightText.getLocalBounds();
-    sf::FloatRect bgBounds = m_background.getGlobalBounds();
-    float centerX = bgBounds.left + (bgBounds.width / 2.0f);
-    float centerY = bgBounds.top + (bgBounds.height / 2.0f);
+    const sf::FloatRect textLocal = m_highlightText.getLocalBounds();
+    const sf::FloatRect bgBounds = m_background.getGlobalBounds();
+    const float centerX = bgBounds.left + (bgBounds.width / 2.0f);
+    const float centerY = bgBounds.top + (bgBounds.height / 2.0f);
 
     sf::Vector2f newTextPos;
 
@@ -177,6 +177,8 @@ void SpriteButton::onFocus()
 {
     m_background.setOutlineColor(m_focusColor);
     m_background.setFillColor(m_backgroundFocusColor);
+
+    // repeat hover state
 }
 
 void SpriteButton::onPress()
