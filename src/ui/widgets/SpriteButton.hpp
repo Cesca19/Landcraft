@@ -8,6 +8,13 @@
 #include <functional>
 #include "IWidget.hpp"
 
+enum class HighlightTextAlign
+{
+    Top,
+    Down,
+    Left,
+    Right
+};
 
 class SpriteButton : public IWidget
 {
@@ -16,6 +23,8 @@ public:
     void initStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor,
         const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& highlightTextColor);
     void initOnClickCallback(std::function<void()> callback);
+    void initHighlightTextAlign(HighlightTextAlign align);
+    void initBackgroundColor(const sf::Color& color);
 
     bool isInteractable() const override;
     sf::FloatRect getBounds() const override;
@@ -36,13 +45,16 @@ protected:
     sf::Sprite m_iconSprite;
     sf::Text m_highlightText;
     sf::RectangleShape m_background;
+
     sf::Color m_baseColor;
     sf::Color m_hoverColor;
     sf::Color m_focusColor;
     sf::Color m_pressColor;
+    sf::Color m_backgroundColor;
     sf::Color m_highlightTextColor;
     sf::Vector2f m_padding;
     float m_spacing;
+    HighlightTextAlign m_highlightTextAlign;
     sf::Vector2f m_baseScale;
     sf::Vector2f m_hoverScale;
     sf::Vector2f m_pressScale;

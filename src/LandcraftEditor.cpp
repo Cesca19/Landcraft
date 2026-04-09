@@ -16,6 +16,9 @@ LandcraftEditor::LandcraftEditor()
     , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft")
 {
 	m_window.setVerticalSyncEnabled(true);
+    m_window.setIcon(256,256, ResourceManager::getInstance()
+            .getImage("assets/textures/ui/landcraft_icon_256.png").getPixelsPtr());
+
     m_worldController.init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
         {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}, m_windowSize});
@@ -28,10 +31,22 @@ void LandcraftEditor::run()
     const auto button = UIFactory::createTextButton({20, 20}, "Test Button", sf::Color::Black, 20);
     button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green);
     button->initOnClickCallback(  [] () {std::cout << "Button clicked" << std::endl; } );
+    button->initBackgroundColor(sf::Color(35, 30, 45, 100));
 
-    const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_32.png", {150, 20}, {32, 32}, "Brush", 15);
+    const auto iconButton = UIFactory::createSpriteButton("assets/textures/ui/brush_32.png", {400, 20}, {32, 32}, "Brush", 15);
     iconButton->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Black);
     iconButton->initOnClickCallback([] () {std::cout << "icon Button clicked" << std::endl; } );
+    iconButton->initHighlightTextAlign(HighlightTextAlign::Down);
+    // iconButton->initBackgroundColor(sf::Color(35, 30, 45, 180));
+    iconButton->initBackgroundColor(sf::Color(45, 35, 60, 200));
+
+    const auto icon1Button = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_32.png", {500, 20}, {32, 32}, "Paint Palette", 15);
+    icon1Button->initStatesColors(sf::Color::Yellow, sf::Color::Blue, sf::Color::Cyan, sf::Color::Green, sf::Color::Black);
+    icon1Button->initOnClickCallback([] () {std::cout << "icon 1 Button clicked" << std::endl; } );
+    icon1Button->initHighlightTextAlign(HighlightTextAlign::Down);
+    // icon1Button->initBackgroundColor(sf::Color(140, 120, 160, 220));
+    icon1Button->initBackgroundColor(sf::Color(25, 30, 45, 210));
+
     m_clock.restart();
     float deltaTime = 0;
     while (m_window.isOpen())

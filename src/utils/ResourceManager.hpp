@@ -19,7 +19,8 @@ public:
     ResourceManager& operator=(const ResourceManager&) = delete;
 
     sf::Font& getFont(const std::string& filepath);
-    sf::Texture& getTexture(const std::string& filepath);
+    sf::Texture& getTexture(const std::string& filepath, bool isSmooth = false);
+    sf::Image& getImage(const std::string& filepath);
     void clear();
 
 private:
@@ -28,6 +29,7 @@ private:
 
     std::unordered_map<std::string, std::unique_ptr<sf::Font>> m_fonts;
     std::unordered_map<std::string, std::unique_ptr<sf::Texture>> m_textures;
+    std::unordered_map<std::string, std::unique_ptr<sf::Image>> m_images;
 };
 
 

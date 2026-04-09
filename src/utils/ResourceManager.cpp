@@ -24,18 +24,36 @@ sf::Font & ResourceManager::getFont(const std::string &filepath)
     return *(m_fonts[filepath].get());
 }
 
-sf::Texture & ResourceManager::getTexture(const std::string &filepath)
+sf::Texture & ResourceManager::getTexture(const std::string &filepath, bool isSmooth)
 {
     auto it = m_textures.find(filepath);
     if (m_textures.find(filepath) != m_textures.end())
-        return *(m_textures[filepath].get());
+        {
+            m_textures[filepath]->setSmooth(isSmooth);
+            return *(m_textures[filepath].get());
+        }
 
     auto texture = std::make_unique<sf::Texture>();
     if (!texture->loadFromFile(filepath))
         throw std::runtime_error("Failed to load: " + filepath);
 
+    texture->setSmooth(isSmooth);
     m_textures[filepath] = std::move(texture);
     return *(m_textures[filepath].get());
+}
+
+sf::Image &ResourceManager::getImage(const std::string &filepath)
+{
+    auto it = m_images.find(filepath);
+    if (m_images.find(filepath) != m_images.end())
+        return *(m_images[filepath].get());
+
+    auto image = std::make_unique<sf::Image>();
+    if (!image->loadFromFile(filepath))
+        throw std::runtime_error("Failed to load: " + filepath);
+
+    m_images[filepath] = std::move(image);
+    return *(m_images[filepath].get());
 }
 
 void ResourceManager::clear()

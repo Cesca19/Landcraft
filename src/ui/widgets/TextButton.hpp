@@ -15,6 +15,7 @@ public:
     void initStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor, 
         const sf::Color& focusColor, const sf::Color& pressColor);
     void initOnClickCallback(std::function<void()> callback);
+    void initBackgroundColor(const sf::Color& color);
 
     bool isInteractable() const override;
     sf::FloatRect getBounds() const override;
@@ -39,6 +40,7 @@ protected:
     sf::Color m_hoverColor;
     sf::Color m_focusColor;
     sf::Color m_pressColor;
+    sf::Color m_backgroundColor;
     sf::Vector2f m_padding;
     std::function<void()> m_onClickCallback;
 };

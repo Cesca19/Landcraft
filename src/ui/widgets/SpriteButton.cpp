@@ -11,42 +11,36 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_padding(20, 20)
     , m_spacing(5)
     , m_onClickCallback(nullptr)
+    , m_highlightTextAlign(HighlightTextAlign::Top)
+    , m_backgroundColor(sf::Color::Transparent)
 {
-    m_iconSprite.setTexture(ResourceManager::getInstance().getTexture(iconPath));
-    m_highlightText.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
-
-    m_highlightText.setString(highlightText);
-    m_highlightText.setCharacterSize(highlightTextSize);
-
-    sf::FloatRect iconLocal = m_iconSprite.getLocalBounds();
-    sf::FloatRect textLocal = m_highlightText.getLocalBounds();
-
-    m_iconSprite.setOrigin(iconLocal.width / 2.0f, iconLocal.height / 2.0f);
-    m_highlightText.setOrigin(textLocal.left + textLocal.width / 2.0f, textLocal.top + textLocal.height);
-
-    m_baseScale = sf::Vector2f(size.x / iconLocal.width, size.y / iconLocal.height);
-    m_hoverScale = m_baseScale * 0.8f;
-    m_pressScale = m_baseScale * 0.7f;
-
     float bgWidth = size.x + m_padding.x;
     float bgHeight = size.y + m_padding.y;
 
-    m_background.setSize(sf::Vector2f(bgWidth, bgHeight));
-    m_background.setPosition(position);
-    m_background.setFillColor(sf::Color::Transparent);
-    m_background.setOutlineThickness(-2.f);
-
+    m_iconSprite.setTexture(ResourceManager::getInstance().getTexture(iconPath, true));
+    sf::FloatRect iconLocal = m_iconSprite.getLocalBounds();
+    m_iconSprite.setOrigin(iconLocal.width / 2.0f, iconLocal.height / 2.0f);
     float centerX = position.x + (bgWidth / 2.0f);
     float centerY = position.y + (bgHeight / 2.0f);
-
     m_iconSprite.setPosition(centerX, centerY);
 
-    sf::FloatRect textBounds = m_highlightText.getLocalBounds();
-    m_highlightText.setPosition(centerX, position.y + bgHeight + textBounds.height + m_spacing);
+    m_highlightText.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
+    m_highlightText.setString(highlightText);
+    m_highlightText.setCharacterSize(highlightTextSize);
     m_highlightText.setStyle(sf::Text::Bold | sf::Text::Italic);
+    sf::FloatRect textLocal = m_highlightText.getLocalBounds();
+    m_highlightText.setOrigin(textLocal.left + textLocal.width / 2.0f, textLocal.top + textLocal.height);
 
-    m_background.setFillColor(sf::Color::Transparent);
-    m_background.setOutlineThickness(2);
+    m_baseScale = sf::Vector2f(size.x / iconLocal.width, size.y / iconLocal.height);
+    m_hoverScale = m_baseScale * 0.85f;
+    m_pressScale = m_baseScale * 0.75f;
+
+    m_background.setSize(sf::Vector2f(bgWidth, bgHeight));
+    m_background.setPosition(position);
+    m_background.setFillColor(m_backgroundColor);
+    m_background.setOutlineThickness(-2.f);
+    
+    initHighlightTextAlign(m_highlightTextAlign);
 }
 
 void SpriteButton::initStatesColors(const sf::Color &baseColor, const sf::Color &hoverColor,
@@ -64,6 +58,48 @@ void SpriteButton::initStatesColors(const sf::Color &baseColor, const sf::Color 
 void SpriteButton::initOnClickCallback(std::function<void()> callback)
 {
     m_onClickCallback = std::move(callback);
+}
+
+void SpriteButton::initHighlightTextAlign(HighlightTextAlign align)
+{
+    m_highlightTextAlign = align;
+
+    sf::FloatRect textLocal = m_highlightText.getLocalBounds();
+    sf::FloatRect bgBounds = m_background.getGlobalBounds();
+    float centerX = bgBounds.left + (bgBounds.width / 2.0f);
+    float centerY = bgBounds.top + (bgBounds.height / 2.0f);
+
+    sf::Vector2f newTextPos;
+
+    switch (m_highlightTextAlign) {
+        case HighlightTextAlign::Top:
+            newTextPos.x = centerX;
+            newTextPos.y = bgBounds.top - m_spacing;
+            break;
+            
+        case HighlightTextAlign::Down:
+            newTextPos.x = centerX;
+            newTextPos.y = bgBounds.top + bgBounds.height + m_spacing + textLocal.height; 
+            break;
+            
+        case HighlightTextAlign::Left:
+            newTextPos.x = bgBounds.left - m_spacing - (textLocal.width / 2.0f);
+            newTextPos.y = centerY + (textLocal.height / 2.0f);
+            break;
+            
+        case HighlightTextAlign::Right:
+            newTextPos.x = bgBounds.left + bgBounds.width + m_spacing + (textLocal.width / 2.0f);
+            newTextPos.y = centerY + (textLocal.height / 2.0f);
+            break;
+    }
+
+    m_highlightText.setPosition(newTextPos);
+}
+
+void SpriteButton::initBackgroundColor(const sf::Color &color)
+{
+    m_backgroundColor = color;
+    m_background.setFillColor(m_backgroundColor);
 }
 
 bool SpriteButton::isInteractable() const

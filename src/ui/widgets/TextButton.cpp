@@ -9,6 +9,7 @@ TextButton::TextButton(const sf::Vector2f position, const std::string &text, con
     , m_currentState(WidgetState::Base)
     , m_padding(20, 20)
     , m_onClickCallback(nullptr)
+    , m_backgroundColor(sf::Color::Transparent)
 {
     m_text.setFillColor(textColor);
     m_text.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
@@ -31,7 +32,7 @@ TextButton::TextButton(const sf::Vector2f position, const std::string &text, con
 
     m_background.setSize(sf::Vector2f(bgWidth, bgHeight));
     m_background.setPosition(position);
-    m_background.setFillColor(sf::Color::Transparent);
+    m_background.setFillColor(m_backgroundColor);
     m_background.setOutlineThickness(-2.f);
 
     float centerX = position.x + (bgWidth / 2.0f);
@@ -52,6 +53,12 @@ void TextButton::initStatesColors(const sf::Color &baseColor, const sf::Color &h
 void TextButton::initOnClickCallback(std::function<void()> callback)
 {
     m_onClickCallback = std::move(callback);
+}
+
+void TextButton::initBackgroundColor(const sf::Color &color)
+{
+    m_backgroundColor = color;
+    m_background.setFillColor(m_backgroundColor);
 }
 
 bool TextButton::isInteractable() const
