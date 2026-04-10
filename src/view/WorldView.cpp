@@ -18,14 +18,19 @@ WorldView::WorldView()
 {
 }
 
-void WorldView::init(const sf::Vector2f center, const sf::Vector2f size)
+void WorldView::init(const sf::Vector2f center, const sf::Vector2f size, const int defaultZoom)
 {
     m_view.setCenter(center);
     m_view.setSize(size);
+    zoom(defaultZoom);
 
     m_baseSize = size;
     m_currentCenter = center;
     m_targetCenter = center;
+
+    m_defaultCenter = center;
+    m_defaultZoom = defaultZoom;
+    m_defaultTargetZoom = m_targetZoom;
 }
 
 void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, const sf::Vector2f worldPivot)
@@ -146,6 +151,14 @@ void WorldView::zoom(const int zoomDelta)
 const Camera &WorldView::getCamera() const
 {
     return *m_camera;
+}
+
+void WorldView::recenter()
+{
+    setCenter(m_defaultCenter);
+    m_targetZoom = m_defaultTargetZoom;
+    if (m_camera)
+        m_camera->resetRotation();
 }
 
 void WorldView::zoomAtMouse(const sf::RenderWindow &window, const float zoomDelta)

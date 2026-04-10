@@ -19,13 +19,10 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
     m_redoButton->initOnClickCallback([this, &model, &view] () {
         m_commandHistory.redoCommand(model, view);
     });
-
-    m_editionToolsBox = UIFactory::createBox(sf::Vector2f(0, 84), {85, 800});
+    m_editionToolsBox = UIFactory::createBox(sf::Vector2f(0, 84), {85, 210});
     m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
-
     m_toolsText = UIFactory::createText(sf::Vector2f(10, 90), "Tools:", 20);
     m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
-
     const sf::Vector2f toolStartPos(15, 140);
     SpriteButton *elevationButton = UIFactory::createSpriteButton("assets/textures/ui/elevation_tool_512.png", toolStartPos, {32, 32}, "Elevation", 15);
     SpriteButton *paintButton = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_64.png", toolStartPos + sf::Vector2f(0, 80), {32, 32}, "Paint", 15);
@@ -36,7 +33,6 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
             this->selectEditionTool(i);
         });
     }
-
     applyUIStyle();
 
     m_editionTools.emplace_back(std::make_unique<ElevationTool>());

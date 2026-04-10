@@ -4,7 +4,7 @@
 
 #include "NavigationController.hpp"
 
-NavigationController::NavigationController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition)
+NavigationController::NavigationController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIPosition)
     : m_movementStep(200)
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
@@ -18,6 +18,9 @@ NavigationController::NavigationController(WorldModel &model, WorldView &view, s
     sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
     recenterButton->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
         sf::Color(250, 239, 250), sf::Color(253, 249, 221));
+    recenterButton->initOnClickCallback([&view] {
+       view.recenter();
+    });
 }
 
 void NavigationController::handleEvents(const sf::RenderWindow &window, const sf::Event &event, WorldModel &model,

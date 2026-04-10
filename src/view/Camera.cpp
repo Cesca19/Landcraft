@@ -14,6 +14,7 @@ Camera::Camera(const float tileSizeX, const float tileSizeY, const float heightS
     , m_pitchRotationSpeed(20)
     , m_currentPitchRotationAngle(projectionAngleY)
     , m_targetPitchRotationAngle(projectionAngleY)
+    , m_defaultPitchRotationAngle(projectionAngleY)
     , m_yawRotationSpeed(10)
     , m_currentYawRotationAngle(0)
     , m_targetYawRotationAngle(0)
@@ -145,6 +146,12 @@ void Camera::updateContinuousRotation(const sf::Vector2i mousePosition)
 
     // update last mouse position
     m_mouseLastDragPosition = mousePosition;
+}
+
+void Camera::resetRotation()
+{
+    m_targetPitchRotationAngle = m_defaultPitchRotationAngle;
+    m_targetYawRotationAngle = 0;
 }
 
 void Camera::rotateAroundXAxis(const float newProjectionAngleY)

@@ -19,12 +19,11 @@ void WorldController::init(const std::string &mapName,
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings)
 {
     m_worldModel.loadMap(mapName);
-    m_worldView.init(viewSettings.center, viewSettings.size);
+    m_worldView.init(viewSettings.center, viewSettings.size, 10);
     m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles());
     m_worldView.initEnvironment(viewSettings.windowSize);
-    m_worldView.zoom(10);
 }
 
 void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &window)
