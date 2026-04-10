@@ -13,6 +13,7 @@
 class UIFactory {
     public:
     static void init(UIController* uiController);
+    static Box* createBox(const sf::Vector2f& position, const sf::Vector2f& size);
     static TextButton* createTextButton(sf::Vector2f position, const std::string& text, sf::Color textColor, unsigned int characterSize);
     static SpriteButton* createSpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size, const std::string &highlightText, int highlightTextSize);
 private:

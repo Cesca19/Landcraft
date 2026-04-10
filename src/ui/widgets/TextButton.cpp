@@ -56,15 +56,31 @@ void TextButton::initOnClickCallback(std::function<void()> callback)
     m_onClickCallback = std::move(callback);
 }
 
-void TextButton::initBackgroundColor(const sf::Color &color)
+void TextButton::initBackgroundColor(const sf::Color &color, const sf::Color &selectedColor)
 {
     m_backgroundColor = color;
+    m_selectedColor = selectedColor;
     m_background.setFillColor(m_backgroundColor);
 }
 
 bool TextButton::isInteractable() const
 {
     return m_isInteractable;
+}
+
+bool TextButton::isSelected() const
+{
+    return m_isSelected;
+}
+
+void TextButton::setSelected(bool isSelected)
+{
+    m_isSelected = isSelected;
+    if (m_isSelected) {
+        m_background.setFillColor(m_selectedColor);
+    } else {
+        m_background.setFillColor(m_backgroundColor);
+    }
 }
 
 sf::FloatRect TextButton::getBounds() const
@@ -92,18 +108,18 @@ void TextButton::setState(const WidgetState state)
     if (m_currentState == state)
         return;
     switch (state) {
-        case WidgetState::Base:
-            onBase();
-            break;
-        case WidgetState::Focused:
-            onFocus();
-            break;
-        case WidgetState::Hovered:
-            onHover();
-            break;
-        case WidgetState::Pressed:
-            onPress();
-            break;
+    case WidgetState::Base:
+        onBase();
+        break;
+    case WidgetState::Focused:
+        onFocus();
+        break;
+    case WidgetState::Hovered:
+        onHover();
+        break;
+    case WidgetState::Pressed:
+        onPress();
+        break;
     }
     m_currentState = state;
 }
@@ -121,6 +137,8 @@ void TextButton::setVisibility(const bool isVisible)
 void TextButton::onBase()
 {
     m_background.setOutlineColor(m_baseColor);
+    if (m_isSelected)
+        m_background.setFillColor(m_selectedColor);
 }
 
 void TextButton::onHover()

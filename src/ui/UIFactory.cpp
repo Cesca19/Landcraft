@@ -11,6 +11,19 @@ void UIFactory::init(UIController *uiController)
     s_uiController = uiController;
 }
 
+Box *UIFactory::createBox(const sf::Vector2f &position, const sf::Vector2f &size)
+{
+    if (!s_uiController) {
+        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        return nullptr;
+    }
+
+    std::unique_ptr<Box> box = std::make_unique<Box>(position, size);
+    Box* boxPtr = box.get();
+    s_uiController->addWidget(std::move(box));
+    return boxPtr;
+}
+
 TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, sf::Color textColor, unsigned int characterSize)
 {
     if (!s_uiController) {

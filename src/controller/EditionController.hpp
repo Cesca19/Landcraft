@@ -9,6 +9,7 @@
 #include "../view/WorldView.hpp"
 #include "../commands/CommandHistory.hpp"
 #include "../editionTools/EditionTools.hpp"
+#include "../ui/UIFactory.hpp"
 
 class EditionController {
 public:
@@ -25,6 +26,8 @@ private:
     CommandHistory m_commandHistory;
     int m_currentEditionTool;
     std::vector<std::unique_ptr<IEditionTool>> m_editionTools;
+    std::vector<SpriteButton*> m_editionToolsButtons;
+    Box *m_editionToolsBox;
 };
 
 #endif //LANDCRAFT_EDITIONCONTROLLER_HPP

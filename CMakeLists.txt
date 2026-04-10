@@ -84,6 +84,8 @@ add_executable(${MY_TARGET}
         src/ui/widgets/TextButton.cpp
         src/ui/widgets/SpriteButton.cpp
         src/utils/ResourceManager.cpp
+        src/ui/widgets/Box.cpp
+        src/ui/widgets/Box.hpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

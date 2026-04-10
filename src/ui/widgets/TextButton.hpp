@@ -15,9 +15,13 @@ public:
     void initStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor, 
         const sf::Color& focusColor, const sf::Color& pressColor);
     void initOnClickCallback(std::function<void()> callback);
-    void initBackgroundColor(const sf::Color& color);
+    void initBackgroundColor(const sf::Color& color, const sf::Color& selectedColor);
 
     bool isInteractable() const override;
+
+    bool isSelected() const override;
+    void setSelected(bool isSelected) override;
+
     sf::FloatRect getBounds() const override;
     sf::Vector2f getCenter() const override;
 
@@ -35,6 +39,7 @@ protected:
     void onPress() override;
 
     bool m_isVisible;
+    bool m_isSelected;
     bool m_isInteractable;
     WidgetState m_currentState;
 
@@ -44,6 +49,7 @@ protected:
     sf::Color m_hoverColor;
     sf::Color m_focusColor;
     sf::Color m_pressColor;
+    sf::Color m_selectedColor;
     sf::Color m_backgroundColor;
     sf::Vector2f m_padding;
     std::function<void()> m_onClickCallback;

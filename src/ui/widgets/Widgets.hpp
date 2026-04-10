@@ -6,6 +6,7 @@
 #define LANDCRAFT_WIDGETS_HPP
 
 #include "IWidget.hpp"
+#include "Box.hpp"
 #include "TextButton.hpp"
 #include "SpriteButton.hpp"
 

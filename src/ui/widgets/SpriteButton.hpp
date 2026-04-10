@@ -20,16 +20,20 @@ class SpriteButton : public IWidget
 {
 public:
     SpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size, const std::string &highlightText, int highlightTextSize);
-    void initStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor,
+    void initOutlineStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor,
         const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& highlightTextColor);
     void initBackgroundStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor,
-        const sf::Color& focusColor, const sf::Color& pressColor);
+        const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& selectedColor);
     void initOnClickCallback(std::function<void()> callback);
     void initHighlightTextAlign(HighlightTextAlign align);
 
     bool isInteractable() const override;
+
     bool isVisible() const override;
     void setVisibility(bool isVisible) override;
+
+    bool isSelected() const override;
+    void setSelected(bool isSelected) override;
 
     sf::FloatRect getBounds() const override;
     sf::Vector2f getCenter() const override;
@@ -60,6 +64,7 @@ protected:
     sf::Color m_hoverColor;
     sf::Color m_focusColor;
     sf::Color m_pressColor;
+    sf::Color m_selectedColor;
     sf::Color m_highlightTextColor;
     sf::Color m_backgroundBaseColor;
     sf::Color m_backgroundHoverColor;
@@ -67,7 +72,9 @@ protected:
     sf::Color m_backgroundPressColor;
 
     bool m_isVisible;
+    bool m_isSelected;
     bool m_isInteractable;
+    bool m_isHilightTextVisible;
     WidgetState m_currentState;
     std::function<void()> m_onClickCallback;
 };

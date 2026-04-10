@@ -14,6 +14,8 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_currentState(WidgetState::Base)
     , m_onClickCallback(nullptr)
     , m_isVisible(true)
+    , m_isSelected(false)
+    , m_isHilightTextVisible(false)
 {
     const float bgWidth = size.x + m_padding.x;
     const float bgHeight = size.y + m_padding.y;
@@ -42,9 +44,10 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     m_background.setOutlineThickness(-2.f);
 
     initHighlightTextAlign(m_highlightTextAlign);
+    onBase();
 }
 
-void SpriteButton::initStatesColors(const sf::Color &baseColor, const sf::Color &hoverColor,
+void SpriteButton::initOutlineStatesColors(const sf::Color &baseColor, const sf::Color &hoverColor,
     const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color &highlightTextColor)
 {
     m_baseColor = baseColor;
@@ -56,12 +59,14 @@ void SpriteButton::initStatesColors(const sf::Color &baseColor, const sf::Color 
     onBase();
 }
 
-void SpriteButton::initBackgroundStatesColor(const sf::Color &baseColor, const sf::Color &hoverColor, const sf::Color &focusColor, const sf::Color &pressColor)
+void SpriteButton::initBackgroundStatesColor(const sf::Color &baseColor, const sf::Color &hoverColor, 
+    const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color &selectedColor)
 {
     m_backgroundBaseColor = baseColor;
     m_backgroundHoverColor = hoverColor;
     m_backgroundFocusColor = focusColor;
     m_backgroundPressColor = pressColor;
+    m_selectedColor = selectedColor;
 
     m_background.setFillColor(m_backgroundBaseColor);
 }
@@ -122,6 +127,21 @@ void SpriteButton::setVisibility(const bool isVisible)
     m_isVisible = isVisible;
 }
 
+bool SpriteButton::isSelected() const
+{
+    return m_isSelected;
+}
+
+void SpriteButton::setSelected(bool isSelected)
+{
+    m_isSelected = isSelected;
+    m_isHilightTextVisible = isSelected;
+    if (m_isSelected)
+        m_background.setFillColor(m_selectedColor);
+    else
+        m_background.setFillColor(m_backgroundBaseColor);
+}
+
 sf::FloatRect SpriteButton::getBounds() const
 {
     return m_background.getGlobalBounds();
@@ -140,7 +160,8 @@ void SpriteButton::draw(sf::RenderWindow &window) const
 {
     window.draw(m_background);
     window.draw(m_iconSprite);
-    window.draw(m_highlightText);
+    if (m_isHilightTextVisible)
+        window.draw(m_highlightText);
 }
 
 void SpriteButton::setState(const WidgetState state)
@@ -169,11 +190,13 @@ void SpriteButton::onBase()
     m_background.setOutlineColor(m_baseColor);
     m_background.setFillColor(m_backgroundBaseColor);
     m_iconSprite.setScale(m_baseScale);
+    m_highlightText.setFillColor(m_highlightTextColor);
+    m_isHilightTextVisible = false;
 
-    // or add a bool should draw
-    sf::Color transparentText = m_highlightTextColor;
-    transparentText.a = 0;
-    m_highlightText.setFillColor(transparentText);
+    if (m_isSelected) {
+        m_background.setFillColor(m_selectedColor);
+        m_isHilightTextVisible = true;
+    }
 }
 
 void SpriteButton::onHover()
@@ -182,6 +205,7 @@ void SpriteButton::onHover()
     m_background.setFillColor(m_backgroundHoverColor);
     m_iconSprite.setScale(m_hoverScale);
     m_highlightText.setFillColor(m_highlightTextColor);
+    m_isHilightTextVisible = true;
 }
 
 void SpriteButton::onFocus()
@@ -198,6 +222,7 @@ void SpriteButton::onPress()
     m_background.setFillColor(m_backgroundPressColor);
     m_iconSprite.setScale(m_pressScale);
     m_highlightText.setFillColor(m_highlightTextColor);
+    m_isHilightTextVisible = true;
 
     if (m_onClickCallback)
         m_onClickCallback();
