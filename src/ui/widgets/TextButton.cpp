@@ -73,7 +73,7 @@ bool TextButton::isSelected() const
     return m_isSelected;
 }
 
-void TextButton::setSelected(bool isSelected)
+void TextButton::setSelected(const bool isSelected)
 {
     m_isSelected = isSelected;
     if (m_isSelected) {

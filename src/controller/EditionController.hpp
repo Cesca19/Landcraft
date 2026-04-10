@@ -29,9 +29,10 @@ private:
     int m_currentEditionTool;
     std::vector<std::unique_ptr<IEditionTool>> m_editionTools;
     std::vector<SpriteButton*> m_editionToolsButtons;
+    Text *m_toolsText;
+    Box *m_editionToolsBox;
     SpriteButton *m_undoButton;
     SpriteButton *m_redoButton;
-    Box *m_editionToolsBox;
     sf::Vector2f m_globalUIStartPosition;
     sf::Vector2f m_toolsStartMenuPosition;
 };

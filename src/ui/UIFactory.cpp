@@ -24,6 +24,18 @@ Box *UIFactory::createBox(const sf::Vector2f &position, const sf::Vector2f &size
     return boxPtr;
 }
 
+Text * UIFactory::createText(const sf::Vector2f& position, const std::string &content, int characterSize)
+{
+    if (!s_uiController) {
+        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        return nullptr;
+    }
+    std::unique_ptr<Text> text = std::make_unique<Text>(position, content, characterSize);
+    Text* textPtr = text.get();
+    s_uiController->addWidget(std::move(text));
+    return textPtr;
+}
+
 TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, sf::Color textColor, unsigned int characterSize)
 {
     if (!s_uiController) {

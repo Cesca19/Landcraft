@@ -9,28 +9,10 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
     , m_globalUIStartPosition(globalUIStartPosition)
     , m_toolsStartMenuPosition(globalUIStartPosition + sf::Vector2f(90, 0))
 {
-    m_editionTools.emplace_back(std::make_unique<ElevationTool>());
-    m_editionTools.emplace_back(std::make_unique<PaintTool>());
-
     m_undoButton = UIFactory::createSpriteButton("assets/textures/ui/undo_512.png",
         globalUIStartPosition + sf::Vector2f(15, 16), {28, 28}, "Undo", 12);
     m_redoButton = UIFactory::createSpriteButton("assets/textures/ui/redo_512.png",
         globalUIStartPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
-
-    m_editionToolsBox = UIFactory::createBox(sf::Vector2f(0, 84), {85, 800});
-    m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
-
-    const sf::Vector2f toolStartPos(15, 150);
-    SpriteButton *elevationButton = UIFactory::createSpriteButton("assets/textures/ui/elevation_tool_512.png", toolStartPos, {32, 32}, "Elevation", 15);
-    SpriteButton *paintButton = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_64.png", toolStartPos + sf::Vector2f(0, 80), {32, 32}, "Paint", 15);
-
-    m_editionToolsButtons.emplace_back(elevationButton);
-    m_editionToolsButtons.emplace_back(paintButton);
-    for (int i = 0; i < m_editionToolsButtons.size(); i++ ) {
-        m_editionToolsButtons[i]->initOnClickCallback([this, i] () {
-            this->selectEditionTool(i);
-        });
-    }
     m_undoButton->initOnClickCallback([this, &model, &view] () {
         m_commandHistory.undoCommand(model, view);
     });
@@ -38,7 +20,27 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
         m_commandHistory.redoCommand(model, view);
     });
 
+    m_editionToolsBox = UIFactory::createBox(sf::Vector2f(0, 84), {85, 800});
+    m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+
+    m_toolsText = UIFactory::createText(sf::Vector2f(10, 90), "Tools:", 20);
+    m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+
+    const sf::Vector2f toolStartPos(15, 140);
+    SpriteButton *elevationButton = UIFactory::createSpriteButton("assets/textures/ui/elevation_tool_512.png", toolStartPos, {32, 32}, "Elevation", 15);
+    SpriteButton *paintButton = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_64.png", toolStartPos + sf::Vector2f(0, 80), {32, 32}, "Paint", 15);
+    m_editionToolsButtons.emplace_back(elevationButton);
+    m_editionToolsButtons.emplace_back(paintButton);
+    for (int i = 0; i < m_editionToolsButtons.size(); i++ ) {
+        m_editionToolsButtons[i]->initOnClickCallback([this, i] () {
+            this->selectEditionTool(i);
+        });
+    }
+
     applyUIStyle();
+
+    m_editionTools.emplace_back(std::make_unique<ElevationTool>());
+    m_editionTools.emplace_back(std::make_unique<PaintTool>());
     selectEditionTool(0);
 }
 

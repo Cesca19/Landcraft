@@ -7,6 +7,7 @@
 
 #include "IWidget.hpp"
 #include "Box.hpp"
+#include "Text.hpp"
 #include "TextButton.hpp"
 #include "SpriteButton.hpp"
 
