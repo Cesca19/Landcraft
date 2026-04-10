@@ -33,6 +33,7 @@ private:
     Box *m_editionToolsBox;
     SpriteButton *m_undoButton;
     SpriteButton *m_redoButton;
+    sf::Vector2f m_editionToolsBoxPosition;
     sf::Vector2f m_globalUIStartPosition;
     sf::Vector2f m_toolsStartMenuPosition;
 };

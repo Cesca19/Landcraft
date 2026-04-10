@@ -4,22 +4,23 @@
 
 #include "EditionController.hpp"
 
-EditionController::EditionController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIStartPosition)
+EditionController::EditionController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIPosition)
     : m_currentEditionTool(-1)
-    , m_globalUIStartPosition(globalUIStartPosition)
-    , m_toolsStartMenuPosition(globalUIStartPosition + sf::Vector2f(90, 0))
+    , m_globalUIStartPosition(globalUIPosition)
+    , m_editionToolsBoxPosition(0, 84)
+    , m_toolsStartMenuPosition(m_editionToolsBoxPosition + sf::Vector2f(90, 0))
 {
     m_undoButton = UIFactory::createSpriteButton("assets/textures/ui/undo_512.png",
-        globalUIStartPosition + sf::Vector2f(15, 16), {28, 28}, "Undo", 12);
+        globalUIPosition + sf::Vector2f(15, 16), {28, 28}, "Undo", 12);
     m_redoButton = UIFactory::createSpriteButton("assets/textures/ui/redo_512.png",
-        globalUIStartPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
+        globalUIPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
     m_undoButton->initOnClickCallback([this, &model, &view] () {
         m_commandHistory.undoCommand(model, view);
     });
     m_redoButton->initOnClickCallback([this, &model, &view] () {
         m_commandHistory.redoCommand(model, view);
     });
-    m_editionToolsBox = UIFactory::createBox(sf::Vector2f(0, 84), {85, 210});
+    m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 210});
     m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
     m_toolsText = UIFactory::createText(sf::Vector2f(10, 90), "Tools:", 20);
     m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
@@ -36,7 +37,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
     applyUIStyle();
 
     m_editionTools.emplace_back(std::make_unique<ElevationTool>());
-    m_editionTools.emplace_back(std::make_unique<PaintTool>());
+    m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsStartMenuPosition));
     selectEditionTool(0);
 }
 
@@ -111,7 +112,6 @@ void EditionController::applyUIStyle()
             sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
         button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
             sf::Color(250, 239, 250), sf::Color(253, 249, 221));
-        button->initHighlightTextAlign(HighlightTextAlign::Top);
     }
     m_undoButton->initHighlightTextAlign(HighlightTextAlign::Down);
     m_redoButton->initHighlightTextAlign(HighlightTextAlign::Down);
