@@ -4,12 +4,20 @@
 
 #include "NavigationController.hpp"
 
-NavigationController::NavigationController()
+NavigationController::NavigationController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition)
     : m_movementStep(200)
     , m_zoomStep(1)
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
 {
+    // to do : add recenter view cmd
+    SpriteButton *recenterButton = UIFactory::createSpriteButton("assets/textures/ui/recenter_view_512.png",
+       globalUIPosition  + sf::Vector2f(155, 16), {28, 28}, "Recenter", 12);
+    recenterButton->initHighlightTextAlign(HighlightTextAlign::Down);
+    recenterButton->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color::White,
+    sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
+    recenterButton->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
+        sf::Color(250, 239, 250), sf::Color(253, 249, 221));
 }
 
 void NavigationController::handleEvents(const sf::RenderWindow &window, const sf::Event &event, WorldModel &model,

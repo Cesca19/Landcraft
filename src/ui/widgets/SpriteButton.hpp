@@ -20,10 +20,9 @@ class SpriteButton : public IWidget
 {
 public:
     SpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size, const std::string &highlightText, int highlightTextSize);
-    void initOutlineStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor,
-        const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& highlightTextColor);
-    void initBackgroundStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor,
-        const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& selectedColor);
+    void initHighLightTextColor(const sf::Color& highlightTextColor);
+    void initOutlineStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& selectedColor);
+    void initBackgroundStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor,const sf::Color& focusColor, const sf::Color& pressColor);
     void initOnClickCallback(std::function<void()> callback);
     void initHighlightTextAlign(HighlightTextAlign align);
 

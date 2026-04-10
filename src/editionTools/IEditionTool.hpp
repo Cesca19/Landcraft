@@ -21,6 +21,8 @@ public:
                               SelectionController& selectionController, CommandHistory& history) = 0;
     virtual void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view,
                                         SelectionController& selectionController, CommandHistory& history) = 0;
+    virtual void onToolSelected() const = 0;
+    virtual void onToolUnSelected() const = 0;
 };
 
 #endif //LANDCRAFT_IEDITIONTOOL_HPP

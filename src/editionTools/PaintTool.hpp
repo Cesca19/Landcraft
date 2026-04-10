@@ -8,13 +8,14 @@
 #include "IEditionTool.hpp"
 #include "../commands/PaintTilesCommand.hpp"
 
-class PaintTool : public IEditionTool
-{
+class PaintTool : public IEditionTool {
 public:
     PaintTool();
     bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
+    void onToolSelected() const override;
+    void onToolUnSelected() const override;
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
                               SelectionController& selectionController, CommandHistory& history) override;
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;

@@ -27,6 +27,14 @@ SelectionMode PaintTool::getRequiredSelectionMode() const
     return SelectionMode::TILE;
 }
 
+void PaintTool::onToolSelected() const
+{
+}
+
+void PaintTool::onToolUnSelected() const
+{
+}
+
 void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController,
                              CommandHistory &history)
 {

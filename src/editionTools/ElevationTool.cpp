@@ -34,6 +34,14 @@ SelectionMode ElevationTool::getRequiredSelectionMode() const
     return m_currentSelectionMode;
 }
 
+void ElevationTool::onToolSelected() const
+{
+}
+
+void ElevationTool::onToolUnSelected() const
+{
+}
+
 void ElevationTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view,
                                  SelectionController &selectionController, CommandHistory &history)
 {

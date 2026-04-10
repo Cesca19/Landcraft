@@ -16,6 +16,7 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_isVisible(true)
     , m_isSelected(false)
     , m_isHilightTextVisible(false)
+    , m_highlightTextColor(sf::Color::White)
 {
     const float bgWidth = size.x + m_padding.x;
     const float bgHeight = size.y + m_padding.y;
@@ -31,12 +32,14 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     m_highlightText.setString(highlightText);
     m_highlightText.setCharacterSize(highlightTextSize);
     m_highlightText.setStyle(sf::Text::Bold | sf::Text::Italic);
+    m_highlightText.setFillColor(m_highlightTextColor);
     const sf::FloatRect textLocal = m_highlightText.getLocalBounds();
     m_highlightText.setOrigin(textLocal.left + textLocal.width / 2.0f, textLocal.top + textLocal.height);
 
     m_baseScale = sf::Vector2f(size.x / iconLocal.width, size.y / iconLocal.height);
-    m_hoverScale = m_baseScale * 1.30f;
-    m_pressScale = m_baseScale * 1.15f;
+    m_hoverScale = m_baseScale * 1.4f;
+    m_pressScale = m_baseScale * 1.2f;
+    m_baseScale = m_baseScale * 1.25f;
 
     m_background.setSize(sf::Vector2f(bgWidth, bgHeight));
     m_background.setPosition(position);
@@ -47,26 +50,30 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     onBase();
 }
 
+void SpriteButton::initHighLightTextColor(const sf::Color &highlightTextColor)
+{
+    m_highlightTextColor = highlightTextColor;
+    m_highlightText.setFillColor(m_highlightTextColor);
+}
+
 void SpriteButton::initOutlineStatesColors(const sf::Color &baseColor, const sf::Color &hoverColor,
-    const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color &highlightTextColor)
+                                           const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color& selectedColor)
 {
     m_baseColor = baseColor;
     m_hoverColor = hoverColor;
     m_focusColor = focusColor;
     m_pressColor = pressColor;
-    m_highlightTextColor = highlightTextColor;
-
+    m_selectedColor = selectedColor;
     onBase();
 }
 
 void SpriteButton::initBackgroundStatesColor(const sf::Color &baseColor, const sf::Color &hoverColor, 
-    const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color &selectedColor)
+    const sf::Color &focusColor, const sf::Color &pressColor)
 {
     m_backgroundBaseColor = baseColor;
     m_backgroundHoverColor = hoverColor;
     m_backgroundFocusColor = focusColor;
     m_backgroundPressColor = pressColor;
-    m_selectedColor = selectedColor;
 
     m_background.setFillColor(m_backgroundBaseColor);
 }
@@ -132,14 +139,20 @@ bool SpriteButton::isSelected() const
     return m_isSelected;
 }
 
-void SpriteButton::setSelected(bool isSelected)
+void SpriteButton::setSelected(const bool isSelected)
 {
     m_isSelected = isSelected;
     m_isHilightTextVisible = isSelected;
-    if (m_isSelected)
-        m_background.setFillColor(m_selectedColor);
-    else
-        m_background.setFillColor(m_backgroundBaseColor);
+    if (m_isSelected) {
+        m_background.setOutlineColor(m_selectedColor);
+        m_background.setOutlineThickness(-4);
+
+    }
+    else {
+        m_background.setOutlineColor(m_baseColor);
+        m_background.setOutlineThickness(-2);
+
+    }
 }
 
 sf::FloatRect SpriteButton::getBounds() const
@@ -190,11 +203,12 @@ void SpriteButton::onBase()
     m_background.setOutlineColor(m_baseColor);
     m_background.setFillColor(m_backgroundBaseColor);
     m_iconSprite.setScale(m_baseScale);
-    m_highlightText.setFillColor(m_highlightTextColor);
+    // m_highlightText.setFillColor(m_highlightTextColor);
     m_isHilightTextVisible = false;
 
     if (m_isSelected) {
-        m_background.setFillColor(m_selectedColor);
+        m_background.setOutlineColor(m_selectedColor);
+        m_background.setOutlineThickness(-4);
         m_isHilightTextVisible = true;
     }
 }
@@ -204,7 +218,7 @@ void SpriteButton::onHover()
     m_background.setOutlineColor(m_hoverColor);
     m_background.setFillColor(m_backgroundHoverColor);
     m_iconSprite.setScale(m_hoverScale);
-    m_highlightText.setFillColor(m_highlightTextColor);
+
     m_isHilightTextVisible = true;
 }
 

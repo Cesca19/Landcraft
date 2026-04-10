@@ -7,10 +7,11 @@
 
 #include "../view/WorldView.hpp"
 #include "../model/WorldModel.hpp"
+#include "../ui/UIFactory.hpp"
 
 class NavigationController {
 public:
-    NavigationController();
+    NavigationController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition);
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
     void handleContinuousEvents(float deltaTime, WorldView& view) const;
 private:
