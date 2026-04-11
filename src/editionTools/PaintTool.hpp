@@ -11,7 +11,8 @@
 
 class PaintTool : public IEditionTool {
 public:
-    PaintTool(const sf::Vector2f startMenuPosition);
+    PaintTool(sf::Vector2f startMenuPosition);
+    ~PaintTool();
     bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
@@ -23,6 +24,7 @@ public:
 private:
     void selectPaintTexture(int textureId);
     void setUIVisibility(bool isVisible) const;
+    void initToolWidgetsList();
 
     bool m_isEditing;
     int m_currentTextureId;
@@ -32,6 +34,7 @@ private:
     std::vector<SpriteButton *> m_paintTextureButtons;
     Box *m_paintToolBox;
     Text *m_paintToolText;
+    std::vector<IWidget *> m_widgets;
 };
 
 

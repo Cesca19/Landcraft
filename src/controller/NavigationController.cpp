@@ -10,21 +10,25 @@ NavigationController::NavigationController(WorldModel &model, WorldView &view, c
     , m_pitchRotationStep(5)
     , m_yawRotationStep(22.5)
 {
-    // to do : add recenter view cmd
-    SpriteButton *recenterButton = UIFactory::createSpriteButton("assets/textures/ui/recenter_view_512.png",
+    m_recenterViewButton = UIFactory::createSpriteButton("assets/textures/ui/recenter_view_512.png",
        globalUIPosition  + sf::Vector2f(155, 16), {28, 28}, "Recenter", 12);
-    recenterButton->initHighlightTextAlign(HighlightTextAlign::Down);
-    recenterButton->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color::White,
+    m_recenterViewButton->initHighlightTextAlign(HighlightTextAlign::Down);
+    m_recenterViewButton->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color::White,
     sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-    recenterButton->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
+    m_recenterViewButton->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
         sf::Color(250, 239, 250), sf::Color(253, 249, 221));
-    recenterButton->initOnClickCallback([&view] {
+    m_recenterViewButton->initOnClickCallback([&view] {
        view.recenter();
     });
 }
 
+NavigationController::~NavigationController()
+{
+    UIFactory::removeWidget(m_recenterViewButton);
+}
+
 void NavigationController::handleEvents(const sf::RenderWindow &window, const sf::Event &event, WorldModel &model,
-    WorldView &view, const bool isEditing)
+                                        WorldView &view, const bool isEditing)
 {
     handlePanEvents(window, event, view);
     if (!isEditing) {

@@ -6,8 +6,8 @@
 
 EditionController::EditionController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIPosition)
     : m_currentEditionTool(-1)
-    , m_globalUIStartPosition(globalUIPosition)
     , m_editionToolsBoxPosition(0, 84)
+    , m_globalUIStartPosition(globalUIPosition)
     , m_toolsStartMenuPosition(m_editionToolsBoxPosition + sf::Vector2f(90, 0))
 {
     m_undoButton = UIFactory::createSpriteButton("assets/textures/ui/undo_512.png",
@@ -35,10 +35,18 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
         });
     }
     applyUIStyle();
+    initWidgetsList();
 
     m_editionTools.emplace_back(std::make_unique<ElevationTool>(m_toolsStartMenuPosition));
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsStartMenuPosition));
     selectEditionTool(0);
+}
+
+EditionController::~EditionController()
+{
+    for (const auto widget : m_widgets)
+        UIFactory::removeWidget(widget);
+    m_widgets.clear();
 }
 
 void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController)
@@ -116,4 +124,14 @@ void EditionController::applyUIStyle()
     m_undoButton->initHighlightTextAlign(HighlightTextAlign::Down);
     m_redoButton->initHighlightTextAlign(HighlightTextAlign::Down);
     buttons.clear();
+}
+
+void EditionController::initWidgetsList()
+{
+    for (const auto& button : m_editionToolsButtons)
+        m_widgets.push_back(button);
+    m_widgets.push_back(m_undoButton);
+    m_widgets.push_back(m_redoButton);
+    m_widgets.push_back(m_toolsText);
+    m_widgets.push_back(m_editionToolsBox);
 }

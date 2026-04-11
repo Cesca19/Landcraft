@@ -12,6 +12,7 @@
 class NavigationController {
 public:
     NavigationController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition);
+    ~NavigationController();
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
     void handleContinuousEvents(float deltaTime, WorldView& view) const;
 private:
@@ -24,6 +25,7 @@ private:
     int m_zoomStep;
     float m_pitchRotationStep;
     float m_yawRotationStep;
+    SpriteButton *m_recenterViewButton;
 };
 
 

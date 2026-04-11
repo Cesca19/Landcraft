@@ -40,7 +40,15 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
         });
     }
     selectPaintTexture(1);
+    initToolWidgetsList();
     setUIVisibility(false);
+}
+
+PaintTool::~PaintTool()
+{
+    for (const auto widget : m_widgets)
+        UIFactory::removeWidget(widget);
+    m_widgets.clear();
 }
 
 bool PaintTool::isEditing() const
@@ -147,8 +155,14 @@ void PaintTool::selectPaintTexture(const int textureId)
 
 void PaintTool::setUIVisibility(const bool isVisible) const
 {
-    m_paintToolBox->setVisibility(isVisible);
-    m_paintToolText->setVisibility(isVisible);
+    for (const auto widget : m_widgets)
+        widget->setVisibility(isVisible);
+}
+
+void PaintTool::initToolWidgetsList()
+{
+    m_widgets.push_back(m_paintToolBox);
+    m_widgets.push_back(m_paintToolText);
     for (const auto button : m_paintTextureButtons)
-        button->setVisibility(isVisible);
+        m_widgets.push_back(button);
 }

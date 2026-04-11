@@ -11,7 +11,8 @@
 
 class ElevationTool : public IEditionTool {
 public:
-    ElevationTool(const sf::Vector2f startMenuPosition);
+    ElevationTool(sf::Vector2f startMenuPosition);
+    ~ElevationTool();
     bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
@@ -34,6 +35,7 @@ private:
     void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
     void initSelectionModeUI(sf::Vector2f startMenuPosition);
     void initElevationStepUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);
+    void initToolWidgetsList();
 
     std::string getHeightStepValue() const;
     void setSelectionMode(int index);
@@ -70,6 +72,7 @@ private:
     Text *m_selectionModeText;
     Text *m_elevationStepText;
     Text *m_elevationStepValueText;
+    std::vector<IWidget*> m_widgets;
 };
 
 

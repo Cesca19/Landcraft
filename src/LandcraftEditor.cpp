@@ -18,6 +18,9 @@ LandcraftEditor::LandcraftEditor()
     , m_uiController(nullptr)
 {
     m_uiController = std::make_unique<UIController>();
+    m_uiController->setOnDestroy([] {
+        UIFactory::init(nullptr);
+    });
     UIFactory::init(m_uiController.get());
     m_worldController = std::make_unique<WorldController>();
 

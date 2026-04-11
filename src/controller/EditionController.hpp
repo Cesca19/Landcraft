@@ -14,6 +14,7 @@
 class EditionController {
 public:
     EditionController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition);
+    ~EditionController();
     void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, SelectionController& selectionController);
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, SelectionController& selectionController);
     bool isEditing() const;
@@ -24,6 +25,7 @@ private:
     void handleEditionToolSwitchEvents(const sf::Event& event);
     void selectEditionTool(int toolId);
     void applyUIStyle();
+    void initWidgetsList();
 
     CommandHistory m_commandHistory;
     int m_currentEditionTool;
@@ -33,6 +35,7 @@ private:
     Box *m_editionToolsBox;
     SpriteButton *m_undoButton;
     SpriteButton *m_redoButton;
+    std::vector<IWidget *> m_widgets;
     sf::Vector2f m_editionToolsBoxPosition;
     sf::Vector2f m_globalUIStartPosition;
     sf::Vector2f m_toolsStartMenuPosition;

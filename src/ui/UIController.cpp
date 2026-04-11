@@ -7,12 +7,35 @@
 UIController::UIController()
     : m_focusedWidget(nullptr)
     , m_hoveredWidget(nullptr)
+    , m_onDestroy(nullptr)
 {
+}
+
+UIController::~UIController()
+{
+    if (m_onDestroy != nullptr)
+        m_onDestroy();
 }
 
 void UIController::addWidget(std::unique_ptr<IWidget> widget)
 {
     m_widgets.push_back(std::move(widget));
+}
+
+void UIController::removeWidget(IWidget *widgetToRemove)
+{
+    if (m_focusedWidget == widgetToRemove)
+        m_focusedWidget = nullptr;
+    if (m_hoveredWidget == widgetToRemove)
+        m_hoveredWidget = nullptr;
+
+    m_widgets.erase(
+        std::remove_if(m_widgets.begin(), m_widgets.end(),
+            [widgetToRemove](const std::unique_ptr<IWidget>& widget) {
+                return widget.get() == widgetToRemove;
+            }),
+        m_widgets.end()
+    );
 }
 
 void UIController::handleEvents(const sf::Event &event, const sf::RenderWindow &window)
@@ -49,6 +72,11 @@ void UIController::draw(sf::RenderWindow &window) const
         if (widget->isVisible())
             widget->draw(window);
     window.setView(lastView);
+}
+
+void UIController::setOnDestroy(std::function<void()> onDestroy)
+{
+    m_onDestroy = std::move(onDestroy);
 }
 
 void UIController::findHoveredWidget(const sf::RenderWindow &window)

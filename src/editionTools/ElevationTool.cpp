@@ -35,12 +35,19 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
     initSelectionModeUI(startMenuPosition);
     initElevationStepUI(startMenuPosition, startBtnPosition);
-
+    initToolWidgetsList();
     setUIVisibility(false);
 
     m_selectionModes.push_back(SelectionMode::TILE_CORNER);
     m_selectionModes.push_back(SelectionMode::TILE);
     setSelectionMode(0);
+}
+
+ElevationTool::~ElevationTool()
+{
+    for (const auto widget : m_widgets)
+        UIFactory::removeWidget(widget);
+    m_widgets.clear();
 }
 
 bool ElevationTool::isEditing() const
@@ -239,20 +246,8 @@ std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf:
 
 void ElevationTool::setUIVisibility(const bool isVisible) const
 {
-    m_elevationToolBox->setVisibility(isVisible);
-    m_elevationToolText->setVisibility(isVisible);
-
-    m_selectionModeBox->setVisibility(isVisible);
-    m_selectionModeText->setVisibility(isVisible);
-
-    m_elevationStepBox->setVisibility(isVisible);
-    m_elevationStepText->setVisibility(isVisible);
-    m_elevationStepDecrement->setVisibility(isVisible);
-    m_elevationStepIncrement->setVisibility(isVisible);
-    m_elevationStepValueText->setVisibility(isVisible);
-
-    for (const auto button : m_selectionModesButtons)
-        button->setVisibility(isVisible);
+    for (const auto widget : m_widgets)
+        widget->setVisibility(isVisible);
 }
 
 void ElevationTool::initButtonStyle(SpriteButton *button, const HighlightTextAlign align)
@@ -317,6 +312,21 @@ void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, co
     m_elevationStepIncrement->initOnClickCallback([this] () {
         this->incrementHeightStepFactor();
     });
+}
+
+void ElevationTool::initToolWidgetsList()
+{
+    for (SpriteButton *button : m_selectionModesButtons)
+        m_widgets.push_back(button);
+    m_widgets.push_back(m_elevationStepDecrement);
+    m_widgets.push_back(m_elevationStepIncrement);
+    m_widgets.push_back(m_elevationToolBox);
+    m_widgets.push_back(m_selectionModeBox);
+    m_widgets.push_back(m_elevationStepBox);
+    m_widgets.push_back(m_elevationToolText);
+    m_widgets.push_back(m_selectionModeText);
+    m_widgets.push_back(m_elevationStepText);
+    m_widgets.push_back(m_elevationStepValueText);
 }
 
 std::string ElevationTool::getHeightStepValue() const

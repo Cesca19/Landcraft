@@ -11,10 +11,19 @@ void UIFactory::init(UIController *uiController)
     s_uiController = uiController;
 }
 
+void UIFactory::removeWidget(IWidget *widget)
+{
+    if (!s_uiController) {
+        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
+        return;
+    }
+    s_uiController->removeWidget(widget);
+}
+
 Box *UIFactory::createBox(const sf::Vector2f &position, const sf::Vector2f &size)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
         return nullptr;
     }
 
@@ -27,7 +36,7 @@ Box *UIFactory::createBox(const sf::Vector2f &position, const sf::Vector2f &size
 Text * UIFactory::createText(const sf::Vector2f& position, const std::string &content, int characterSize)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
         return nullptr;
     }
     std::unique_ptr<Text> text = std::make_unique<Text>(position, content, characterSize);
@@ -39,7 +48,7 @@ Text * UIFactory::createText(const sf::Vector2f& position, const std::string &co
 TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, sf::Color textColor, unsigned int characterSize)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
         return nullptr;
     }
 
@@ -53,7 +62,7 @@ SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Ve
     const std::string &highlightText, int highlightTextSize)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with a UIController" << std::endl;
+        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
         return nullptr;
     }
 

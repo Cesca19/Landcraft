@@ -27,8 +27,8 @@ private:
     float m_projectionAngleY;
     sf::Clock m_clock;
     sf::RenderWindow m_window;
-    std::unique_ptr<WorldController> m_worldController;
     std::unique_ptr<UIController> m_uiController;
+    std::unique_ptr<WorldController> m_worldController;
 };
 
 
