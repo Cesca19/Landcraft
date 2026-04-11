@@ -7,10 +7,11 @@
 
 #include "IEditionTool.hpp"
 #include "../commands/EditTilesCornersHeightCommand.hpp"
+#include "../ui/UIFactory.hpp"
 
 class ElevationTool : public IEditionTool {
 public:
-    ElevationTool();
+    ElevationTool(const sf::Vector2f startMenuPosition);
     bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
@@ -29,13 +30,24 @@ private:
     void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
     std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model) const;
 
+    void setUIVisibility(bool isVisible) const;
+    void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
+    void initSelectionModeUI(sf::Vector2f startMenuPosition);
+    void initElevationStepUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);
+
+    std::string getHeightStepValue() const;
+    void setSelectionMode(int index);
+    void incrementHeightStepFactor();
+    void decrementHeightStepFactor();
+    void updateHeightStepFactor(int newValue);
+
     float m_heightStep;
     int m_heightStepFactor;
     int m_maxHeightStepFactor;
 
     bool m_isEditing;
     bool m_isSelectionLocked;
-    SelectionMode m_currentSelectionMode;
+    int m_currentSelectionMode;
 
     float m_continuousElevationInterval;
     sf::Clock m_continuousElevationClock;
@@ -46,6 +58,18 @@ private:
     float m_mouseMovementThreshold;
     const sf::Mouse::Button m_editingMouseButton = sf::Mouse::Left;
     std::unique_ptr<EditTilesCornersHeightCommand> m_ongoingEditCornersHeightCommand;
+
+    std::vector<SelectionMode> m_selectionModes;
+    std::vector<SpriteButton*> m_selectionModesButtons;
+    SpriteButton *m_elevationStepIncrement;
+    SpriteButton *m_elevationStepDecrement;
+    Box *m_elevationToolBox;
+    Box *m_selectionModeBox;
+    Box *m_elevationStepBox;
+    Text *m_elevationToolText;
+    Text *m_selectionModeText;
+    Text *m_elevationStepText;
+    Text *m_elevationStepValueText;
 };
 
 

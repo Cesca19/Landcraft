@@ -55,6 +55,8 @@ void UIController::findHoveredWidget(const sf::RenderWindow &window)
 {
     const sf::Vector2f mousePos = getMouseScreenPosition(window);
     for (const auto& widget : m_widgets) {
+        if (!widget->isVisible())
+            continue;
         sf::FloatRect bounds = widget->getBounds();
         if (widget->isInteractable() && bounds.contains(mousePos))
         {

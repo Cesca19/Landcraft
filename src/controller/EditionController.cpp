@@ -36,7 +36,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
     }
     applyUIStyle();
 
-    m_editionTools.emplace_back(std::make_unique<ElevationTool>());
+    m_editionTools.emplace_back(std::make_unique<ElevationTool>(m_toolsStartMenuPosition));
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsStartMenuPosition));
     selectEditionTool(0);
 }
