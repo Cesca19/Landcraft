@@ -16,6 +16,15 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     , m_lastMouseWorldPosition(-1, -1)
     , m_mouseMovementThreshold(2.5f)
     , m_ongoingEditCornersHeightCommand(nullptr)
+    , m_elevationStepIncrement(nullptr)
+    , m_elevationStepDecrement(nullptr)
+    , m_elevationToolBox(nullptr)
+    , m_selectionModeBox(nullptr)
+    , m_elevationStepBox(nullptr)
+    , m_elevationToolText(nullptr)
+    , m_selectionModeText(nullptr)
+    , m_elevationStepText(nullptr)
+    , m_elevationStepValueText(nullptr)
 {
     m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 330});
     m_elevationToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
@@ -295,6 +304,9 @@ void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, co
         sf::Vector2f(20, 20), "Reduce", 15);
     m_elevationStepIncrement = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", startButtonPosition + sf::Vector2f(80, 140),
         sf::Vector2f(20, 20), "Add", 15);
+
+    m_elevationStepDecrement->setContinuousClick(true, 0.5);
+    m_elevationStepIncrement->setContinuousClick(true, 0.5);
 
     initButtonStyle(m_elevationStepDecrement, HighlightTextAlign::Down);
     initButtonStyle(m_elevationStepIncrement, HighlightTextAlign::Down);

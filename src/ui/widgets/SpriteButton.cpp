@@ -9,14 +9,16 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     : m_spacing(5)
     , m_padding(20, 20)
     , m_highlightTextAlign(HighlightTextAlign::Top)
+    , m_highlightTextColor(sf::Color::White)
     , m_backgroundBaseColor(sf::Color::Transparent)
-    , m_isInteractable(true)
-    , m_currentState(WidgetState::Base)
-    , m_onClickCallback(nullptr)
     , m_isVisible(true)
     , m_isSelected(false)
-    , m_isHilightTextVisible(false)
-    , m_highlightTextColor(sf::Color::White)
+    , m_isInteractable(true)
+    , m_isHighLightTextVisible(false)
+    , m_didSupportContinuousClick(false)
+    , m_continuousClickRepeatInterval(0.25)
+    , m_currentState(WidgetState::Base)
+    , m_onClickCallback(nullptr)
 {
     const float bgWidth = size.x + m_padding.x;
     const float bgHeight = size.y + m_padding.y;
@@ -124,6 +126,12 @@ bool SpriteButton::isInteractable() const
     return m_isInteractable;
 }
 
+void SpriteButton::setContinuousClick(const bool didSupportContinuousClick, const float repeatInterval)
+{
+    m_didSupportContinuousClick = didSupportContinuousClick;
+    m_continuousClickRepeatInterval = repeatInterval;
+}
+
 bool SpriteButton::isVisible() const
 {
     return m_isVisible;
@@ -142,7 +150,7 @@ bool SpriteButton::isSelected() const
 void SpriteButton::setSelected(const bool isSelected)
 {
     m_isSelected = isSelected;
-    m_isHilightTextVisible = isSelected;
+    m_isHighLightTextVisible = isSelected;
     if (m_isSelected) {
         m_background.setOutlineColor(m_selectedColor);
         m_background.setOutlineThickness(-4);
@@ -165,15 +173,23 @@ sf::Vector2f SpriteButton::getCenter() const
     return m_background.getPosition() + (m_background.getSize() / 2.0f);
 }
 
-void SpriteButton::update(float deltaTime) 
+void SpriteButton::update(const float deltaTime)
 {
+    if (!m_didSupportContinuousClick
+        || m_currentState != WidgetState::Pressed)
+        return;
+    m_elapsedTimeSinceClick += deltaTime;
+    if (m_elapsedTimeSinceClick >= m_continuousClickRepeatInterval) {
+        m_elapsedTimeSinceClick = 0.0f;
+        onPress();
+    }
 }
 
 void SpriteButton::draw(sf::RenderWindow &window) const 
 {
     window.draw(m_background);
     window.draw(m_iconSprite);
-    if (m_isHilightTextVisible)
+    if (m_isHighLightTextVisible)
         window.draw(m_highlightText);
 }
 
@@ -204,12 +220,12 @@ void SpriteButton::onBase()
     m_background.setFillColor(m_backgroundBaseColor);
     m_iconSprite.setScale(m_baseScale);
     // m_highlightText.setFillColor(m_highlightTextColor);
-    m_isHilightTextVisible = false;
+    m_isHighLightTextVisible = false;
 
     if (m_isSelected) {
         m_background.setOutlineColor(m_selectedColor);
         m_background.setOutlineThickness(-4);
-        m_isHilightTextVisible = true;
+        m_isHighLightTextVisible = true;
     }
 }
 
@@ -219,7 +235,7 @@ void SpriteButton::onHover()
     m_background.setFillColor(m_backgroundHoverColor);
     m_iconSprite.setScale(m_hoverScale);
 
-    m_isHilightTextVisible = true;
+    m_isHighLightTextVisible = true;
 }
 
 void SpriteButton::onFocus()
@@ -236,8 +252,11 @@ void SpriteButton::onPress()
     m_background.setFillColor(m_backgroundPressColor);
     m_iconSprite.setScale(m_pressScale);
     m_highlightText.setFillColor(m_highlightTextColor);
-    m_isHilightTextVisible = true;
+    m_isHighLightTextVisible = true;
 
     if (m_onClickCallback)
         m_onClickCallback();
+    if (!m_didSupportContinuousClick)
+        return;
+    m_elapsedTimeSinceClick = 0.0f;
 }

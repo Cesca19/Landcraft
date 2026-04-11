@@ -27,6 +27,7 @@ public:
     void initHighlightTextAlign(HighlightTextAlign align);
 
     bool isInteractable() const override;
+    void setContinuousClick(bool didSupportContinuousClick, float repeatInterval = 0.25f);
 
     bool isVisible() const override;
     void setVisibility(bool isVisible) override;
@@ -73,7 +74,12 @@ protected:
     bool m_isVisible;
     bool m_isSelected;
     bool m_isInteractable;
-    bool m_isHilightTextVisible;
+    bool m_isHighLightTextVisible;
+
+    bool m_didSupportContinuousClick;
+    float m_elapsedTimeSinceClick;
+    float m_continuousClickRepeatInterval;
+
     WidgetState m_currentState;
     std::function<void()> m_onClickCallback;
 };
