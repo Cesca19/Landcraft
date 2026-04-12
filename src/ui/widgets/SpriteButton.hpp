@@ -53,6 +53,7 @@ protected:
     sf::RectangleShape m_background;
 
     float m_spacing;
+    float m_baseThickness;
     sf::Vector2f m_padding;
     HighlightTextAlign m_highlightTextAlign;
 

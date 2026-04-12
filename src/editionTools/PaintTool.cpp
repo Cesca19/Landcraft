@@ -31,8 +31,8 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     m_paintTextureButtons.push_back(waterTextureButton);
     m_paintTextureButtons.push_back(sandTextureButton);
     for (int i = 0; i < m_paintTextureButtons.size(); i++) {
-        m_paintTextureButtons[i]->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color::White,
-            sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
+        m_paintTextureButtons[i]->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
+            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
         m_paintTextureButtons[i]->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
             sf::Color(250, 239, 250), sf::Color(253, 249, 221));
         m_paintTextureButtons[i]->initOnClickCallback([this, i] () {

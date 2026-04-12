@@ -7,6 +7,7 @@
 SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f position, const sf::Vector2f size, const std::string &highlightText,
     const int highlightTextSize)
     : m_spacing(5)
+    , m_baseThickness(-3)
     , m_padding(20, 20)
     , m_highlightTextAlign(HighlightTextAlign::Top)
     , m_highlightTextColor(sf::Color::White)
@@ -16,6 +17,7 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_isInteractable(true)
     , m_isHighLightTextVisible(false)
     , m_didSupportContinuousClick(false)
+    , m_elapsedTimeSinceClick(0)
     , m_continuousClickRepeatInterval(0.25)
     , m_currentState(WidgetState::Base)
     , m_onClickCallback(nullptr)
@@ -46,7 +48,7 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     m_background.setSize(sf::Vector2f(bgWidth, bgHeight));
     m_background.setPosition(position);
     m_background.setFillColor(m_backgroundBaseColor);
-    m_background.setOutlineThickness(-2.f);
+    m_background.setOutlineThickness(m_baseThickness);
 
     initHighlightTextAlign(m_highlightTextAlign);
     onBase();
@@ -153,12 +155,12 @@ void SpriteButton::setSelected(const bool isSelected)
     m_isHighLightTextVisible = isSelected;
     if (m_isSelected) {
         m_background.setOutlineColor(m_selectedColor);
-        m_background.setOutlineThickness(-4);
+        m_background.setOutlineThickness(m_baseThickness * 2);
 
     }
     else {
         m_background.setOutlineColor(m_baseColor);
-        m_background.setOutlineThickness(-2);
+        m_background.setOutlineThickness(m_baseThickness);
 
     }
 }
@@ -224,7 +226,7 @@ void SpriteButton::onBase()
 
     if (m_isSelected) {
         m_background.setOutlineColor(m_selectedColor);
-        m_background.setOutlineThickness(-4);
+        m_background.setOutlineThickness(m_baseThickness * 2);
         m_isHighLightTextVisible = true;
     }
 }

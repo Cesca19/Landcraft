@@ -252,8 +252,8 @@ void ElevationTool::setUIVisibility(const bool isVisible) const
 
 void ElevationTool::initButtonStyle(SpriteButton *button, const HighlightTextAlign align)
 {
-    button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color::White,
-            sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
+    button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
+            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
     button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
         sf::Color(250, 239, 250), sf::Color(253, 249, 221));
     button->initHighlightTextAlign(align);

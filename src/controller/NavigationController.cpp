@@ -13,8 +13,8 @@ NavigationController::NavigationController(WorldModel &model, WorldView &view, c
     m_recenterViewButton = UIFactory::createSpriteButton("assets/textures/ui/recenter_view_512.png",
        globalUIPosition  + sf::Vector2f(155, 16), {28, 28}, "Recenter", 12);
     m_recenterViewButton->initHighlightTextAlign(HighlightTextAlign::Down);
-    m_recenterViewButton->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color::White,
-    sf::Color::Cyan, sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
+    m_recenterViewButton->initOutlineStatesColors(sf::Color(255, 255, 255, 175),sf::Color(178, 247, 239),
+            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
     m_recenterViewButton->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
         sf::Color(250, 239, 250), sf::Color(253, 249, 221));
     m_recenterViewButton->initOnClickCallback([&view] {
