@@ -93,14 +93,16 @@ void UIController::handleMouseEvents(const sf::Event &event, const sf::RenderWin
 {
     if (event.type == sf::Event::MouseMoved)
         findHoveredWidget(window);
-    if (event.type == sf::Event::MouseButtonPressed
-        && (event.mouseButton.button == sf::Mouse::Left || event.mouseButton.button == sf::Mouse::Right)
+    if (event.type == sf::Event::MouseButtonPressed) {
+        if ((event.mouseButton.button == sf::Mouse::Left || event.mouseButton.button == sf::Mouse::Right)
         && m_hoveredWidget != nullptr) {
-        m_hoveredWidget->setState(WidgetState::Pressed);
-        if (m_focusedWidget != nullptr && m_focusedWidget != m_hoveredWidget) {
-            m_focusedWidget->setState(WidgetState::Base);
-        }
-        m_focusedWidget = m_hoveredWidget;
+            m_hoveredWidget->setState(WidgetState::Pressed);
+            if (m_focusedWidget != nullptr && m_focusedWidget != m_hoveredWidget) {
+                m_focusedWidget->setState(WidgetState::Base);
+            }
+            m_focusedWidget = m_hoveredWidget;
+        } else if (m_hoveredWidget == nullptr)
+            unfocusCurrentWidget();
     }
     if (event.type == sf::Event::MouseButtonReleased
         && (event.mouseButton.button == sf::Mouse::Left || event.mouseButton.button == sf::Mouse::Right)
