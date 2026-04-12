@@ -123,7 +123,7 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
     const std::vector<TileCorner *> upRightCorners = tile.getUpRightTriangleCorners();
     for (const TileCorner *corner : upRightCorners)
     {
-        sf::Vector2f screenPos = camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
+        sf::Vector2f screenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
         m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
     }
 
@@ -131,7 +131,7 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
     const std::vector<TileCorner *> downLeftCorners = tile.getDownLeftTriangleCorners();
     for (const TileCorner *corner : downLeftCorners)
     {
-        sf::Vector2f screenPos = camera.world_to_screen(corner->getRow(), corner->getColumn(), corner->getHeight());
+        sf::Vector2f screenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
         m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
     }
     paintTile(m_shadedTilesVertexArray.getVertexCount() - 6, tile.getTextureId());
@@ -145,8 +145,8 @@ void TileMap::addWireframeTile(const Tile &tile, const Camera &camera)
     {
         const TileCorner *corner1 = corners[i];
         const TileCorner *corner2 = corners[(i + 1) % corners.size()];
-        sf::Vector2f screenPos1 = camera.world_to_screen(corner1->getRow(), corner1->getColumn(), corner1->getHeight());
-        sf::Vector2f screenPos2 = camera.world_to_screen(corner2->getRow(), corner2->getColumn(), corner2->getHeight());
+        sf::Vector2f screenPos1 = camera.world_to_screen(corner1->getColumn(), corner1->getRow(), corner1->getHeight());
+        sf::Vector2f screenPos2 = camera.world_to_screen(corner2->getColumn(), corner2->getRow(), corner2->getHeight());
         m_wireframeTilesVertexArray.append(sf::Vertex(screenPos1, m_wireframeTileColor));
         m_wireframeTilesVertexArray.append(sf::Vertex(screenPos2, m_wireframeTileColor));
     }
