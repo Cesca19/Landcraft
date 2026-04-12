@@ -124,10 +124,20 @@ void UIController::handleKeyBoardEvents(const sf::Event &event)
             case sf::Keyboard::Down:
                 spatialNavigation(event.key.code);
                 break;
+            case sf::Keyboard::Space:
+            case sf::Keyboard::Enter:
+                if (m_focusedWidget)
+                    m_focusedWidget->setState(WidgetState::Pressed);
+                break;
             default:
                 break;
         }
     }
+    if (event.type == sf::Event::KeyReleased
+        && (event.key.code == sf::Keyboard::Space || event.key.code == sf::Keyboard::Enter)
+        && m_focusedWidget != nullptr)
+            m_focusedWidget->setState(WidgetState::Focused);
+
 }
 
 void UIController::findHoveredWidget(const sf::RenderWindow &window)
