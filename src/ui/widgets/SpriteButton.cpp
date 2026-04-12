@@ -236,7 +236,6 @@ void SpriteButton::onHover()
     m_background.setOutlineColor(m_hoverColor);
     m_background.setFillColor(m_backgroundHoverColor);
     m_iconSprite.setScale(m_hoverScale);
-
     m_isHighLightTextVisible = true;
 }
 
@@ -244,8 +243,8 @@ void SpriteButton::onFocus()
 {
     m_background.setOutlineColor(m_focusColor);
     m_background.setFillColor(m_backgroundFocusColor);
-
-    // repeat hover state
+    m_iconSprite.setScale(m_hoverScale);
+    m_isHighLightTextVisible = true;
 }
 
 void SpriteButton::onPress()
