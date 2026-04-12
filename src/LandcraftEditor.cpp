@@ -63,7 +63,9 @@ void LandcraftEditor::handleEvents()
     while (m_window.pollEvent(event))
     {
         if (event.type == sf::Event::Closed
-            || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+            || (event.type == sf::Event::KeyPressed
+                && event.key.code == sf::Keyboard::Escape
+                && !m_uiController->isKeyBoardNavigatingHoverUI()))
             m_window.close();
         switch (event.type) {
             case sf::Event::LostFocus:
@@ -82,13 +84,15 @@ void LandcraftEditor::handleEvents()
         }
         if (m_hasFocus) {
             m_uiController->handleEvents(event, m_window);
-            m_worldController->handleEvents(event, m_window);
+            if (!m_uiController->isUserOverUI())
+                m_worldController->handleEvents(event, m_window);
         }
     }
 }
 
-void LandcraftEditor::handleContinuousEvents(const float deltaTime)
+void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
 {
     m_uiController->handleContinuousEvents(deltaTime, m_window);
-	m_worldController->handleContinuousEvents(deltaTime, m_window);
+    if (!m_uiController->isUserOverUI())
+	    m_worldController->handleContinuousEvents(deltaTime, m_window);
 }
