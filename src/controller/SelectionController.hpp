@@ -10,6 +10,7 @@
 #include "../model/WorldModel.hpp"
 #include "../view/SelectionView.hpp"
 #include "../view/Camera.hpp"
+#include "../ui/UIFactory.hpp"
 
 enum class SelectionMode {
     TILE,
@@ -18,7 +19,7 @@ enum class SelectionMode {
 
 class SelectionController {
 public:
-    SelectionController();
+    SelectionController(sf::Vector2f uiStartPosition);
     ~SelectionController();
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
                  WorldModel &worldModel, const Camera &camera);
@@ -42,10 +43,22 @@ private:
     bool isPointInsideTile(const Camera &camera, Tile *tile, sf::Vector2f pointScreenPosition) const;
     sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner) const;
 
+    void initBrushSizeWidgets();
+    void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
+    void initWidgetsList();
+
     SelectionView m_selectionView;
     std::vector<TileCorner *> m_selectedTileCorners;
     std::vector<Tile *> m_selectedTiles;
     sf::Vector2i m_mouseWorldPosition;
+
+    sf::Vector2f m_startUIPosition;
+    Box *m_brushSizeBox;
+    Text *m_brushSizeText;
+    Text *m_brushSizeValueText;
+    SpriteButton *m_incrementBrushSize;
+    SpriteButton *m_decrementBrushSize;
+    std::vector<IWidget *> m_widgets;
 };
 
 #endif //LANDCRAFT_SELECTIONCONTROLLER_HPP

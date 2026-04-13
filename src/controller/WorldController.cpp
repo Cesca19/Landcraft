@@ -17,7 +17,7 @@ void WorldController::init(const std::string &mapName,
     globalActions->initColors(sf::Color(sf::Color(205, 185, 220)), sf::Color(255, 255, 255));
 
     m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));
-    m_selectionController = std::make_unique<SelectionController>();
+    m_selectionController = std::make_unique<SelectionController>(sf::Vector2f(0, 0));
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));
 
     m_worldModel.loadMap(mapName);

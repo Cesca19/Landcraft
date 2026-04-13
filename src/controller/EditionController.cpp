@@ -6,7 +6,7 @@
 
 EditionController::EditionController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIPosition)
     : m_currentEditionTool(-1)
-    , m_editionToolsBoxPosition(0, 84)
+    , m_editionToolsBoxPosition(0, 250)
     , m_globalUIStartPosition(globalUIPosition)
     , m_toolsStartMenuPosition(m_editionToolsBoxPosition + sf::Vector2f(90, 0))
 {
@@ -22,9 +22,9 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
     });
     m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 210});
     m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
-    m_toolsText = UIFactory::createText(sf::Vector2f(10, 90), "Tools:", 20);
+    m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 5), "Tools:", 20);
     m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
-    const sf::Vector2f toolStartPos(15, 140);
+    const sf::Vector2f toolStartPos = m_editionToolsBoxPosition + sf::Vector2f(15, 60);
     SpriteButton *elevationButton = UIFactory::createSpriteButton("assets/textures/ui/elevation_tool_512.png", toolStartPos, {32, 32}, "Elevation", 15);
     SpriteButton *paintButton = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_64.png", toolStartPos + sf::Vector2f(0, 80), {32, 32}, "Paint", 15);
     m_editionToolsButtons.emplace_back(elevationButton);

@@ -4,13 +4,23 @@
 
 #include "SelectionController.hpp"
 
-SelectionController::SelectionController()
+SelectionController::SelectionController(const sf::Vector2f uiStartPosition)
     : m_mouseWorldPosition(-1, -1)
+    , m_startUIPosition(uiStartPosition)
+    , m_brushSizeBox(nullptr)
+    , m_brushSizeText(nullptr)
+    , m_incrementBrushSize(nullptr)
+    , m_decrementBrushSize(nullptr)
 {
+    initBrushSizeWidgets();
+    initWidgetsList();
 }
 
 SelectionController::~SelectionController()
 {
+    for (auto *widget : m_widgets)
+        UIFactory::removeWidget(widget);
+    m_widgets.clear();
 }
 
 void SelectionController::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode,
@@ -210,4 +220,44 @@ bool SelectionController::isPointInsideTile(const Camera &camera, Tile *tile, sf
 sf::Vector2f SelectionController::getTileCornerScreenCoordinates(const Camera &camera, const TileCorner *corner) const
 {
     return camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
+}
+
+void SelectionController::initBrushSizeWidgets()
+{
+    m_brushSizeBox = UIFactory::createBox(m_startUIPosition, {280, 85});
+    m_brushSizeBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+    m_brushSizeText = UIFactory::createText( m_startUIPosition + sf::Vector2f(10, 30), "Brush size", 15);
+    m_brushSizeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+
+    const sf::Vector2f startButtonPosition = m_startUIPosition + sf::Vector2f(40, 0);
+
+    m_brushSizeValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(130, 25), "00", 22);
+    m_brushSizeValueText->init(sf::Color::White, sf::Text::Bold);
+
+    m_decrementBrushSize = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", startButtonPosition + sf::Vector2f(70, 15),
+        sf::Vector2f(28, 28), "Reduce", 12);
+    m_incrementBrushSize = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", startButtonPosition + sf::Vector2f(170, 15),
+        sf::Vector2f(28, 28), "Add", 12);
+
+    // next buttons
+    initButtonStyle(m_decrementBrushSize, HighlightTextAlign::Down);
+    initButtonStyle(m_incrementBrushSize, HighlightTextAlign::Down);
+}
+
+void SelectionController::initButtonStyle(SpriteButton *button, const HighlightTextAlign align)
+{
+    button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
+        sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
+    button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
+        sf::Color(250, 239, 250), sf::Color(253, 249, 221));
+    button->initHighlightTextAlign(align);
+}
+
+void SelectionController::initWidgetsList()
+{
+    m_widgets.push_back(m_brushSizeBox);
+    m_widgets.push_back(m_brushSizeText);
+    m_widgets.push_back(m_incrementBrushSize);
+    m_widgets.push_back(m_decrementBrushSize);
+    m_widgets.push_back(m_brushSizeValueText);
 }
