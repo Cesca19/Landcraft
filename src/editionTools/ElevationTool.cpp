@@ -25,8 +25,14 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     , m_selectionModeText(nullptr)
     , m_elevationStepText(nullptr)
     , m_elevationStepValueText(nullptr)
+    , m_digOrElevateBox(nullptr)
+    , m_digOrElevateText(nullptr)
+    , m_digButton(nullptr)
+    , m_elevateButton(nullptr)
+    , m_shouldDig(false)
+    , m_shouldElevate(false)
 {
-    m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 330});
+    m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 475});
     m_elevationToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
 
     m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 5),"Elevation", 20);
@@ -34,13 +40,15 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
     initSelectionModeUI(startMenuPosition);
-    initElevationStepUI(startMenuPosition, startBtnPosition);
+    initDigOrElevateUI(startMenuPosition + sf::Vector2f(0, -5), startBtnPosition + sf::Vector2f(0, -5));
+    initElevationStepUI(startMenuPosition + sf::Vector2f(0, 140), startBtnPosition + sf::Vector2f(0, 150));
     initToolWidgetsList();
     setUIVisibility(false);
 
     m_selectionModes.push_back(SelectionMode::TILE_CORNER);
     m_selectionModes.push_back(SelectionMode::TILE);
     setSelectionMode(0);
+    elevate();
 }
 
 ElevationTool::~ElevationTool()
@@ -112,12 +120,10 @@ void ElevationTool::handleHeightStepEditingEvents(const sf::Event &event)
 void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view,
                                               const SelectionController &selectionController, CommandHistory &history)
 {
-    const bool isShiftPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-    const bool isRaising = sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || (!isShiftPressed && sf::Mouse::isButtonPressed(m_editingMouseButton));;
-    const bool isLowering = sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || ( isShiftPressed && sf::Mouse::isButtonPressed(m_editingMouseButton));
+    bool isMouseButtonPressed = sf::Mouse::isButtonPressed(m_editingMouseButton);
 
-    if (isRaising || isLowering) {
-        const float heightFactor = (isRaising ? 1.0f : -1.0f ) * m_heightStep * static_cast<float>(m_heightStepFactor);
+    if ((m_shouldElevate || m_shouldDig) && isMouseButtonPressed) {
+        const float heightFactor = (m_shouldElevate ? 1.0f : -1.0f ) * m_heightStep * static_cast<float>(m_heightStepFactor);
         if (m_ongoingEditCornersHeightCommand == nullptr)
             startContinuousElevation(window, model, view, selectionController, heightFactor);
         else
@@ -284,6 +290,30 @@ void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
     }
 }
 
+void ElevationTool::initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition)
+{
+    m_digOrElevateBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 200), {150, 125});
+    m_digOrElevateBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+
+    m_digOrElevateText = UIFactory::createText(startMenuPosition + sf::Vector2f(35, 210),"Action", 15);
+    m_digOrElevateText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+
+    m_digButton = UIFactory::createSpriteButton("assets/textures/ui/dig_512.png", startButtonPosition + sf::Vector2f(65, 155),
+        sf::Vector2f(32, 32), "Dig", 15);
+    m_elevateButton = UIFactory::createSpriteButton("assets/textures/ui/elevate_512.png", startButtonPosition + sf::Vector2f(0, 155),
+        sf::Vector2f(32, 32), "Elevate", 15);
+
+    initButtonStyle(m_digButton);
+    initButtonStyle(m_elevateButton);
+
+    m_digButton->initOnClickCallback([this] () {
+        this->dig();
+    });
+    m_elevateButton->initOnClickCallback([this] () {
+        this->elevate();
+    });
+}
+
 void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, const sf::Vector2f startButtonPosition)
 {
     m_elevationStepBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 200), {150, 110});
@@ -303,8 +333,8 @@ void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, co
     m_elevationStepDecrement->setContinuousClick(true, 0.5);
     m_elevationStepIncrement->setContinuousClick(true, 0.5);
 
-    initButtonStyle(m_elevationStepDecrement, HighlightTextAlign::Down);
-    initButtonStyle(m_elevationStepIncrement, HighlightTextAlign::Down);
+    initButtonStyle(m_elevationStepDecrement);
+    initButtonStyle(m_elevationStepIncrement);
 
     m_elevationStepDecrement->initOnClickCallback([this] () {
         this->decrementHeightStepFactor();
@@ -327,6 +357,10 @@ void ElevationTool::initToolWidgetsList()
     m_widgets.push_back(m_selectionModeText);
     m_widgets.push_back(m_elevationStepText);
     m_widgets.push_back(m_elevationStepValueText);
+    m_widgets.push_back(m_digOrElevateBox);
+    m_widgets.push_back(m_digOrElevateText);
+    m_widgets.push_back(m_digButton);
+    m_widgets.push_back(m_elevateButton);
 }
 
 std::string ElevationTool::getHeightStepValue() const
@@ -361,4 +395,24 @@ void ElevationTool::updateHeightStepFactor(const int newValue)
         return;
     m_heightStepFactor = std::clamp(newValue, 1, m_maxHeightStepFactor);
     m_elevationStepValueText->setContent(getHeightStepValue());
+}
+
+void ElevationTool::dig()
+{
+    if (m_shouldElevate) {
+        m_elevateButton->setSelected(false);
+        m_shouldElevate = false;
+    }
+    m_digButton->setSelected(true);
+    m_shouldDig = true;
+}
+
+void ElevationTool::elevate()
+{
+    if (m_shouldDig) {
+        m_digButton->setSelected(false);
+        m_shouldDig = false;
+    }
+    m_elevateButton->setSelected(true);
+    m_shouldElevate = true;
 }

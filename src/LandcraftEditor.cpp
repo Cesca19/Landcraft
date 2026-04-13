@@ -6,7 +6,7 @@
 
 LandcraftEditor::LandcraftEditor()
     : m_hasFocus(true)
-    , m_windowSize(sf::Vector2f(1200, 800))
+    , m_windowSize(sf::Vector2f(1920, 1080))
     , m_viewSize(m_windowSize)
     , m_tileSizeX(64)
     , m_tileSizeY(64)
@@ -30,7 +30,7 @@ LandcraftEditor::LandcraftEditor()
 
     m_worldController->init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
-        {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}, m_windowSize});
+        {sf::Vector2f{0, 0}, sf::Vector2f{static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y)}, m_windowSize});
 }
 
 void LandcraftEditor::run()

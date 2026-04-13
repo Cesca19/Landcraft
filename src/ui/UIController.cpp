@@ -101,6 +101,7 @@ void UIController::handleMouseEvents(const sf::Event &event, const sf::RenderWin
                 m_focusedWidget->setState(WidgetState::Base);
             }
             m_focusedWidget = m_hoveredWidget;
+            m_isMouseHoverUI = true;
         } else if (m_hoveredWidget == nullptr)
             unfocusCurrentWidget();
     }

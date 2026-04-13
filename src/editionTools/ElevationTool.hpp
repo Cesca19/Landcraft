@@ -34,6 +34,7 @@ private:
     void setUIVisibility(bool isVisible) const;
     void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
     void initSelectionModeUI(sf::Vector2f startMenuPosition);
+    void initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);
     void initElevationStepUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);
     void initToolWidgetsList();
 
@@ -42,6 +43,11 @@ private:
     void incrementHeightStepFactor();
     void decrementHeightStepFactor();
     void updateHeightStepFactor(int newValue);
+    void dig();
+    void elevate();
+
+    bool m_shouldDig;
+    bool m_shouldElevate;
 
     float m_heightStep;
     int m_heightStepFactor;
@@ -65,13 +71,17 @@ private:
     std::vector<SpriteButton*> m_selectionModesButtons;
     SpriteButton *m_elevationStepIncrement;
     SpriteButton *m_elevationStepDecrement;
+    SpriteButton *m_digButton;
+    SpriteButton *m_elevateButton;
     Box *m_elevationToolBox;
     Box *m_selectionModeBox;
     Box *m_elevationStepBox;
+    Box *m_digOrElevateBox;
     Text *m_elevationToolText;
     Text *m_selectionModeText;
     Text *m_elevationStepText;
     Text *m_elevationStepValueText;
+    Text *m_digOrElevateText;
     std::vector<IWidget*> m_widgets;
 };
 
