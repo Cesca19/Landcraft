@@ -6,7 +6,7 @@
 
 LandcraftEditor::LandcraftEditor()
     : m_hasFocus(true)
-    , m_windowSize(sf::Vector2f(1200, 800))
+    , m_windowSize(sf::Vector2f(1920, 1080))
     , m_viewSize(m_windowSize)
     , m_tileSizeX(64)
     , m_tileSizeY(64)
@@ -14,11 +14,23 @@ LandcraftEditor::LandcraftEditor()
     , m_projectionAngleX(30)
     , m_projectionAngleY(15) // 35.264 realistic isometric angle
     , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft")
+    , m_worldController(nullptr)
+    , m_uiController(nullptr)
 {
+    m_uiController = std::make_unique<UIController>();
+    m_uiController->setOnDestroy([] {
+        UIFactory::init(nullptr);
+    });
+    UIFactory::init(m_uiController.get());
+    m_worldController = std::make_unique<WorldController>();
+
 	m_window.setVerticalSyncEnabled(true);
-    m_worldController.init("assets/maps/map.txt",
+    m_window.setIcon(512, 512, ResourceManager::getInstance()
+            .getImage("assets/textures/ui/landcraft_icon_512.png").getPixelsPtr());
+
+    m_worldController->init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
-        {sf::Vector2f{0, 0}, sf::Vector2f{1200, 800}, m_windowSize});
+        {sf::Vector2f{0, 0}, sf::Vector2f{static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y)}, m_windowSize});
 }
 
 void LandcraftEditor::run()
@@ -33,11 +45,13 @@ void LandcraftEditor::run()
 
 		if (m_hasFocus) {
 			handleContinuousEvents(deltaTime);
-        	m_worldController.update(deltaTime, m_window);
+		    m_uiController->update(deltaTime, m_window);
+        	m_worldController->update(deltaTime, m_window);
 		}
 
         m_window.clear(sf::Color(196, 218, 242));
-        m_worldController.draw(m_window);
+        m_worldController->draw(m_window);
+        m_uiController->draw(m_window);
         m_window.display();
     }
 }
@@ -49,7 +63,9 @@ void LandcraftEditor::handleEvents()
     while (m_window.pollEvent(event))
     {
         if (event.type == sf::Event::Closed
-            || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+            || (event.type == sf::Event::KeyPressed
+                && event.key.code == sf::Keyboard::Escape
+                && !m_uiController->isKeyBoardNavigatingHoverUI()))
             m_window.close();
         switch (event.type) {
             case sf::Event::LostFocus:
@@ -61,19 +77,22 @@ void LandcraftEditor::handleEvents()
 				m_clock.restart();
                 break;
             case sf::Event::Resized:
-                m_worldController.onWindowResized(sf::Vector2u(event.size.width, event.size.height));
+                m_worldController->onWindowResized(sf::Vector2u(event.size.width, event.size.height));
                 break;
             default:
                 break;
         }
         if (m_hasFocus) {
-            // ui ctrl events
-            m_worldController.handleEvents(event, m_window);
+            m_uiController->handleEvents(event, m_window);
+            if (!m_uiController->isUserOverUI())
+                m_worldController->handleEvents(event, m_window);
         }
     }
 }
 
-void LandcraftEditor::handleContinuousEvents(float deltaTime)
+void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
 {
-	m_worldController.handleContinuousEvents(deltaTime, m_window);
+    m_uiController->handleContinuousEvents(deltaTime, m_window);
+    if (!m_uiController->isUserOverUI())
+	    m_worldController->handleContinuousEvents(deltaTime, m_window);
 }

@@ -35,16 +35,16 @@ public:
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
     void handleContinuousEvents(float deltaTime, const sf::RenderWindow& window);
     void update(float deltaTime, const sf::RenderWindow& window);
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) const;
     void onWindowResized(sf::Vector2u windowSize);
 private:
     // add event for turn on/off wireframe, shaded mode,
 
     WorldView m_worldView;
     WorldModel m_worldModel;
-    EditionController m_editionController;
-    SelectionController m_selectionController;
-    NavigationController m_navigationController;
+    std::unique_ptr<EditionController> m_editionController;
+    std::unique_ptr<SelectionController> m_selectionController;
+    std::unique_ptr<NavigationController> m_navigationController;
 };
 
 

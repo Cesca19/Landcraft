@@ -7,8 +7,9 @@
 
 #include <set>
 #include <SFML/Graphics.hpp>
-#include "../model/Tile.hpp"
 #include "Camera.hpp"
+#include "../model/Tile.hpp"
+#include "../utils/ResourceManager.hpp"
 
 class TileMap  : public sf::Drawable, public sf::Transformable
 {
@@ -36,7 +37,7 @@ private:
     sf::Color m_wireframeTileColor;
 
     sf::Vector2u m_tilesSize;
-    sf::Texture m_tilesetTexture;
+    const sf::Texture* m_tilesetTexture;
 };
 
 

@@ -15,7 +15,7 @@ class WorldView
 {
 public:
     WorldView();
-    void init(sf::Vector2f center, sf::Vector2f size);
+    void init(sf::Vector2f center, sf::Vector2f size, int defaultZoom);
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
     void initEnvironment(sf::Vector2u windowSize);
@@ -31,6 +31,8 @@ public:
     sf::Vector2f getCenter() const;
     sf::Vector2f getSize() const;
     const Camera &getCamera() const;
+
+    void recenter();
 
     void zoom(int zoomDelta);
     void zoomAtMouse(const sf::RenderWindow& window, float zoomDelta);
@@ -80,6 +82,10 @@ private:
     float m_movementEpsilon = 0.1f;
 
     bool m_isMoving;
+
+    sf::Vector2f m_defaultCenter;
+    int m_defaultZoom;
+    float m_defaultTargetZoom;
 };
 
 #endif //LANDCRAFT_WORLDVIEW_HPP

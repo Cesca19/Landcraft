@@ -4,12 +4,51 @@
 
 #include "PaintTool.hpp"
 
-PaintTool::PaintTool()
+PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     : m_isEditing(false)
-    , m_currentTextureId(1)
+    , m_currentTextureId(-1)
     , m_previousMousePosition(-1, -1)
     , m_ongoingPaintCommand(nullptr)
 {
+    m_paintToolBox = UIFactory::createBox(startMenuPosition, {110, 350});
+    m_paintToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+
+    m_paintToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(7.5, 5),"Textures", 20);
+    m_paintToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+
+    const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(25, 55);
+    SpriteButton *clearTextureButton = UIFactory::createSpriteButton("assets/textures/ui/clear_512.png", startBtnPosition + sf::Vector2f(0, 225),
+        sf::Vector2f(32, 32), "Clear", 15);
+    SpriteButton *grassTextureButton = UIFactory::createSpriteButton("assets/textures/ui/grass_512.png", startBtnPosition,
+        sf::Vector2f(32, 32), "Grass", 15);
+    SpriteButton *waterTextureButton = UIFactory::createSpriteButton("assets/textures/ui/water_512.png", startBtnPosition + sf::Vector2f(0, 75),
+        sf::Vector2f(32, 32), "Water", 15);
+    SpriteButton *sandTextureButton = UIFactory::createSpriteButton("assets/textures/ui/sand_512.png", startBtnPosition + sf::Vector2f(0, 150),
+        sf::Vector2f(32, 32), "Sand", 15);
+
+    m_paintTextureButtons.push_back(clearTextureButton);
+    m_paintTextureButtons.push_back(grassTextureButton);
+    m_paintTextureButtons.push_back(waterTextureButton);
+    m_paintTextureButtons.push_back(sandTextureButton);
+    for (int i = 0; i < m_paintTextureButtons.size(); i++) {
+        m_paintTextureButtons[i]->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
+            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
+        m_paintTextureButtons[i]->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
+            sf::Color(250, 239, 250), sf::Color(253, 249, 221));
+        m_paintTextureButtons[i]->initOnClickCallback([this, i] () {
+            this->selectPaintTexture(i);
+        });
+    }
+    selectPaintTexture(1);
+    initToolWidgetsList();
+    setUIVisibility(false);
+}
+
+PaintTool::~PaintTool()
+{
+    for (const auto widget : m_widgets)
+        UIFactory::removeWidget(widget);
+    m_widgets.clear();
 }
 
 bool PaintTool::isEditing() const
@@ -27,16 +66,26 @@ SelectionMode PaintTool::getRequiredSelectionMode() const
     return SelectionMode::TILE;
 }
 
+void PaintTool::onToolSelected() const
+{
+    setUIVisibility(true);
+}
+
+void PaintTool::onToolUnSelected() const
+{
+    setUIVisibility(false);
+}
+
 void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController,
                              CommandHistory &history)
 {
     // tile painting texture picking
     // Later it will we be ui button that will change the current textureId
     if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) m_currentTextureId = 0; // clear
-        if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) m_currentTextureId = 1; // grass
-        if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) m_currentTextureId = 2; // water
-        if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) m_currentTextureId = 3; // sand
+        if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) selectPaintTexture(0); // clear
+        if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) selectPaintTexture(1); // grass
+        if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) selectPaintTexture(2); // water
+        if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) selectPaintTexture(3); // sand
     }
 
     // paint starting
@@ -90,4 +139,30 @@ void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldMode
             m_ongoingPaintCommand->AddTile(&worldTiles[pos.y][pos.x], model, view);
         }
     m_previousMousePosition = currentMousePosition;
+}
+
+void PaintTool::selectPaintTexture(const int textureId)
+{
+    if (textureId == m_currentTextureId
+        || textureId < 0
+        || textureId > 3)
+        return;
+    if (m_currentTextureId != -1)
+        m_paintTextureButtons[m_currentTextureId]->setSelected(false);
+    m_currentTextureId = textureId;
+    m_paintTextureButtons[m_currentTextureId]->setSelected(true);
+}
+
+void PaintTool::setUIVisibility(const bool isVisible) const
+{
+    for (const auto widget : m_widgets)
+        widget->setVisibility(isVisible);
+}
+
+void PaintTool::initToolWidgetsList()
+{
+    m_widgets.push_back(m_paintToolBox);
+    m_widgets.push_back(m_paintToolText);
+    for (const auto button : m_paintTextureButtons)
+        m_widgets.push_back(button);
 }

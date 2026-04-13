@@ -69,6 +69,7 @@ public:
     float getHeightScale() const { return m_heightScale; }
     bool isRotating() const { return m_isRotating; }
 
+    void resetRotation();
 private:
     /**
      * @brief Rotates the map around the X axis by changing the projection angle.
@@ -100,6 +101,7 @@ private:
     float m_pitchRotationSpeed;
     float m_currentPitchRotationAngle;
     float m_targetPitchRotationAngle;
+    float m_defaultPitchRotationAngle;
 
     float m_yawRotationSpeed;
     float m_currentYawRotationAngle;

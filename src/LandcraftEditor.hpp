@@ -6,6 +6,8 @@
 #define LANDCRAFT_LANDCRAFTEDITOR_HPP
 
 #include "controller/WorldController.hpp"
+#include "ui/UIController.hpp"
+#include "ui/UIFactory.hpp"
 
 class LandcraftEditor {
 public:
@@ -13,7 +15,7 @@ public:
     void run();
 private:
     void handleEvents();
-    void handleContinuousEvents(float deltaTime);
+    void handleContinuousEvents(float deltaTime) const;
 
     bool m_hasFocus;
     sf::Vector2u m_windowSize;
@@ -25,7 +27,8 @@ private:
     float m_projectionAngleY;
     sf::Clock m_clock;
     sf::RenderWindow m_window;
-    WorldController m_worldController;
+    std::unique_ptr<UIController> m_uiController;
+    std::unique_ptr<WorldController> m_worldController;
 };
 
 
