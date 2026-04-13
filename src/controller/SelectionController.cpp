@@ -118,7 +118,7 @@ int SelectionController::getSearchRadius(const Camera &camera, const WorldModel 
 TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition,
                                                                   const sf::Vector2f pointScreenPosition, const int radius) const
 {
-    const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(camera, worldModel, pointWorldPosition.x, pointWorldPosition.y, radius);
+    const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(worldModel, pointWorldPosition.x, pointWorldPosition.y, radius);
     if (neighbors.empty())
         return nullptr;
     TileCorner* closestNeighbor = neighbors[0];
@@ -137,7 +137,7 @@ TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &
     return closestNeighbor;
 }
 
-std::vector<TileCorner *> SelectionController::getPointNeighborsInRadius(const Camera &camera, WorldModel &worldModel, int x, int y, const int radius ) const
+std::vector<TileCorner *> SelectionController::getPointNeighborsInRadius(WorldModel &worldModel, int x, int y, const int radius ) const
 {
     std::vector<TileCorner*> neighbors;
     const std::vector<std::vector<std::unique_ptr<TileCorner>>>& map = worldModel.getCorners();
@@ -165,7 +165,7 @@ Tile *SelectionController::getSelectedTileInRadius(const Camera &camera, WorldMo
         && isPointInsideTile(camera, &tilesMap[pointWorldPosition.y][pointWorldPosition.x], pointScreenPosition))
         return &tilesMap[pointWorldPosition.y][pointWorldPosition.x];
     for (int searchRadius = 1; searchRadius <= radius; searchRadius++) {
-        const std::vector<Tile *> &tilesInRadius =  getClosestTilesInRadius(camera, worldModel, 
+        const std::vector<Tile *> &tilesInRadius =  getClosestTilesInRadius(worldModel,
             pointWorldPosition.x, pointWorldPosition.y, searchRadius);
         for (  Tile *tile : tilesInRadius)
             if (isPointInsideTile(camera, tile, pointScreenPosition))
@@ -175,7 +175,7 @@ Tile *SelectionController::getSelectedTileInRadius(const Camera &camera, WorldMo
     return nullptr;
 }
 
-std::vector<Tile *> SelectionController::getClosestTilesInRadius(const Camera &camera, WorldModel &worldModel, int x, int y, int radius) const
+std::vector<Tile *> SelectionController::getClosestTilesInRadius(WorldModel &worldModel, int x, int y, const int radius) const
 {
     std::vector<Tile *> tiles;
     std::vector<std::vector<Tile>>& tilesMap = worldModel.getTiles();
