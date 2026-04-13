@@ -12,12 +12,14 @@ WorldController::WorldController()
 void WorldController::init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings)
 {
-    const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - 125, 0};
+    float globalToolBoxOffset = 450;
+    const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 0};
     Box *globalActions = UIFactory::createBox(globalUIPosition, {225, 85});
     globalActions->initColors(sf::Color(sf::Color(205, 185, 220)), sf::Color(255, 255, 255));
 
     m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));
-    m_selectionController = std::make_unique<SelectionController>(sf::Vector2f(0, 0));
+    float selectionMenuOffset = 185;
+    m_selectionController = std::make_unique<SelectionController>(sf::Vector2f{static_cast<float>(viewSettings.windowSize.x) / 2.f - selectionMenuOffset, 0});
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));
 
     m_worldModel.loadMap(mapName);

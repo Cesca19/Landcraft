@@ -231,7 +231,7 @@ void SelectionController::initBrushSizeWidgets()
 
     const sf::Vector2f startButtonPosition = m_startUIPosition + sf::Vector2f(40, 0);
 
-    m_brushSizeValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(130, 25), "00", 22);
+    m_brushSizeValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(130, 27), "00", 20);
     m_brushSizeValueText->init(sf::Color::White, sf::Text::Bold);
 
     m_decrementBrushSize = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", startButtonPosition + sf::Vector2f(70, 15),
