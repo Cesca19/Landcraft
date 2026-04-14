@@ -12,7 +12,7 @@
 class ElevationTool : public IEditionTool {
 public:
     ElevationTool(sf::Vector2f startMenuPosition);
-    ~ElevationTool();
+    ~ElevationTool() override;
     bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;

@@ -11,11 +11,11 @@ class EditionView {
 public:
     EditionView(sf::Vector2f globalUIPosition);
     ~EditionView();
-    void setEditionToolButtonOnCLickCallback(int toolId, std::function<void()> callback);
-    void setUndoButtonOnClickCallback(std::function<void()> callback);
-    void setRedoButtonOnClickCallback(std::function<void()> callback);
-    void selectEditionTool(int toolId);
-    void unselectEditionTool(int toolId);
+    void setEditionToolButtonOnCLickCallback(int toolId, const std::function<void()> &callback) const;
+    void setUndoButtonOnClickCallback(const std::function<void()> &callback) const;
+    void setRedoButtonOnClickCallback(const std::function<void()> &callback) const;
+    void selectEditionTool(int toolId) const;
+    void unselectEditionTool(int toolId) const;
 private:
     void applyUIStyle();
     void initWidgetsList();

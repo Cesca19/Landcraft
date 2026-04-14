@@ -5,7 +5,9 @@
 #include "ElevationTool.hpp"
 
 ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
-    : m_heightStep(1)
+    : m_shouldDig(false)
+    , m_shouldElevate(false)
+    , m_heightStep(1)
     , m_heightStepFactor(1)
     , m_maxHeightStepFactor(10)
     , m_isEditing(false)
@@ -18,29 +20,27 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     , m_ongoingEditCornersHeightCommand(nullptr)
     , m_elevationStepIncrement(nullptr)
     , m_elevationStepDecrement(nullptr)
+    , m_digButton(nullptr)
+    , m_elevateButton(nullptr)
     , m_elevationToolBox(nullptr)
     , m_selectionModeBox(nullptr)
     , m_elevationStepBox(nullptr)
+    , m_digOrElevateBox(nullptr)
     , m_elevationToolText(nullptr)
     , m_selectionModeText(nullptr)
     , m_elevationStepText(nullptr)
     , m_elevationStepValueText(nullptr)
-    , m_digOrElevateBox(nullptr)
     , m_digOrElevateText(nullptr)
-    , m_digButton(nullptr)
-    , m_elevateButton(nullptr)
-    , m_shouldDig(false)
-    , m_shouldElevate(false)
 {
-    m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 475});
+    m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 470});
     m_elevationToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
 
-    m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 5),"Elevation", 20);
+    m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 10),"Elevation", 20);
     m_elevationToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
-    initSelectionModeUI(startMenuPosition);
-    initDigOrElevateUI(startMenuPosition + sf::Vector2f(0, -5), startBtnPosition + sf::Vector2f(0, -5));
+    initSelectionModeUI(startMenuPosition + sf::Vector2f(0, 10));
+    initDigOrElevateUI(startMenuPosition + sf::Vector2f(0, 0), startBtnPosition + sf::Vector2f(0, -5));
     initElevationStepUI(startMenuPosition + sf::Vector2f(0, 140), startBtnPosition + sf::Vector2f(0, 150));
     initToolWidgetsList();
     setUIVisibility(false);

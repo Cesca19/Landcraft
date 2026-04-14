@@ -13,7 +13,7 @@ LandcraftEditor::LandcraftEditor()
     , m_heightScale(6) // => 64 / 8
     , m_projectionAngleX(30)
     , m_projectionAngleY(15) // 35.264 realistic isometric angle
-    , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft")
+    , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft", sf::Style::Default, sf::ContextSettings(0, 0, 4))
     , m_worldController(nullptr)
     , m_uiController(nullptr)
 {
@@ -24,6 +24,8 @@ LandcraftEditor::LandcraftEditor()
     UIFactory::init(m_uiController.get());
     m_worldController = std::make_unique<WorldController>();
 
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
 	m_window.setVerticalSyncEnabled(true);
     m_window.setIcon(512, 512, ResourceManager::getInstance()
             .getImage("assets/textures/ui/landcraft_icon_512.png").getPixelsPtr());

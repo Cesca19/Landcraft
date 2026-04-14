@@ -13,15 +13,9 @@ EditionView::EditionView(sf::Vector2f globalUIPosition)
         globalUIPosition + sf::Vector2f(15, 16), {28, 28}, "Undo", 12);
     m_redoButton = UIFactory::createSpriteButton("assets/textures/ui/redo_512.png",
         globalUIPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
-    // m_undoButton->initOnClickCallback([this, &model, &view] () {
-    //     m_commandHistory.undoCommand(model, view);
-    // });
-    // m_redoButton->initOnClickCallback([this, &model, &view] () {
-    //     m_commandHistory.redoCommand(model, view);
-    // });
     m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 210});
     m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
-    m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 5), "Tools:", 20);
+    m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 10), "Tools:", 20);
     m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
     const sf::Vector2f toolStartPos = m_editionToolsBoxPosition + sf::Vector2f(15, 60);
     SpriteButton *elevationButton = UIFactory::createSpriteButton("assets/textures/ui/elevation_tool_512.png", toolStartPos, {32, 32}, "Elevation", 15);
@@ -39,27 +33,27 @@ EditionView::~EditionView()
     m_widgets.clear();
 }
 
-void EditionView::selectEditionTool(int toolId)
+void EditionView::selectEditionTool(const int toolId) const
 {
     m_editionToolsButtons[toolId]->setSelected(true);
 }
 
-void EditionView::unselectEditionTool(int toolId)
+void EditionView::unselectEditionTool(const int toolId) const
 {
     m_editionToolsButtons[toolId]->setSelected(false);
 }
 
-void EditionView::setEditionToolButtonOnCLickCallback(int toolId, std::function<void()> callback)
+void EditionView::setEditionToolButtonOnCLickCallback(const int toolId, const std::function<void()> &callback) const
 {
     m_editionToolsButtons[toolId]->initOnClickCallback(callback);
 }
 
-void EditionView::setUndoButtonOnClickCallback(std::function<void()> callback)
+void EditionView::setUndoButtonOnClickCallback(const std::function<void()> &callback) const
 {
     m_undoButton->initOnClickCallback(callback);
 }
 
-void EditionView::setRedoButtonOnClickCallback(std::function<void()> callback)
+void EditionView::setRedoButtonOnClickCallback(const std::function<void()> &callback) const
 {
     m_redoButton->initOnClickCallback(callback);
 }

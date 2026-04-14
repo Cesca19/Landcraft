@@ -11,6 +11,7 @@ SelectionController::SelectionController(const sf::Vector2f uiStartPosition)
     , m_brushSizeText(nullptr)
     , m_incrementBrushSize(nullptr)
     , m_decrementBrushSize(nullptr)
+    , m_brushSizeValueText(nullptr)
 {
     initBrushSizeWidgets();
     initWidgetsList();

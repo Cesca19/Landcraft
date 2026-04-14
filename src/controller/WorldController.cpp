@@ -6,7 +6,6 @@
 
 WorldController::WorldController()
 {
-
 }
 
 void WorldController::init(const std::string &mapName, 
