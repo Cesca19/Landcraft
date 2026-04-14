@@ -13,7 +13,7 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     m_paintToolBox = UIFactory::createBox(startMenuPosition, {110, 350});
     m_paintToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
 
-    m_paintToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(7.5, 5),"Textures", 20);
+    m_paintToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(7.5, 10),"Textures", 20);
     m_paintToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(25, 55);

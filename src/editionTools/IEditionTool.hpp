@@ -7,7 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../model/WorldModel.hpp"
-#include "../view/WorldView.hpp"
+#include "../view/world/WorldView.hpp"
 #include "../controller/SelectionController.hpp"
 #include "../commands/CommandHistory.hpp"
 

@@ -2,9 +2,9 @@
 // Created by fran on 14/04/2026.
 //
 
-#include "EditionView.hpp"
+#include "EditionMenu.hpp"
 
-EditionView::EditionView(sf::Vector2f globalUIPosition)
+EditionMenu::EditionMenu(sf::Vector2f globalUIPosition)
     : m_editionToolsBoxPosition(0, 250)
     , m_globalUIStartPosition(globalUIPosition)
     , m_toolsMenuStartPosition(m_editionToolsBoxPosition + sf::Vector2f(90, 0))
@@ -26,39 +26,39 @@ EditionView::EditionView(sf::Vector2f globalUIPosition)
     initWidgetsList();
 }
 
-EditionView::~EditionView()
+EditionMenu::~EditionMenu()
 {
     for (const auto widget : m_widgets)
         UIFactory::removeWidget(widget);
     m_widgets.clear();
 }
 
-void EditionView::selectEditionTool(const int toolId) const
+void EditionMenu::selectEditionTool(const int toolId) const
 {
     m_editionToolsButtons[toolId]->setSelected(true);
 }
 
-void EditionView::unselectEditionTool(const int toolId) const
+void EditionMenu::unselectEditionTool(const int toolId) const
 {
     m_editionToolsButtons[toolId]->setSelected(false);
 }
 
-void EditionView::setEditionToolButtonOnCLickCallback(const int toolId, const std::function<void()> &callback) const
+void EditionMenu::setEditionToolButtonOnCLickCallback(const int toolId, const std::function<void()> &callback) const
 {
     m_editionToolsButtons[toolId]->initOnClickCallback(callback);
 }
 
-void EditionView::setUndoButtonOnClickCallback(const std::function<void()> &callback) const
+void EditionMenu::setUndoButtonOnClickCallback(const std::function<void()> &callback) const
 {
     m_undoButton->initOnClickCallback(callback);
 }
 
-void EditionView::setRedoButtonOnClickCallback(const std::function<void()> &callback) const
+void EditionMenu::setRedoButtonOnClickCallback(const std::function<void()> &callback) const
 {
     m_redoButton->initOnClickCallback(callback);
 }
 
-void EditionView::applyUIStyle()
+void EditionMenu::applyUIStyle()
 {
     std::vector<SpriteButton*> buttons = { m_undoButton, m_redoButton };
     buttons.insert(buttons.end(), m_editionToolsButtons.begin(), m_editionToolsButtons.end());
@@ -73,7 +73,7 @@ void EditionView::applyUIStyle()
     buttons.clear();
 }
 
-void EditionView::initWidgetsList()
+void EditionMenu::initWidgetsList()
 {
     for (const auto& button : m_editionToolsButtons)
         m_widgets.push_back(button);

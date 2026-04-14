@@ -6,7 +6,7 @@
 #define LANDCRAFT_ICOMMAND_HPP
 
 #include "../model/WorldModel.hpp"
-#include "../view/WorldView.hpp"
+#include "../view/world/WorldView.hpp"
 
 class ICommand {
 public:

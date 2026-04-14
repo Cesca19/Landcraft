@@ -8,8 +8,8 @@
 #include <set>
 #include <SFML/Graphics.hpp>
 #include "Camera.hpp"
-#include "../model/Tile.hpp"
-#include "../utils/ResourceManager.hpp"
+#include "../../model/Tile.hpp"
+#include "../../utils/ResourceManager.hpp"
 
 class TileMap  : public sf::Drawable, public sf::Transformable
 {

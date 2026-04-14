@@ -6,10 +6,10 @@
 #define LANDCRAFT_EDITIONCONTROLLER_HPP
 
 #include "../model/WorldModel.hpp"
-#include "../view/WorldView.hpp"
+#include "../view/world/WorldView.hpp"
 #include "../commands/CommandHistory.hpp"
 #include "../editionTools/EditionTools.hpp"
-#include "../view/EditionView.hpp"
+#include "../view/menu/EditionMenu.hpp"
 
 class EditionController {
 public:
@@ -27,7 +27,7 @@ private:
     CommandHistory m_commandHistory;
     int m_currentEditionTool;
     std::vector<std::unique_ptr<IEditionTool>> m_editionTools;
-    std::unique_ptr<EditionView> m_editionView;
+    std::unique_ptr<EditionMenu> m_editionView;
     sf::Vector2f m_editionToolsBoxPosition;
     sf::Vector2f m_toolsMenuStartPosition;
 };

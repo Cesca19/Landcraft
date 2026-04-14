@@ -7,7 +7,7 @@
 
 #include <SFML/System/Vector2.hpp>
 #include <algorithm>
-#include "../utils/MathUtils.hpp"
+#include "../../utils/MathUtils.hpp"
 
 class Camera {
 public:

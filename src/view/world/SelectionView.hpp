@@ -7,7 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Camera.hpp"
-#include "../model/Tile.hpp"
+#include "../../model/Tile.hpp"
 
 class SelectionView {
 public:

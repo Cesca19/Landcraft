@@ -5,12 +5,12 @@
 #ifndef LANDCRAFT_EDITIONVIEW_HPP
 #define LANDCRAFT_EDITIONVIEW_HPP
 
-#include "../ui/UIFactory.hpp"
+#include "../../ui/UIFactory.hpp"
 
-class EditionView {
+class EditionMenu {
 public:
-    EditionView(sf::Vector2f globalUIPosition);
-    ~EditionView();
+    EditionMenu(sf::Vector2f globalUIPosition);
+    ~EditionMenu();
     void setEditionToolButtonOnCLickCallback(int toolId, const std::function<void()> &callback) const;
     void setUndoButtonOnClickCallback(const std::function<void()> &callback) const;
     void setRedoButtonOnClickCallback(const std::function<void()> &callback) const;

@@ -8,8 +8,8 @@
 #include <set>
 #include <SFML/Graphics.hpp>
 #include "../model/WorldModel.hpp"
-#include "../view/SelectionView.hpp"
-#include "../view/Camera.hpp"
+#include "../view/world/SelectionView.hpp"
+#include "../view/world/Camera.hpp"
 #include "../ui/UIFactory.hpp"
 
 enum class SelectionMode {

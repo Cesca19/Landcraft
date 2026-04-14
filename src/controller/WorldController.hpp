@@ -6,7 +6,7 @@
 #define LANDCRAFT_WORLDCONTROLLER_HPP
 
 #include "../model/WorldModel.hpp"
-#include "../view/WorldView.hpp"
+#include "../view/world/WorldView.hpp"
 #include "EditionController.hpp"
 #include "SelectionController.hpp"
 #include "NavigationController.hpp"

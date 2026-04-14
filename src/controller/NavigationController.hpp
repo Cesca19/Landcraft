@@ -5,7 +5,7 @@
 #ifndef LANDCRAFT_NAVIGATIONCONTROLLER_HPP
 #define LANDCRAFT_NAVIGATIONCONTROLLER_HPP
 
-#include "../view/WorldView.hpp"
+#include "../view/world/WorldView.hpp"
 #include "../model/WorldModel.hpp"
 #include "../ui/UIFactory.hpp"
 

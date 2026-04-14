@@ -62,15 +62,15 @@ add_executable(${MY_TARGET}
         src/main.cpp
         src/utils/MathUtils.cpp
         src/model/WorldModel.cpp
-        src/view/WorldView.cpp
+        src/view/world/WorldView.cpp
         src/controller/WorldController.cpp
-        src/view/Camera.cpp
+        src/view/world/Camera.cpp
         src/model/Tile.cpp
         src/model/TileCorner.cpp
-        src/view/TileMap.cpp
+        src/view/world/TileMap.cpp
         src/controller/SelectionController.cpp
-        src/view/SelectionView.cpp
-        src/view/EnvironmentView.cpp
+        src/view/world/SelectionView.cpp
+        src/view/world/EnvironmentView.cpp
         src/commands/EditTilesCornersHeightCommand.cpp
         src/commands/PaintTilesCommand.cpp
         src/commands/CommandHistory.cpp
@@ -86,7 +86,7 @@ add_executable(${MY_TARGET}
         src/utils/ResourceManager.cpp
         src/ui/widgets/Box.cpp
         src/ui/widgets/Text.cpp
-        src/view/EditionView.cpp
+        src/view/menu/EditionMenu.cpp
         src/ui/widgets/RoundedRectangleShape.cpp
 )
 
