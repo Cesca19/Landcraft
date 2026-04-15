@@ -57,6 +57,11 @@ bool BrushController::isAnyTileCornerSelected() const
     return !m_selectedTileCorners.empty() || !m_selectedTiles.empty();
 }
 
+std::vector<Tile *> BrushController::getNeighborsTilesInBrush(WorldModel &worldModel, int x, int y) const
+{
+    return getClosestTilesInRadius(worldModel, x, y, m_brushSize, true);
+}
+
 void BrushController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
     m_selectedTileCorners.clear();

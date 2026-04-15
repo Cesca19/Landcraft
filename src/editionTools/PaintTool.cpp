@@ -136,7 +136,8 @@ void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldMode
     for (const sf::Vector2i& pos : lineTilesPositions)
         if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
         && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
-            m_ongoingPaintCommand->AddTile(&worldTiles[pos.y][pos.x], model, view);
+            std::vector<Tile *> tilesInBrush = brushController.getNeighborsTilesInBrush(model, pos.x, pos.y);
+            m_ongoingPaintCommand->AddTiles(tilesInBrush, model, view);
         }
     m_previousMousePosition = currentMousePosition;
 }
