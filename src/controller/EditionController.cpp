@@ -27,16 +27,16 @@ EditionController::EditionController(WorldModel &model, WorldView &view, const s
     selectEditionTool(0);
 }
 
-void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController)
+void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController)
 {
     handleEditionToolSwitchEvents(event);
-    m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, selectionController, m_commandHistory);
+    m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, brushController, m_commandHistory);
     handleUndoRedoEvents(window, event, model, view);
 }
 
-void EditionController::handleContinuousEvents(const sf::RenderWindow &window, WorldModel &model, WorldView &view, SelectionController &selectionController)
+void EditionController::handleContinuousEvents(const sf::RenderWindow &window, WorldModel &model, WorldView &view, BrushController &brushController)
 {
-    m_editionTools[m_currentEditionTool]->handleContinuousEvents(window, model, view, selectionController, m_commandHistory);
+    m_editionTools[m_currentEditionTool]->handleContinuousEvents(window, model, view, brushController, m_commandHistory);
 }
 
 bool EditionController::isEditing() const

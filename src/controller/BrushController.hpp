@@ -2,25 +2,24 @@
 // Created by fran on 13/03/2026.
 //
 
-#ifndef LANDCRAFT_SELECTIONCONTROLLER_HPP
-#define LANDCRAFT_SELECTIONCONTROLLER_HPP
+#ifndef LANDCRAFT_BRUSHONTROLLER_HPP
+#define LANDCRAFT_BRUSHONTROLLER_HPP
 
 #include <set>
 #include <SFML/Graphics.hpp>
 #include "../model/WorldModel.hpp"
-#include "../view/world/SelectionView.hpp"
+#include "../view/world/BrushView.hpp"
+#include "../view/menu/BrushMenu.hpp"
 #include "../view/world/Camera.hpp"
-#include "../ui/UIFactory.hpp"
 
 enum class SelectionMode {
     TILE,
     TILE_CORNER
 };
 
-class SelectionController {
+class BrushController {
 public:
-    SelectionController(sf::Vector2f uiStartPosition);
-    ~SelectionController();
+    BrushController(sf::Vector2f uiStartPosition);
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
                  WorldModel &worldModel, const Camera &camera);
     void draw(sf::RenderWindow &window, const Camera &camera);
@@ -39,26 +38,24 @@ private:
     std::vector<TileCorner *> getPointNeighborsInRadius(WorldModel &worldModel, int x, int y, int radius) const;
 
     Tile *getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius) const;
-    std::vector<Tile *> getClosestTilesInRadius(WorldModel &worldModel, int x, int y, int radius) const;
+    std::vector<Tile *> getClosestTilesInRadius(WorldModel &worldModel, int x, int y, int radius, bool includeInside = false) const;
     bool isPointInsideTile(const Camera &camera, Tile *tile, sf::Vector2f pointScreenPosition) const;
     sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner) const;
 
-    void initBrushSizeWidgets();
-    void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
-    void initWidgetsList();
+    void incrementBrushSize();
+    void decrementBrushSize();
+    std::string getBrushSizeValue() const;
 
-    SelectionView m_selectionView;
+    BrushView m_brushView;
+    BrushMenu m_brushMenu;
+
     std::vector<TileCorner *> m_selectedTileCorners;
     std::vector<Tile *> m_selectedTiles;
     sf::Vector2i m_mouseWorldPosition;
 
-    sf::Vector2f m_startUIPosition;
-    Box *m_brushSizeBox;
-    Text *m_brushSizeText;
-    Text *m_brushSizeValueText;
-    SpriteButton *m_incrementBrushSize;
-    SpriteButton *m_decrementBrushSize;
-    std::vector<IWidget *> m_widgets;
+    float m_brushSize;
+    float m_brushSizeMin;
+    float m_brushSizeMax;
 };
 
-#endif //LANDCRAFT_SELECTIONCONTROLLER_HPP
+#endif //LANDCRAFT_BRUSHONTROLLER_HPP

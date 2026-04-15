@@ -68,8 +68,8 @@ add_executable(${MY_TARGET}
         src/model/Tile.cpp
         src/model/TileCorner.cpp
         src/view/world/TileMap.cpp
-        src/controller/SelectionController.cpp
-        src/view/world/SelectionView.cpp
+        src/controller/BrushController.cpp
+        src/view/world/BrushView.cpp
         src/view/world/EnvironmentView.cpp
         src/commands/EditTilesCornersHeightCommand.cpp
         src/commands/PaintTilesCommand.cpp
@@ -88,6 +88,7 @@ add_executable(${MY_TARGET}
         src/ui/widgets/Text.cpp
         src/view/menu/EditionMenu.cpp
         src/ui/widgets/RoundedRectangleShape.cpp
+        src/view/menu/BrushMenu.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

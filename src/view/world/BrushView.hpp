@@ -2,17 +2,17 @@
 // Created by fran on 13/03/2026.
 //
 
-#ifndef LANDCRAFT_SELECTIONVIEW_HPP
-#define LANDCRAFT_SELECTIONVIEW_HPP
+#ifndef LANDCRAFT_BRUSHVIEW_HPP
+#define LANDCRAFT_BRUSHVIEW_HPP
 
 #include <SFML/Graphics.hpp>
 #include "Camera.hpp"
 #include "../../model/Tile.hpp"
 
-class SelectionView {
+class BrushView {
 public:
-    SelectionView();
-    ~SelectionView();
+    BrushView();
+    ~BrushView();
 
     void drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera);
     void drawTileCorners(sf::RenderWindow &window, const std::vector<TileCorner *> &cornersToHighlight, const Camera &camera);
@@ -25,4 +25,4 @@ private:
 };
 
 
-#endif //LANDCRAFT_SELECTIONVIEW_HPP
+#endif //LANDCRAFT_BRUSHVIEW_HPP

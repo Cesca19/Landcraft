@@ -8,7 +8,7 @@
 #include "../model/WorldModel.hpp"
 #include "../view/world/WorldView.hpp"
 #include "EditionController.hpp"
-#include "SelectionController.hpp"
+#include "BrushController.hpp"
 #include "NavigationController.hpp"
 
 
@@ -43,7 +43,7 @@ private:
     WorldView m_worldView;
     WorldModel m_worldModel;
     std::unique_ptr<EditionController> m_editionController;
-    std::unique_ptr<SelectionController> m_selectionController;
+    std::unique_ptr<BrushController> m_brushController;
     std::unique_ptr<NavigationController> m_navigationController;
 };
 

@@ -76,7 +76,7 @@ void PaintTool::onToolUnSelected() const
     setUIVisibility(false);
 }
 
-void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController,
                              CommandHistory &history)
 {
     // tile painting texture picking
@@ -91,9 +91,9 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
     // paint starting
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == m_paintMouseButton
         && m_ongoingPaintCommand == nullptr) {
-        m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(selectionController.getSelectedTiles(), m_currentTextureId);
+        m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(brushController.getSelectedTiles(), m_currentTextureId);
         m_ongoingPaintCommand->execute(model, view);
-        m_previousMousePosition = selectionController.getMouseWorldPosition();
+        m_previousMousePosition = brushController.getMouseWorldPosition();
         m_isEditing = true;
     }
     // paint ending
@@ -107,17 +107,17 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
     }
 }
 
-void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController,
     CommandHistory &history)
 {
     // tiles painting
-    const std::vector<Tile *>& selectedTiles = selectionController.getSelectedTiles();
+    const std::vector<Tile *>& selectedTiles = brushController.getSelectedTiles();
     if (!sf::Mouse::isButtonPressed(m_paintMouseButton)
         || m_ongoingPaintCommand == nullptr
         || selectedTiles.empty())
         return;
 
-    const sf::Vector2i currentMousePosition = selectionController.getMouseWorldPosition();
+    const sf::Vector2i currentMousePosition = brushController.getMouseWorldPosition();
     if (currentMousePosition == m_previousMousePosition)
         return;
 

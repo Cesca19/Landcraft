@@ -2,9 +2,9 @@
 // Created by fran on 13/03/2026.
 //
 
-#include "SelectionView.hpp"
+#include "BrushView.hpp"
 
-SelectionView::SelectionView()
+BrushView::BrushView()
     : m_tileCornerRadius(5)
     , m_highlightedTilesVertexArray(sf::Triangles)
     , m_highlightedTileCorner(m_tileCornerRadius)
@@ -16,11 +16,11 @@ SelectionView::SelectionView()
     m_highlightedTileCorner.setOrigin(m_tileCornerRadius, m_tileCornerRadius); 
 }
 
-SelectionView::~SelectionView()
+BrushView::~BrushView()
 {
 }
 
-void SelectionView::drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera)
+void BrushView::drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera)
 {
     m_highlightedTilesVertexArray.clear();
     m_highlightedTilesVertexArray.resize(tilesToHighlight.size() * 6); // 2 triangles per tile, 3 corners per triangle
@@ -43,9 +43,9 @@ void SelectionView::drawTiles(sf::RenderWindow &window, const std::vector<Tile*>
     window.draw(m_highlightedTilesVertexArray);
 }
 
-void SelectionView::drawTileCorners(sf::RenderWindow &window, const std::vector<TileCorner *> &cornersToHighlight, const Camera &camera)
+void BrushView::drawTileCorners(sf::RenderWindow &window, const std::vector<TileCorner *> &cornersToHighlight, const Camera &camera)
 {
-    const float pinSize = 7.5;
+    const float pinSize = 2.5f;
     for (const TileCorner* corner : cornersToHighlight)  {
         sf::Vector2f baseScreenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
         sf::Vector2f topScreenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight() + pinSize);

@@ -2,45 +2,37 @@
 // Created by fran on 13/03/2026.
 //
 
-#include "SelectionController.hpp"
+#include "BrushController.hpp"
 
-SelectionController::SelectionController(const sf::Vector2f uiStartPosition)
+BrushController::BrushController(const sf::Vector2f uiStartPosition)
     : m_mouseWorldPosition(-1, -1)
-    , m_startUIPosition(uiStartPosition)
-    , m_brushSizeBox(nullptr)
-    , m_brushSizeText(nullptr)
-    , m_incrementBrushSize(nullptr)
-    , m_decrementBrushSize(nullptr)
-    , m_brushSizeValueText(nullptr)
+    , m_brushSize(0)
+    , m_brushSizeMin(0)
+    , m_brushSizeMax(50)
+    , m_brushMenu(uiStartPosition)
 {
-    initBrushSizeWidgets();
-    initWidgetsList();
+    m_brushMenu.setIncrementBrushSizeButtonCallback([this]() { incrementBrushSize(); });
+    m_brushMenu.setDecrementBrushSizeButtonCallback([this]() { decrementBrushSize(); });
+    m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
 }
 
-SelectionController::~SelectionController()
-{
-    for (auto *widget : m_widgets)
-        UIFactory::removeWidget(widget);
-    m_widgets.clear();
-}
-
-void SelectionController::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode,
+void BrushController::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode,
                                 WorldModel &worldModel, const Camera &camera)
 {
     getSelectedCorners(window, camera, worldModel, selectionMode);
     // should we hide the mouse cursor when something is hovered inside the map
 }
 
-void SelectionController::draw(sf::RenderWindow &window, const Camera &camera)
+void BrushController::draw(sf::RenderWindow &window, const Camera &camera)
 {
     if (!m_selectedTileCorners.empty())
-        m_selectionView.drawTileCorners(window, m_selectedTileCorners, camera);
+        m_brushView.drawTileCorners(window, m_selectedTileCorners, camera);
 
     if (!m_selectedTiles.empty())
-        m_selectionView.drawTiles(window, m_selectedTiles, camera);
+        m_brushView.drawTiles(window, m_selectedTiles, camera);
 }
 
-std::vector<TileCorner *> SelectionController::getSelectedTileCorners() const {
+std::vector<TileCorner *> BrushController::getSelectedTileCorners() const {
     std::set<TileCorner*> uniqueCorners;
 
     for (TileCorner* corner : m_selectedTileCorners)
@@ -51,21 +43,21 @@ std::vector<TileCorner *> SelectionController::getSelectedTileCorners() const {
     return std::vector<TileCorner*>(uniqueCorners.begin(), uniqueCorners.end());
 }
 
-const std::vector<Tile *> & SelectionController::getSelectedTiles() const
+const std::vector<Tile *> & BrushController::getSelectedTiles() const
 {
     return m_selectedTiles;
 }
 
-sf::Vector2i SelectionController::getMouseWorldPosition() const {
+sf::Vector2i BrushController::getMouseWorldPosition() const {
     return m_mouseWorldPosition;
 }
 
-bool SelectionController::isAnyTileCornerSelected() const
+bool BrushController::isAnyTileCornerSelected() const
 {
     return !m_selectedTileCorners.empty() || !m_selectedTiles.empty();
 }
 
-void SelectionController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
+void BrushController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
     m_selectedTileCorners.clear();
     m_selectedTiles.clear();
@@ -85,25 +77,31 @@ void SelectionController::getSelectedCorners(const sf::RenderWindow &window, con
     
 }
 
-void SelectionController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
+void BrushController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
     const int searchRadius = getSearchRadius(camera, worldModel);
     TileCorner* closestCorner = getClosestNeighborCornerInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (closestCorner == nullptr)
         return;
     m_selectedTileCorners.push_back(closestCorner);
+    const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(worldModel, closestCorner->getColumn(), closestCorner->getRow(), m_brushSize);
+    for (TileCorner* neighbor : neighbors)
+        m_selectedTileCorners.push_back(neighbor);
 }
 
-void SelectionController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
+void BrushController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
     const int searchRadius = getSearchRadius(camera, worldModel);
     Tile *hoveredTile = getSelectedTileInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
     if (hoveredTile == nullptr)
         return;
     m_selectedTiles.push_back(hoveredTile);
+    const std::vector<Tile *> neighbors = getClosestTilesInRadius(worldModel, hoveredTile->getGridPosition().x, hoveredTile->getGridPosition().y, m_brushSize, true);
+    for (Tile* neighbor : neighbors)
+        m_selectedTiles.push_back(neighbor);
 }
 
-int SelectionController::getSearchRadius(const Camera &camera, const WorldModel &worldModel) const
+int BrushController::getSearchRadius(const Camera &camera, const WorldModel &worldModel) const
 {
     const float maxAbsZ = worldModel.getHighestTileCornerHeight();
     const sf::Vector2f flatPos = camera.screen_to_world(0.0f, 0.0f, 0.0f);
@@ -116,7 +114,7 @@ int SelectionController::getSearchRadius(const Camera &camera, const WorldModel 
     return (minRadius > optimalRadius) ? minRadius : optimalRadius;
 }
 
-TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition,
+TileCorner *BrushController::getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition,
                                                                   const sf::Vector2f pointScreenPosition, const int radius) const
 {
     const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(worldModel, pointWorldPosition.x, pointWorldPosition.y, radius);
@@ -138,7 +136,7 @@ TileCorner *SelectionController::getClosestNeighborCornerInRadius(const Camera &
     return closestNeighbor;
 }
 
-std::vector<TileCorner *> SelectionController::getPointNeighborsInRadius(WorldModel &worldModel, int x, int y, const int radius ) const
+std::vector<TileCorner *> BrushController::getPointNeighborsInRadius(WorldModel &worldModel, int x, int y, const int radius ) const
 {
     std::vector<TileCorner*> neighbors;
     const std::vector<std::vector<std::unique_ptr<TileCorner>>>& map = worldModel.getCorners();
@@ -157,7 +155,7 @@ std::vector<TileCorner *> SelectionController::getPointNeighborsInRadius(WorldMo
     return neighbors;
 }
 
-Tile *SelectionController::getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition, const sf::Vector2f pointScreenPosition, const int radius) const
+Tile *BrushController::getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, const sf::Vector2i pointWorldPosition, const sf::Vector2f pointScreenPosition, const int radius) const
 {
     //pointScreenPosition = camera.screen_to_world(pointScreenPosition.x, pointScreenPosition.y, 0);
     std::vector<std::vector<Tile>>& tilesMap = worldModel.getTiles();
@@ -176,7 +174,7 @@ Tile *SelectionController::getSelectedTileInRadius(const Camera &camera, WorldMo
     return nullptr;
 }
 
-std::vector<Tile *> SelectionController::getClosestTilesInRadius(WorldModel &worldModel, int x, int y, const int radius) const
+std::vector<Tile *> BrushController::getClosestTilesInRadius(WorldModel &worldModel, int x, int y, const int radius, const bool includeInside) const
 {
     std::vector<Tile *> tiles;
     std::vector<std::vector<Tile>>& tilesMap = worldModel.getTiles();
@@ -189,19 +187,24 @@ std::vector<Tile *> SelectionController::getClosestTilesInRadius(WorldModel &wor
     int startY = std::max(0, y - radius);
     int endY = std::min(static_cast<int>(tilesMap.size() -1), y + radius);
 
-    for (int i = startX; i <= endX; i++) {
-        tiles.push_back(&tilesMap[startY][i]);
-        tiles.push_back(&tilesMap[endY][i]);
-    }
-
-    for (int j = startY + 1; j <= endY - 1; j++) {
-        tiles.push_back(&tilesMap[j][startX]);
-        tiles.push_back(&tilesMap[j][endX]);
+    if (includeInside) {
+        for (int j = startY; j <= endY; j++)
+            for (int i = startX; i <= endX; i++)
+                tiles.push_back(&tilesMap[j][i]);
+    } else {
+        for (int i = startX; i <= endX; i++) {
+            tiles.push_back(&tilesMap[startY][i]);
+            tiles.push_back(&tilesMap[endY][i]);
+        }
+        for (int j = startY + 1; j <= endY - 1; j++) {
+            tiles.push_back(&tilesMap[j][startX]);
+            tiles.push_back(&tilesMap[j][endX]);
+        }
     }
     return tiles;
 }
 
-bool SelectionController::isPointInsideTile(const Camera &camera, Tile *tile, sf::Vector2f pointScreenPosition) const
+bool BrushController::isPointInsideTile(const Camera &camera, Tile *tile, sf::Vector2f pointScreenPosition) const
 {
     std::vector<TileCorner*> tileCorners = tile->getCorners();
     if (tileCorners.size() != 4)
@@ -218,47 +221,29 @@ bool SelectionController::isPointInsideTile(const Camera &camera, Tile *tile, sf
     return false;
 }
 
-sf::Vector2f SelectionController::getTileCornerScreenCoordinates(const Camera &camera, const TileCorner *corner) const
+sf::Vector2f BrushController::getTileCornerScreenCoordinates(const Camera &camera, const TileCorner *corner) const
 {
     return camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
 }
 
-void SelectionController::initBrushSizeWidgets()
+void BrushController::incrementBrushSize()
 {
-    m_brushSizeBox = UIFactory::createBox(m_startUIPosition, {280, 85});
-    m_brushSizeBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
-    m_brushSizeText = UIFactory::createText( m_startUIPosition + sf::Vector2f(10, 30), "Brush size", 15);
-    m_brushSizeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
-
-    const sf::Vector2f startButtonPosition = m_startUIPosition + sf::Vector2f(40, 0);
-
-    m_brushSizeValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(130, 27), "00", 20);
-    m_brushSizeValueText->init(sf::Color::White, sf::Text::Bold);
-
-    m_decrementBrushSize = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", startButtonPosition + sf::Vector2f(70, 15),
-        sf::Vector2f(28, 28), "Reduce", 12);
-    m_incrementBrushSize = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", startButtonPosition + sf::Vector2f(170, 15),
-        sf::Vector2f(28, 28), "Add", 12);
-
-    // next buttons
-    initButtonStyle(m_decrementBrushSize, HighlightTextAlign::Down);
-    initButtonStyle(m_incrementBrushSize, HighlightTextAlign::Down);
+    m_brushSize += 1.0f;
+    if (m_brushSize > m_brushSizeMax)
+        m_brushSize = m_brushSizeMax;
+    m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
 }
 
-void SelectionController::initButtonStyle(SpriteButton *button, const HighlightTextAlign align)
+void BrushController::decrementBrushSize()
 {
-    button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
-        sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-    button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
-        sf::Color(250, 239, 250), sf::Color(253, 249, 221));
-    button->initHighlightTextAlign(align);
+    m_brushSize -= 1.0f;
+    if (m_brushSize <= m_brushSizeMin)
+        m_brushSize = m_brushSizeMin;
+    m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
 }
 
-void SelectionController::initWidgetsList()
+std::string BrushController::getBrushSizeValue() const
 {
-    m_widgets.push_back(m_brushSizeBox);
-    m_widgets.push_back(m_brushSizeText);
-    m_widgets.push_back(m_incrementBrushSize);
-    m_widgets.push_back(m_decrementBrushSize);
-    m_widgets.push_back(m_brushSizeValueText);
+    std::string value = std::to_string(static_cast<int>(m_brushSize));
+    return (value.size() > 1) ? value : "0" + value;
 }

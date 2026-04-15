@@ -14,8 +14,8 @@
 class EditionController {
 public:
     EditionController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition);
-    void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, SelectionController& selectionController);
-    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, SelectionController& selectionController);
+    void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, BrushController& brushController);
+    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, BrushController& brushController);
     bool isEditing() const;
     bool isSelectionLocked() const;
     SelectionMode getSelectionMode() const;

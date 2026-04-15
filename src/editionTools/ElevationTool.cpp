@@ -83,16 +83,16 @@ void ElevationTool::onToolUnSelected() const
 }
 
 void ElevationTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view,
-                                 SelectionController &selectionController, CommandHistory &history)
+                                 BrushController &brushController, CommandHistory &history)
 {
     handleSelectionModeEditingEvents(event);
     handleHeightStepEditingEvents(event);
 }
 
-void ElevationTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void ElevationTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController,
                                            CommandHistory &history)
 {
-    handleHeightEditingEvents(window, model, view, selectionController, history);
+    handleHeightEditingEvents(window, model, view, brushController, history);
 }
 
 void ElevationTool::handleSelectionModeEditingEvents(const sf::Event &event)
@@ -118,16 +118,16 @@ void ElevationTool::handleHeightStepEditingEvents(const sf::Event &event)
 }
 
 void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view,
-                                              const SelectionController &selectionController, CommandHistory &history)
+                                              const BrushController &brushController, CommandHistory &history)
 {
     bool isMouseButtonPressed = sf::Mouse::isButtonPressed(m_editingMouseButton);
 
     if ((m_shouldElevate || m_shouldDig) && isMouseButtonPressed) {
         const float heightFactor = (m_shouldElevate ? 1.0f : -1.0f ) * m_heightStep * static_cast<float>(m_heightStepFactor);
         if (m_ongoingEditCornersHeightCommand == nullptr)
-            startContinuousElevation(window, model, view, selectionController, heightFactor);
+            startContinuousElevation(window, model, view, brushController, heightFactor);
         else
-            updateContinuousElevation(window, model, view, selectionController, heightFactor);
+            updateContinuousElevation(window, model, view, brushController, heightFactor);
         m_isEditing = true;
     } else {
         if (m_ongoingEditCornersHeightCommand != nullptr)
@@ -137,33 +137,33 @@ void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, Wo
 }
 
 void ElevationTool::startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
-    const SelectionController &selectionController, const float heightStep)
+    const BrushController &brushController, const float heightStep)
 {
-    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+    const std::vector<TileCorner *> selectedCorners = brushController.getSelectedTileCorners();
     if (selectedCorners.empty()) return;
     m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(/*selectedCorners, heightStep*/);
     m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
     m_isSelectionLocked = true;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Mouse::getPosition(window);
-    m_lastMouseWorldPosition = selectionController.getMouseWorldPosition();
+    m_lastMouseWorldPosition = brushController.getMouseWorldPosition();
 }
 
 void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
-    const SelectionController &selectionController, const float heightStep)
+    const BrushController &brushController, const float heightStep)
 {
     if (m_ongoingEditCornersHeightCommand == nullptr)
         return;
     const sf::Vector2i currentMouseScreenPosition = sf::Mouse::getPosition(window);
     const bool hasScreenMouseMoved = MathUtils::distanceBetweenPoints(static_cast<sf::Vector2f>(m_lastMouseScreenPosition),
                                 static_cast<sf::Vector2f>(currentMouseScreenPosition)) > m_mouseMovementThreshold;
-    const sf::Vector2i currentMouseWorldPosition = selectionController.getMouseWorldPosition();
+    const sf::Vector2i currentMouseWorldPosition = brushController.getMouseWorldPosition();
     const bool hasAnyMouseMoved = hasScreenMouseMoved || view.isMoving();
 
     if (!hasAnyMouseMoved) {
         m_isSelectionLocked = true;
         if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-            applyElevationOnCurrentSelection(model, view, selectionController, heightStep);
+            applyElevationOnCurrentSelection(model, view, brushController, heightStep);
             m_continuousElevationClock.restart();
         }
         return;
@@ -174,13 +174,13 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
         return;
     }
     if (m_lastMouseWorldPosition != currentMouseWorldPosition) {
-        applyElevationAlongPath(currentMouseWorldPosition, model, view, selectionController, heightStep);
+        applyElevationAlongPath(currentMouseWorldPosition, model, view, brushController, heightStep);
         m_lastMouseWorldPosition = currentMouseWorldPosition;
         m_lastMouseScreenPosition = currentMouseScreenPosition;
         m_continuousElevationClock.restart();
         m_isSelectionLocked = true;
     } else if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-        applyElevationOnCurrentSelection(model, view, selectionController, heightStep);
+        applyElevationOnCurrentSelection(model, view, brushController, heightStep);
         m_continuousElevationClock.restart();
         m_lastMouseScreenPosition = currentMouseScreenPosition;
         m_isSelectionLocked = true;
@@ -189,17 +189,17 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
 }
 
 void ElevationTool::applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view,
-    const SelectionController &selectionController, const float heightStep) const
+    const BrushController &brushController, const float heightStep) const
 {
-    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+    const std::vector<TileCorner *> selectedCorners = brushController.getSelectedTileCorners();
     if (selectedCorners.empty()) return;
     m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
 }
 
 void ElevationTool::applyElevationAlongPath(const sf::Vector2i &currentWorldPosition, WorldModel &model,
-    const WorldView &view, const SelectionController &selectionController, const float heightStep) const
+    const WorldView &view, const BrushController &brushController, const float heightStep) const
 {
-    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
+    const std::vector<TileCorner *> selectedCorners = brushController.getSelectedTileCorners();
     std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
     std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition, model);
 
