@@ -2,8 +2,8 @@
 // Created by fran on 13/03/2026.
 //
 
-#ifndef LANDCRAFT_BRUSHONTROLLER_HPP
-#define LANDCRAFT_BRUSHONTROLLER_HPP
+#ifndef LANDCRAFT_BRUSHCONTROLLER_HPP
+#define LANDCRAFT_BRUSHCONTROLLER_HPP
 
 #include <set>
 #include <SFML/Graphics.hpp>
@@ -36,13 +36,8 @@ public:
                  WorldModel &worldModel, const Camera &camera);
     void draw(sf::RenderWindow &window, const Camera &camera);
 
-    // std::vector<TileCorner *> getSelectedTileCorners() const;
-    // const std::vector<Tile *> &getSelectedTiles() const;
     sf::Vector2i getMouseWorldPosition() const;
     bool isAnyTileCornerSelected() const;
-    // std::vector<Tile *> getNeighborsTilesInBrush(WorldModel &worldModel, int x, int y) const;
-    // std::vector<TileCorner *> getNeighborsTileCornersInBrush(WorldModel &worldModel, int x, int y) const;
-    // std::vector<TileCorner *> getNeighborsTilesInBrushAsTileCorners(WorldModel &worldModel, int x, int y) const;
 
     const std::vector<BrushTileCornerHit>& getBrushTileCornersSelection() const;
     const std::vector<BrushTileHit>& getBrushTilesSelection() const;
@@ -79,11 +74,11 @@ private:
     std::vector<BrushTileCornerHit> m_brushSelectionTileCorners;
     std::vector<BrushTileHit> m_brushSelectionTiles;
 
-    float m_brushSize;
-    float m_brushSizeMin;
-    float m_brushSizeMax;
+    int m_brushSize;
+    int m_brushSizeMin;
+    int m_brushSizeMax;
 
     sf::Image m_currentBrushImage;
 };
 
-#endif //LANDCRAFT_BRUSHONTROLLER_HPP
+#endif //LANDCRAFT_BRUSHCONTROLLER_HPP

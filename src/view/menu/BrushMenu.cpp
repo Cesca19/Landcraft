@@ -34,7 +34,7 @@ void BrushMenu::setBrushSizeValueText(const std::string &value)
 
 void BrushMenu::initBrushSizeWidgets(sf::Vector2f brushSizeUIStartPosition)
 {
-    m_brushSizeBox = UIFactory::createBox(brushSizeUIStartPosition, {280, 85});
+    m_brushSizeBox = UIFactory::createBox(brushSizeUIStartPosition, {280, 80});
     m_brushSizeBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
     m_brushSizeText = UIFactory::createText( brushSizeUIStartPosition + sf::Vector2f(10, 30), "Brush size", 15);
     m_brushSizeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);

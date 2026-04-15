@@ -6,9 +6,9 @@
 
 EditionController::EditionController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIPosition)
     : m_currentEditionTool(-1)
+    , m_editionView(std::make_unique<EditionMenu>(globalUIPosition))
     , m_editionToolsBoxPosition(0, 250)
     , m_toolsMenuStartPosition(m_editionToolsBoxPosition + sf::Vector2f(95, 0))
-    , m_editionView(std::make_unique<EditionMenu>(globalUIPosition))
 {
     m_editionTools.emplace_back(std::make_unique<ElevationTool>(m_toolsMenuStartPosition));
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsMenuStartPosition));

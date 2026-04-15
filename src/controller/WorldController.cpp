@@ -13,7 +13,7 @@ void WorldController::init(const std::string &mapName,
 {
     float globalToolBoxOffset = 450;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
-    Box *globalActions = UIFactory::createBox(globalUIPosition, {225, 85});
+    Box *globalActions = UIFactory::createBox(globalUIPosition, {225, 80});
     globalActions->initColors(sf::Color(sf::Color(205, 185, 220)), sf::Color(255, 255, 255));
 
     m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));

@@ -16,13 +16,13 @@ PaintTilesCommand::PaintTilesCommand(const std::vector<Tile *> &tiles, const int
     }
 }
 
-void PaintTilesCommand::AddTiles(const std::vector<Tile *> tiles, WorldModel &model, WorldView &view)
+void PaintTilesCommand::AddTiles(const std::vector<Tile *> &tiles, WorldModel &model, const WorldView &view)
 {
     for (Tile * tile: tiles)
         AddTile(tile, model, view);
 }
 
-void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, WorldView &view)
+void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, const WorldView &view)
 {
     if (tile->getTextureId() == m_textureId)
         return; // skip if the tile already has the target texture to avoid unnecessary painting
