@@ -60,6 +60,11 @@ sf::Vector2i Tile::getGridPosition() const
     );
 }
 
+sf::Vector2f Tile::getCenterGridPosition() const
+{
+    return getPosition() + sf::Vector2f(0.5f, 0.5f);
+}
+
 int Tile::getTextureId() const
 {
     return m_textureId;

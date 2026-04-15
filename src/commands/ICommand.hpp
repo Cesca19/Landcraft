@@ -7,6 +7,7 @@
 
 #include "../model/WorldModel.hpp"
 #include "../view/world/WorldView.hpp"
+#include "../controller/BrushController.hpp"
 
 class ICommand {
 public:
