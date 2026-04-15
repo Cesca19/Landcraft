@@ -29,6 +29,8 @@ public:
     sf::Vector2i getMouseWorldPosition() const;
     bool isAnyTileCornerSelected() const;
     std::vector<Tile *> getNeighborsTilesInBrush(WorldModel &worldModel, int x, int y) const;
+    std::vector<TileCorner *> getNeighborsTileCornersInBrush(WorldModel &worldModel, int x, int y) const;
+    std::vector<TileCorner *> getNeighborsTilesInBrushAsTileCorners(WorldModel &worldModel, int x, int y) const;
 private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);

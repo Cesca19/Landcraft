@@ -29,7 +29,7 @@ private:
     void applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view, const BrushController &brushController, float heightStep) const;
     void applyElevationAlongPath(const sf::Vector2i& currentWorldPosition, WorldModel &model, const WorldView &view, const BrushController &brushController, float heightStep) const;
     void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
-    std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model) const;
+    std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model, const BrushController &brushController) const;
 
     void setUIVisibility(bool isVisible) const;
     void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);

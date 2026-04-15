@@ -28,7 +28,7 @@ void Tile::setCorners(const std::vector<TileCorner*> &corners)
     updateTriangleCorners();
 }
 
-std::vector<TileCorner*> Tile::getCorners() const
+const std::vector<TileCorner*> &Tile::getCorners() const
 {
     return m_corners;
 }

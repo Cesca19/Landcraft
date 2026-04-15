@@ -62,6 +62,20 @@ std::vector<Tile *> BrushController::getNeighborsTilesInBrush(WorldModel &worldM
     return getClosestTilesInRadius(worldModel, x, y, m_brushSize, true);
 }
 
+std::vector<TileCorner *> BrushController::getNeighborsTileCornersInBrush(WorldModel &worldModel, int x, int y) const
+{
+    return getPointNeighborsInRadius(worldModel, x, y, m_brushSize);
+}
+
+std::vector<TileCorner *> BrushController::getNeighborsTilesInBrushAsTileCorners(WorldModel &worldModel, int x, int y) const
+{
+    std::vector<Tile *> tiles = getClosestTilesInRadius(worldModel, x, y, m_brushSize, true);
+    std::vector<TileCorner *> corners;
+    for (const Tile *tile : tiles)
+        corners.insert(corners.end(), tile->getCorners().begin(), tile->getCorners().end());
+    return corners;
+}
+
 void BrushController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
     m_selectedTileCorners.clear();

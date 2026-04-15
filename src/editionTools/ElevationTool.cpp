@@ -201,7 +201,7 @@ void ElevationTool::applyElevationAlongPath(const sf::Vector2i &currentWorldPosi
 {
     const std::vector<TileCorner *> selectedCorners = brushController.getSelectedTileCorners();
     std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
-    std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition, model);
+    std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition, model, brushController);
 
     cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
     if (!cornersToElevate.empty())
@@ -219,7 +219,7 @@ void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, 
 }
 
 std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf::Vector2i startPosition,
-    const sf::Vector2i endPosition, WorldModel &model) const
+    const sf::Vector2i endPosition, WorldModel &model, const BrushController &brushController) const
 {
     std::set<TileCorner *> cornersToElevate = {};
     if (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) {
@@ -231,7 +231,9 @@ std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf:
         for (const sf::Vector2i& pos : lineTilesPositions)
             if (pos.y >= 0 && pos.y < static_cast<int>(worldTilesCorners.size())
             && pos.x >= 0 && pos.x < static_cast<int>(worldTilesCorners[0].size())) {
-                cornersToElevate.insert(worldTilesCorners[pos.y][pos.x].get());
+                std::vector<TileCorner *> corners = brushController.getNeighborsTileCornersInBrush(model, pos.x, pos.y);
+                cornersToElevate.insert(corners.begin(), corners.end());
+                //cornersToElevate.insert(worldTilesCorners[pos.y][pos.x].get());
             }
     } else {
         const std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
@@ -243,7 +245,8 @@ std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf:
         for (const sf::Vector2i& pos : lineTilesPositions)
             if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
             && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
-                const std::vector<TileCorner *>  corners = worldTiles[pos.y][pos.x].getCorners();
+                
+                const std::vector<TileCorner *>  corners = brushController.getNeighborsTilesInBrushAsTileCorners(model, pos.x, pos.y);
                 cornersToElevate.insert(corners.begin(), corners.end());
             }
     }
