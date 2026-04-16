@@ -21,7 +21,6 @@ public:
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
                  WorldModel &worldModel, const Camera &camera);
     void draw(sf::RenderWindow &window, const Camera &camera);
-
     sf::Vector2i getMouseWorldPosition() const;
     bool isAnyTileCornerSelected() const;
 
@@ -63,9 +62,8 @@ private:
     int m_brushSizeMin;
     int m_brushSizeMax;
 
-    std::vector<sf::Image> m_brushesImages;
-    int m_currentBrushImage;
-    // sf::Image m_currentBrushImage;
+    // std::vector<sf::Image> m_brushesImages;
+    // int m_currentBrushImage;
 };
 
 #endif //LANDCRAFT_BRUSHCONTROLLER_HPP
