@@ -10,11 +10,25 @@ BrushController::BrushController(const sf::Vector2f uiStartPosition)
     , m_brushSize(0)
     , m_brushSizeMin(0)
     , m_brushSizeMax(10)
+    , m_currentBrushImage(0)
 {
     m_brushMenu.setIncrementBrushSizeButtonCallback([this]() { incrementBrushSize(); });
     m_brushMenu.setDecrementBrushSizeButtonCallback([this]() { decrementBrushSize(); });
     m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
-    m_currentBrushImage = ResourceManager::getInstance().getImage("assets/textures/brushes/Brosse_Bruit.png");
+
+    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Hexagone.png"));
+    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/white_square.png"));
+    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Cercle_Dur.png"));
+    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Cercle_Flou_Petit.png"));
+    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Cercle_Flou_Grand.png"));
+    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Etoile.png"));
+}
+
+void BrushController::handleEvents(const sf::RenderWindow &window, const sf::Event &event)
+{
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add) {
+        m_currentBrushImage = (m_currentBrushImage + 1) % m_brushesImages.size();
+    }
 }
 
 void BrushController::update(float deltaTime, const sf::RenderWindow &window, const SelectionMode selectionMode,
@@ -26,12 +40,30 @@ void BrushController::update(float deltaTime, const sf::RenderWindow &window, co
 
 void BrushController::draw(sf::RenderWindow &window, const Camera &camera)
 {
-    if (!m_selectedTileCorners.empty())
+    if (!m_selectedTiles.empty()){
+        // Pass the brush parameters to the view
+        sf::Vector2f brushCenter(static_cast<float>(m_mouseWorldPosition.x), static_cast<float>(m_mouseWorldPosition.y));
+        m_brushView.drawTiles(window, m_selectedTiles, camera, brushCenter, static_cast<float>(m_brushSize), m_brushesImages[m_currentBrushImage]);
+        return;
+    }
+    if (!m_selectedTileCorners.empty()) {
         m_brushView.drawTileCorners(window, m_selectedTileCorners, camera);
-
-    if (!m_selectedTiles.empty())
-        m_brushView.drawTiles(window, m_selectedTiles, camera);
+        return;
+    }
 }
+
+// void BrushController::draw(sf::RenderWindow &window, const Camera &camera)
+// {
+//     if (!m_selectedTiles.empty()){
+//         m_brushView.drawTiles(window, m_selectedTiles, camera);
+//         return;
+//     }
+//     if (!m_selectedTileCorners.empty()) {
+//         m_brushView.drawTileCorners(window, m_selectedTileCorners, camera);
+//         return;
+//     }
+    
+// }
 
 sf::Vector2i BrushController::getMouseWorldPosition() const {
     return m_mouseWorldPosition;
@@ -128,27 +160,31 @@ void BrushController::getSelectedCorners(const sf::RenderWindow &window, const C
 void BrushController::getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
     const int searchRadius = getSearchRadius(camera, worldModel);
-    const TileCorner* closestCorner = getClosestNeighborCornerInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
-    if (closestCorner == nullptr)
-        return;
-    const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(worldModel, closestCorner->getColumn(), closestCorner->getRow(), m_brushSize);
-    for (TileCorner* neighbor : neighbors) {
-        m_brushSelectionTileCorners.push_back(BrushTileCornerHit{neighbor, getPointWeightInBrush(neighbor->getPosition(), sf::Vector2f(mouseWorldPosition))});
-        m_selectedTileCorners.push_back(neighbor);
+    std::vector<std::vector<std::unique_ptr<TileCorner>>>& cornersMap = worldModel.getCorners();
+    if (mouseWorldPosition.x >= 0 && mouseWorldPosition.x < cornersMap[0].size()
+        && mouseWorldPosition.y >= 0 && mouseWorldPosition.y < cornersMap.size()) {
+        const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(worldModel, mouseWorldPosition.x, mouseWorldPosition.y, m_brushSize);
+        for (TileCorner* neighbor : neighbors) {
+            m_selectedTileCorners.push_back(neighbor);
+            m_brushSelectionTileCorners.push_back(BrushTileCornerHit{neighbor, getPointWeightInBrush(neighbor->getPosition(), sf::Vector2f(mouseWorldPosition))});
+        }
     }
 }
 
 void BrushController::getSelectedTiles(const Camera &camera, WorldModel &worldModel, const sf::Vector2i mouseWorldPosition, const sf::Vector2f mouseScreenPosition)
 {
     const int searchRadius = getSearchRadius(camera, worldModel);
-    Tile *hoveredTile = getSelectedTileInRadius(camera, worldModel, mouseWorldPosition, mouseScreenPosition, searchRadius);
-    if (hoveredTile == nullptr)
-        return;
-    const std::vector<Tile *> neighbors = getClosestTilesInRadius(worldModel, hoveredTile->getGridPosition().x, hoveredTile->getGridPosition().y, m_brushSize, true);
-    for (Tile* neighbor : neighbors) {
-        m_selectedTiles.push_back(neighbor);
-        m_brushSelectionTiles.push_back(BrushTileHit{neighbor, getPointWeightInBrush(neighbor->getCenterGridPosition(), sf::Vector2f(mouseWorldPosition))});
+    std::vector<std::vector<Tile>>& tilesMap = worldModel.getTiles();
+
+    if (mouseWorldPosition.x >= 0 && mouseWorldPosition.x < tilesMap[0].size()
+        && mouseWorldPosition.y >= 0 && mouseWorldPosition.y < tilesMap.size()) {
+        const std::vector<Tile *> neighbors = getClosestTilesInRadius(worldModel, mouseWorldPosition.x, mouseWorldPosition.y, m_brushSize, true);
+        for (Tile* neighbor : neighbors) {
+            m_selectedTiles.push_back(neighbor);
+            m_brushSelectionTiles.push_back(BrushTileHit{neighbor, getPointWeightInBrush(neighbor->getCenterGridPosition(), sf::Vector2f(mouseWorldPosition))});
+        }
     }
+    
 }
 
 int BrushController::getSearchRadius(const Camera &camera, const WorldModel &worldModel) const
@@ -283,8 +319,8 @@ float BrushController::getPointWeightInBrush(const sf::Vector2f &pointWorldPosit
     if (brushRadius <= 0.0f)
         return 1.0f;
 
-    const float brushTextureWidth = static_cast<float>(m_currentBrushImage.getSize().x);
-    const float brushTextureHeight = static_cast<float>(m_currentBrushImage.getSize().y);
+    const float brushTextureWidth = static_cast<float>(m_brushesImages[m_currentBrushImage].getSize().x);
+    const float brushTextureHeight = static_cast<float>(m_brushesImages[m_currentBrushImage].getSize().y);
 
     const float minX = brushCenterWorldPosition.x - brushRadius;
     const float minY = brushCenterWorldPosition.y - brushRadius;
@@ -300,7 +336,7 @@ float BrushController::getPointWeightInBrush(const sf::Vector2f &pointWorldPosit
     pixelX = std::clamp(pixelX, 0.0f, brushTextureWidth - 1.0f);
     pixelY = std::clamp(pixelY, 0.0f, brushTextureHeight - 1.0f);
 
-    const float pixelColor = m_currentBrushImage.getPixel(static_cast<unsigned int>(pixelX), static_cast<unsigned int>(pixelY)).r / 255.0f;
+    const float pixelColor = m_brushesImages[m_currentBrushImage].getPixel(static_cast<unsigned int>(pixelX), static_cast<unsigned int>(pixelY)).r / 255.0f;
 
     return pixelColor;
 }

@@ -200,22 +200,18 @@ void ElevationTool::applyElevationOnCurrentSelection(WorldModel &model, const Wo
 void ElevationTool::applyElevationAlongPath(const sf::Vector2i &currentWorldPosition, WorldModel &model,
     const WorldView &view, const BrushController &brushController, const float heightStep) const
 {
-    const std::vector<BrushTileCornerHit> &brushSelection = brushController.getBrushTileCornersSelection();
-    std::unordered_map<TileCorner *, float> bresenhamLineCornersToElevateWithWeight = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition, model, brushController);
-    std::unordered_map<TileCorner *, float> cornersToElevateWithWeight = {};
+    const std::vector<sf::Vector2i> lineTilesPositions = MathUtils::getBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition);
 
-    for (const auto &[corner, weight]: brushSelection)
-        cornersToElevateWithWeight[corner] = weight;
-    for (const auto &[tile_corner, weight] : bresenhamLineCornersToElevateWithWeight) {
-        if (cornersToElevateWithWeight.find(tile_corner) == cornersToElevateWithWeight.end()
-            || cornersToElevateWithWeight[tile_corner] < weight)
-        cornersToElevateWithWeight[tile_corner] = weight;
+    for (size_t i = 1; i < lineTilesPositions.size(); ++i) {
+        const sf::Vector2i& pos = lineTilesPositions[i];
+        std::vector<BrushTileCornerHit> stepSelection;
+        if (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER)
+            stepSelection = brushController.getNeighborsTileCornersInBrush(model, pos.x, pos.y);
+        else
+            stepSelection = brushController.getNeighborsTilesInBrushAsTileCorners(model, pos.x, pos.y);
+        if (!stepSelection.empty())
+            m_ongoingEditCornersHeightCommand->addCorners(stepSelection, heightStep, model, view);
     }
-    std::vector<BrushTileCornerHit> newSelection;
-    for (const auto &[tile_corner, weight] : cornersToElevateWithWeight)
-        newSelection.push_back(BrushTileCornerHit{tile_corner, weight});
-    if (!cornersToElevateWithWeight.empty())
-        m_ongoingEditCornersHeightCommand->addCorners(newSelection, heightStep, model, view);
 }
 
 void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history)

@@ -33,6 +33,7 @@ void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &win
 {
     // navigation events like zoom and rotate will only happen when we're not in edition mode
     m_navigationController->handleEvents(window, event, m_worldModel, m_worldView, m_editionController->isEditing());
+    m_brushController->handleEvents(window, event);
     m_editionController->handleEvents(window, event, m_worldModel, m_worldView, *m_brushController);
 }
 

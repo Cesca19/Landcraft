@@ -11,27 +11,13 @@
 #include "../view/world/BrushView.hpp"
 #include "../view/menu/BrushMenu.hpp"
 #include "../view/world/Camera.hpp"
+#include "../model/BrushInfos.hpp"
 
-enum class SelectionMode {
-    TILE,
-    TILE_CORNER
-};
-
-// here the weight is relative to the corner position
-struct BrushTileCornerHit {
-    TileCorner* corner;
-    float weight;
-};
-
-// here the weight is relative to the tile center's position
-struct BrushTileHit {
-    Tile* tile;
-    float weight;
-};
 
 class BrushController {
 public:
     BrushController(sf::Vector2f uiStartPosition);
+    void handleEvents(const sf::RenderWindow &window, const sf::Event &event);
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
                  WorldModel &worldModel, const Camera &camera);
     void draw(sf::RenderWindow &window, const Camera &camera);
@@ -70,7 +56,6 @@ private:
     std::vector<TileCorner *> m_selectedTileCorners;
     std::vector<Tile *> m_selectedTiles;
     sf::Vector2i m_mouseWorldPosition;
-
     std::vector<BrushTileCornerHit> m_brushSelectionTileCorners;
     std::vector<BrushTileHit> m_brushSelectionTiles;
 
@@ -78,7 +63,9 @@ private:
     int m_brushSizeMin;
     int m_brushSizeMax;
 
-    sf::Image m_currentBrushImage;
+    std::vector<sf::Image> m_brushesImages;
+    int m_currentBrushImage;
+    // sf::Image m_currentBrushImage;
 };
 
 #endif //LANDCRAFT_BRUSHCONTROLLER_HPP

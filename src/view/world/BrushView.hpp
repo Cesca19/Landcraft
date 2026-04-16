@@ -13,8 +13,8 @@ class BrushView {
 public:
     BrushView();
     ~BrushView();
-
-    void drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera);
+    void drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera, sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage);
+    // void drawTiles(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera);
     void drawTileCorners(sf::RenderWindow &window, const std::vector<TileCorner *> &cornersToHighlight, const Camera &camera);
 private:
     float m_tileCornerRadius;
