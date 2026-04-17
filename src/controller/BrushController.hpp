@@ -26,6 +26,7 @@ public:
 
     const std::vector<BrushTileCornerHit>& getBrushTileCornersSelection() const;
     const std::vector<BrushTileHit>& getBrushTilesSelection() const;
+    const std::vector<BrushTileCornerHit>& getBrushTilesSelectionAsTileCorners() const;
     std::vector<BrushTileHit> getNeighborsTilesInBrush(WorldModel &worldModel, int x, int y) const;
     std::vector<BrushTileCornerHit> getNeighborsTileCornersInBrush(WorldModel &worldModel, int x, int y) const;
     std::vector<BrushTileCornerHit> getNeighborsTilesInBrushAsTileCorners(WorldModel &worldModel, int x, int y) const;
@@ -33,6 +34,7 @@ private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void getSelectedTiles(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
+    void fillHoveredSelection(WorldModel &worldModel, SelectionMode selectionMode);
     int getSearchRadius(const Camera &camera, const WorldModel &worldModel) const;
     TileCorner *getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition,
                                                 sf::Vector2f pointScreenPosition, int radius) const;
@@ -52,18 +54,22 @@ private:
     BrushView m_brushView;
     BrushMenu m_brushMenu;
 
-    std::vector<TileCorner *> m_selectedTileCorners;
-    std::vector<Tile *> m_selectedTiles;
+    std::vector<TileCorner*> m_hoveredTileCorners;
+    std::vector<Tile*> m_hoveredTiles;
+    std::vector<Tile*> m_tilesToHilight;
+
     sf::Vector2i m_mouseWorldPosition;
+    sf::Vector2f m_brushCenterWorldPosition;
     std::vector<BrushTileCornerHit> m_brushSelectionTileCorners;
+    std::vector<BrushTileCornerHit> m_brushSelectionTilesAsTileCorners;
     std::vector<BrushTileHit> m_brushSelectionTiles;
 
     int m_brushSize;
     int m_brushSizeMin;
     int m_brushSizeMax;
 
-    // std::vector<sf::Image> m_brushesImages;
-    // int m_currentBrushImage;
+    std::vector<sf::Image> m_brushesImages;
+    int m_currentBrushImage;
 };
 
 #endif //LANDCRAFT_BRUSHCONTROLLER_HPP

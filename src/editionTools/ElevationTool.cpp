@@ -139,8 +139,7 @@ void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, Wo
 void ElevationTool::startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
     const BrushController &brushController, const float heightStep)
 {
-    const std::vector<BrushTileCornerHit> &brushSelection = brushController.getBrushTileCornersSelection();
-    // const std::vector<TileCorner *> selectedCorners = brushController.getSelectedTileCorners();
+    const std::vector<BrushTileCornerHit> &brushSelection = (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) ? brushController.getBrushTileCornersSelection() : brushController.getBrushTilesSelectionAsTileCorners();
     if (brushSelection.empty()) return;
     m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(/*selectedCorners, heightStep*/);
     m_ongoingEditCornersHeightCommand->addCorners(brushSelection, heightStep, model, view);
@@ -192,7 +191,7 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
 void ElevationTool::applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view,
     const BrushController &brushController, const float heightStep) const
 {
-    const std::vector<BrushTileCornerHit> &brushSelection = brushController.getBrushTileCornersSelection();
+    const std::vector<BrushTileCornerHit> &brushSelection =  (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) ? brushController.getBrushTileCornersSelection() : brushController.getBrushTilesSelectionAsTileCorners();
     if (brushSelection.empty()) return;
     m_ongoingEditCornersHeightCommand->addCorners(brushSelection, heightStep, model, view);
 }
