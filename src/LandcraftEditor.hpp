@@ -14,6 +14,7 @@ public:
     LandcraftEditor();
     void run();
 private:
+    void applyWindowIcon();
     void handleEvents();
     void handleContinuousEvents(float deltaTime) const;
 

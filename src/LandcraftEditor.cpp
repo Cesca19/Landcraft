@@ -8,8 +8,8 @@ LandcraftEditor::LandcraftEditor()
     : m_hasFocus(true)
     , m_windowSize(sf::Vector2f(1920, 1080))
     , m_viewSize(m_windowSize)
-    , m_tileSizeX(64)
-    , m_tileSizeY(64)
+    , m_tileSizeX(32)
+    , m_tileSizeY(32)
     , m_heightScale(6) // => 64 / 8
     , m_projectionAngleX(30)
     , m_projectionAngleY(15) // 35.264 realistic isometric angle
@@ -17,7 +17,7 @@ LandcraftEditor::LandcraftEditor()
     , m_worldController(nullptr)
     , m_uiController(nullptr)
 {
-    // m_window.setPosition(sf::Vector2i(00, 600));
+    m_window.setPosition(sf::Vector2i(00, 600));
     m_uiController = std::make_unique<UIController>();
     m_uiController->setOnDestroy([] {
         UIFactory::init(nullptr);
@@ -28,8 +28,7 @@ LandcraftEditor::LandcraftEditor()
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 	m_window.setVerticalSyncEnabled(true);
-    m_window.setIcon(512, 512, ResourceManager::getInstance()
-            .getImage("assets/textures/ui/landcraft_icon_512.png").getPixelsPtr());
+    applyWindowIcon();
 
     m_worldController->init("assets/maps/map.txt",
         {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
@@ -78,9 +77,11 @@ void LandcraftEditor::handleEvents()
             case sf::Event::GainedFocus:
                 m_hasFocus = true;
 				m_clock.restart();
+                applyWindowIcon();
                 break;
             case sf::Event::Resized:
                 m_worldController->onWindowResized(sf::Vector2u(event.size.width, event.size.height));
+                applyWindowIcon();
                 break;
             default:
                 break;
@@ -100,4 +101,13 @@ void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
     m_uiController->handleContinuousEvents(deltaTime, m_window);
     if (!m_uiController->isUserOverUI())
 	    m_worldController->handleContinuousEvents(deltaTime, m_window);
+}
+
+void LandcraftEditor::applyWindowIcon()
+{
+    const sf::Image &icon = ResourceManager::getInstance().getImage("assets/textures/ui/landcraft_icon_512.png");
+    const sf::Vector2u iconSize = icon.getSize();
+    if (iconSize.x == 0 || iconSize.y == 0)
+        return;
+    m_window.setIcon(iconSize.x, iconSize.y, icon.getPixelsPtr());
 }
