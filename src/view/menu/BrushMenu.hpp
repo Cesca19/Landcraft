@@ -15,6 +15,8 @@ public:
     void setDecrementBrushSizeButtonCallback(const std::function<void()> &callback) const;
     void setBrushSizeValueText(const std::string &value) const;
     void setBrushTypeButtonCallback(int index, const std::function<void()> &callback) const;
+    void selectBrush(int index) const;
+    void unselectBrush(int index) const;
 private:
     void initBrushTypeWidgets(const std::vector<std::string> &brushImagePaths);
     void initBrushSizeWidgets(sf::Vector2f brushSizeUIStartPosition);

@@ -9,7 +9,7 @@ BrushController::BrushController(const sf::Vector2f uiStartPosition)
     , m_brushSize(0)
     , m_brushSizeMin(0)
     , m_brushSizeMax(10)
-    , m_currentBrushImage(0)
+    , m_currentBrushImage(-1)
     , m_brushView(std::make_unique<BrushView>())
     , m_brushMenu(nullptr)
 {
@@ -28,17 +28,20 @@ BrushController::BrushController(const sf::Vector2f uiStartPosition)
     m_brushMenu->setDecrementBrushSizeButtonCallback([this]() { decrementBrushSize(); });
     m_brushMenu->setBrushSizeValueText(getBrushSizeValue());
 
-    for (const auto& path : brushImagePaths)
-        m_brushesImages.push_back(ResourceManager::getInstance().getImage(path));
+    for (int i = 0; i < brushImagePaths.size(); i++) {
+        m_brushesImages.push_back(ResourceManager::getInstance().getImage(brushImagePaths[i]));
+        m_brushMenu->setBrushTypeButtonCallback(i, [this, i] () { selectBrush(i); });
+    }
+    selectBrush(0);
 }
 
 void BrushController::handleEvents(const sf::RenderWindow &window, const sf::Event &event)
 {
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add) {
-        m_currentBrushImage = (m_currentBrushImage + 1) % m_brushesImages.size();
+        selectBrush((m_currentBrushImage + 1) % static_cast<int>(m_brushesImages.size()));
     }
     else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract) {
-        m_currentBrushImage = (m_currentBrushImage - 1 + m_brushesImages.size()) % m_brushesImages.size();
+        selectBrush(m_currentBrushImage - 1 + static_cast<int>(m_brushesImages.size()) % static_cast<int>(m_brushesImages.size()));
     }
 }
 
@@ -367,6 +370,16 @@ float BrushController::getPointWeightInBrush(const sf::Vector2f &pointWorldPosit
     float finalWeight = (pixelColor.r / 255.0f) * (pixelColor.a / 255.0f);
     
     return finalWeight;
+}
+
+void BrushController::selectBrush(const int index)
+{
+    if (m_currentBrushImage == index || index >= static_cast<int>(m_brushesImages.size()))
+        return;
+    if (m_currentBrushImage != - 1)
+        m_brushMenu->unselectBrush(m_currentBrushImage);
+    m_currentBrushImage = index;
+    m_brushMenu->selectBrush(m_currentBrushImage);
 }
 
 void BrushController::incrementBrushSize()

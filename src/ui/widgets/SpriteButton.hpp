@@ -43,6 +43,7 @@ public:
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
 
+    void resetIconScale();
 protected:
     void onBase() override;
     void onHover() override;

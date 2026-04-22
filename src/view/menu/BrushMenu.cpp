@@ -40,6 +40,16 @@ void BrushMenu::setBrushTypeButtonCallback(const int index, const std::function<
     }
 }
 
+void BrushMenu::selectBrush(const int index) const
+{
+    m_brushTypesButtons[index]->setSelected(true);
+}
+
+void BrushMenu::unselectBrush(const int index) const
+{
+    m_brushTypesButtons[index]->setSelected(false);
+}
+
 void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImagePaths)
 {
     sf::Vector2f menuPosition = m_brushSizeUIStartPosition + sf::Vector2f(1800, 150);
@@ -58,9 +68,10 @@ void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImageP
             sf::Color(123, 101, 81),sf::Color(123, 101, 81)
         );
     }
+    m_brushTypesButtons[0]->resetIconScale();
 }
 
-void BrushMenu::initBrushSizeWidgets(sf::Vector2f brushSizeUIStartPosition) {
+void BrushMenu::initBrushSizeWidgets(const sf::Vector2f brushSizeUIStartPosition) {
     m_brushSizeBox = UIFactory::createBox(brushSizeUIStartPosition, {280, 80});
     UIFactory::applyDefaultBoxStyle(m_brushSizeBox);
     m_brushSizeText = UIFactory::createText(brushSizeUIStartPosition + sf::Vector2f(10, 30), "Brush size", 15);

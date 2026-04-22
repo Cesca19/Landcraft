@@ -231,6 +231,14 @@ void SpriteButton::setState(const WidgetState state)
     m_currentState = state;
 }
 
+void SpriteButton::resetIconScale()
+{
+    m_baseScale /= 1.25f;
+    m_hoverScale = m_baseScale * 1.3f;
+    m_pressScale = m_baseScale * 1.1f;
+    m_iconSprite.setScale(m_baseScale);
+}
+
 void SpriteButton::onBase()
 {
     m_background.setOutlineColor(m_baseColor);

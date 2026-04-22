@@ -47,6 +47,7 @@ private:
 
     float getPointWeightInBrush(const sf::Vector2f& pointWorldPosition, const sf::Vector2f& brushCenterWorldPosition) const;
 
+    void selectBrush(int index);
     void incrementBrushSize();
     void decrementBrushSize();
     std::string getBrushSizeValue() const;
