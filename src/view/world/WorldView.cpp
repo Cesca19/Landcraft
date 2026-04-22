@@ -87,7 +87,7 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
         }
 
     m_camera->update(deltaTime);
-    if (m_camera->isRotating())
+    if (m_camera->isRotating() || m_camera->isContinuousRotationActive())
         m_tileMap->updatePositions(tiles, *m_camera);
     m_environmentView->update(*m_camera, m_view.getCenter(), m_view.getSize(),
         {window.getSize().x - 50.0f, 100.0f}, 40, isMoving() || isRotating());
@@ -251,10 +251,9 @@ void WorldView::stopContinuousRotation() const
     m_camera->stopContinuousRotation();
 }
 
-void WorldView::updateContinuousRotation(const sf::RenderWindow &window, const std::vector<std::vector<Tile>>& tiles) const
+void WorldView::updateContinuousRotation(const sf::RenderWindow &window) const
 {
     m_camera->updateContinuousRotation(sf::Mouse::getPosition(window));
-    m_tileMap->updatePositions(tiles, *m_camera);
 }
 
 void WorldView::updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const

@@ -18,7 +18,7 @@ public:
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
     void handleContinuousPanEvents(float deltaTime, WorldView& view) const;
-    void handleRotationEvents(const sf::RenderWindow& window, const sf::Event &event,  WorldModel& model, const WorldView& view);
+    void handleRotationEvents(const sf::RenderWindow& window, const sf::Event &event, const WorldView& view);
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view) const;
 
     float m_movementStep;

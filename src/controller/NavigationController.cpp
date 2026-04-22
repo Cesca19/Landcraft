@@ -33,7 +33,7 @@ void NavigationController::handleEvents(const sf::RenderWindow &window, const sf
     handlePanEvents(window, event, view);
     if (!isEditing) {
         handleZoomEvents(window, event, view);
-        handleRotationEvents(window, event, model, view);
+        handleRotationEvents(window, event, view);
     }
 }
 
@@ -76,7 +76,7 @@ void NavigationController::handleContinuousPanEvents(const float deltaTime, Worl
     }
 }
 
-void NavigationController::handleRotationEvents(const sf::RenderWindow &window, const sf::Event &event, WorldModel& model, const WorldView& view)
+void NavigationController::handleRotationEvents(const sf::RenderWindow &window, const sf::Event &event, const WorldView& view)
 {
     // mouse
     // right button + vertical / horizontal scroll
@@ -87,7 +87,7 @@ void NavigationController::handleRotationEvents(const sf::RenderWindow &window, 
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
         view.stopContinuousRotation(); 
     if (event.type == sf::Event::MouseMoved && sf::Mouse::isButtonPressed(mouseButton))
-        view.updateContinuousRotation(window, model.getTiles());
+        view.updateContinuousRotation(window);
 
     // keyboard
     // yaw
