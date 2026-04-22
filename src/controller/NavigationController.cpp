@@ -86,7 +86,7 @@ void NavigationController::handleRotationEvents(const sf::RenderWindow &window, 
         view.startContinuousRotation(window);
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
         view.stopContinuousRotation(); 
-    if (event.type == sf::Event::MouseMoved)
+    if (event.type == sf::Event::MouseMoved && sf::Mouse::isButtonPressed(mouseButton))
         view.updateContinuousRotation(window, model.getTiles());
 
     // keyboard

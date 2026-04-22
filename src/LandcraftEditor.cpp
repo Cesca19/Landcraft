@@ -17,6 +17,7 @@ LandcraftEditor::LandcraftEditor()
     , m_worldController(nullptr)
     , m_uiController(nullptr)
 {
+    // m_window.setPosition(sf::Vector2i(00, 600));
     m_uiController = std::make_unique<UIController>();
     m_uiController->setOnDestroy([] {
         UIFactory::init(nullptr);
@@ -86,7 +87,9 @@ void LandcraftEditor::handleEvents()
         }
         if (m_hasFocus) {
             m_uiController->handleEvents(event, m_window);
-            if (!m_uiController->isUserOverUI())
+            const bool shouldForwardToWorld = !m_uiController->isUserOverUI()
+                || event.type == sf::Event::MouseButtonReleased;
+            if (shouldForwardToWorld)
                 m_worldController->handleEvents(event, m_window);
         }
     }
