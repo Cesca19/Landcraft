@@ -72,3 +72,33 @@ SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Ve
     return buttonPtr;
 
 }
+
+void UIFactory::applyDefaultSpriteButtonStyle(SpriteButton* button, HighlightTextAlign align)
+{
+    if (!button) return;
+    
+    button->initOutlineStatesColors(
+        sf::Color(255, 255, 255, 255),  // base
+        sf::Color(178, 247, 239),        // hover
+        sf::Color(115, 80, 135),         // focus
+        sf::Color(255, 255, 255, 225),   // press
+        sf::Color(123, 101, 81)          // selected
+    );
+    button->initBackgroundStatesColor(
+        sf::Color(253, 247, 216),  // base
+        sf::Color(255, 240, 180),  // hover
+        sf::Color(250, 239, 250),  // focus
+        sf::Color(253, 249, 221)   // press
+    );
+    button->initHighlightTextAlign(align);
+}
+
+void UIFactory::applyDefaultBoxStyle(Box* box)
+{
+    if (!box) return;
+    
+    box->initColors(
+        sf::Color(205, 185, 220),  // background
+        sf::Color(255, 255, 255)   // outline
+    );
+}

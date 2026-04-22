@@ -14,7 +14,7 @@ EditionMenu::EditionMenu(sf::Vector2f globalUIPosition)
     m_redoButton = UIFactory::createSpriteButton("assets/textures/ui/redo_512.png",
         globalUIPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
     m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 210});
-    m_editionToolsBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_editionToolsBox);
     m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 10), "Tools:", 20);
     m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
     const sf::Vector2f toolStartPos = m_editionToolsBoxPosition + sf::Vector2f(15, 60);
@@ -63,13 +63,8 @@ void EditionMenu::applyUIStyle()
     std::vector<SpriteButton*> buttons = { m_undoButton, m_redoButton };
     buttons.insert(buttons.end(), m_editionToolsButtons.begin(), m_editionToolsButtons.end());
     for (SpriteButton* button : buttons) {
-        button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
-            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-        button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
-            sf::Color(250, 239, 250), sf::Color(253, 249, 221));
+        UIFactory::applyDefaultSpriteButtonStyle(button, HighlightTextAlign::Down);
     }
-    m_undoButton->initHighlightTextAlign(HighlightTextAlign::Down);
-    m_redoButton->initHighlightTextAlign(HighlightTextAlign::Down);
     buttons.clear();
 }
 

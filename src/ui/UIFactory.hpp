@@ -18,6 +18,10 @@ class UIFactory {
     static Text *createText(const sf::Vector2f& position, const std::string& content, int characterSize);
     static TextButton* createTextButton(sf::Vector2f position, const std::string& text, sf::Color textColor, unsigned int characterSize);
     static SpriteButton* createSpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size, const std::string &highlightText, int highlightTextSize);
+    
+    // Default style functions
+    static void applyDefaultSpriteButtonStyle(SpriteButton* button, HighlightTextAlign align = HighlightTextAlign::Down);
+    static void applyDefaultBoxStyle(Box* box);
 private:
     static UIController* s_uiController;
 };

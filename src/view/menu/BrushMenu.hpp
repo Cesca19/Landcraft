@@ -11,14 +11,13 @@ class BrushMenu {
 public:
     BrushMenu(sf::Vector2f brushSizeUIStartPosition, const std::vector<std::string> &brushImagePaths);
     ~BrushMenu();
-    void setIncrementBrushSizeButtonCallback(std::function<void()> callback);
-    void setDecrementBrushSizeButtonCallback(std::function<void()> callback);
-    void setBrushSizeValueText(const std::string &value);
-    void setBrushTypeButtonCallback(int index, std::function<void()> callback);
+    void setIncrementBrushSizeButtonCallback(const std::function<void()> &callback) const;
+    void setDecrementBrushSizeButtonCallback(const std::function<void()> &callback) const;
+    void setBrushSizeValueText(const std::string &value) const;
+    void setBrushTypeButtonCallback(int index, const std::function<void()> &callback) const;
 private:
     void initBrushTypeWidgets(const std::vector<std::string> &brushImagePaths);
     void initBrushSizeWidgets(sf::Vector2f brushSizeUIStartPosition);
-    void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
     void initWidgetsList();
 
     sf::Vector2f m_brushSizeUIStartPosition;

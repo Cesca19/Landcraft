@@ -32,7 +32,6 @@ private:
     std::unordered_map<TileCorner *, float> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model, const BrushController &brushController) const;
 
     void setUIVisibility(bool isVisible) const;
-    void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
     void initSelectionModeUI(sf::Vector2f startMenuPosition);
     void initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);
     void initElevationStepUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);

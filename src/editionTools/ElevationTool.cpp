@@ -33,7 +33,7 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     , m_digOrElevateText(nullptr)
 {
     m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 470});
-    m_elevationToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_elevationToolBox);
 
     m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 10),"Elevation", 20);
     m_elevationToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
@@ -270,15 +270,6 @@ void ElevationTool::setUIVisibility(const bool isVisible) const
         widget->setVisibility(isVisible);
 }
 
-void ElevationTool::initButtonStyle(SpriteButton *button, const HighlightTextAlign align)
-{
-    button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
-            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-    button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
-        sf::Color(250, 239, 250), sf::Color(253, 249, 221));
-    button->initHighlightTextAlign(align);
-}
-
 void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
 {
     m_selectionModeText =  UIFactory::createText(startMenuPosition + sf::Vector2f(35, 55),"Selection Mode", 15);
@@ -297,7 +288,7 @@ void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
     m_selectionModesButtons.push_back(tileMode);
 
     for (int i = 0; i < m_selectionModesButtons.size(); i++) {
-        initButtonStyle( m_selectionModesButtons[i]);
+        UIFactory::applyDefaultSpriteButtonStyle(m_selectionModesButtons[i]);
         m_selectionModesButtons[i]->initOnClickCallback([this, i] () {
             this->setSelectionMode(i);
         });
@@ -317,8 +308,8 @@ void ElevationTool::initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vecto
     m_elevateButton = UIFactory::createSpriteButton("assets/textures/ui/elevate_512.png", startButtonPosition + sf::Vector2f(0, 155),
         sf::Vector2f(32, 32), "Elevate", 15);
 
-    initButtonStyle(m_digButton);
-    initButtonStyle(m_elevateButton);
+    UIFactory::applyDefaultSpriteButtonStyle(m_digButton);
+    UIFactory::applyDefaultSpriteButtonStyle(m_elevateButton);
 
     m_digButton->initOnClickCallback([this] () {
         this->dig();
@@ -347,8 +338,8 @@ void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, co
     m_elevationStepDecrement->setContinuousClick(true, 0.5);
     m_elevationStepIncrement->setContinuousClick(true, 0.5);
 
-    initButtonStyle(m_elevationStepDecrement);
-    initButtonStyle(m_elevationStepIncrement);
+    UIFactory::applyDefaultSpriteButtonStyle(m_elevationStepDecrement);
+    UIFactory::applyDefaultSpriteButtonStyle(m_elevationStepIncrement);
 
     m_elevationStepDecrement->initOnClickCallback([this] () {
         this->decrementHeightStepFactor();
