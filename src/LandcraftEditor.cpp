@@ -8,8 +8,8 @@ LandcraftEditor::LandcraftEditor()
     : m_hasFocus(true)
     , m_windowSize(sf::Vector2f(1920, 1080))
     , m_viewSize(m_windowSize)
-    , m_tileSizeX(32)
-    , m_tileSizeY(32)
+    , m_tileSizeX(64)
+    , m_tileSizeY(64)
     , m_heightScale(6) // => 64 / 8
     , m_projectionAngleX(30)
     , m_projectionAngleY(15) // 35.264 realistic isometric angle
@@ -88,9 +88,8 @@ void LandcraftEditor::handleEvents()
         }
         if (m_hasFocus) {
             m_uiController->handleEvents(event, m_window);
-            const bool shouldForwardToWorld = !m_uiController->isUserOverUI()
-                || event.type == sf::Event::MouseButtonReleased;
-            if (shouldForwardToWorld)
+
+            if (m_uiController->shouldForwardEventToWorld(event))
                 m_worldController->handleEvents(event, m_window);
         }
     }
@@ -99,7 +98,7 @@ void LandcraftEditor::handleEvents()
 void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
 {
     m_uiController->handleContinuousEvents(deltaTime, m_window);
-    if (!m_uiController->isUserOverUI())
+    if (!m_uiController->isMouseHoverUI())
 	    m_worldController->handleContinuousEvents(deltaTime, m_window);
 }
 
