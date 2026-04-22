@@ -4,9 +4,10 @@
 
 #include "BrushMenu.hpp"
 
-BrushMenu::BrushMenu(sf::Vector2f brushSizeUIStartPosition)
+BrushMenu::BrushMenu(sf::Vector2f brushSizeUIStartPosition, const std::vector<std::string> &brushImagePaths)
 {
     initBrushSizeWidgets(brushSizeUIStartPosition);
+    initBrushTypeWidgets(brushImagePaths);
     initWidgetsList();
 }
 
@@ -30,6 +31,36 @@ void BrushMenu::setDecrementBrushSizeButtonCallback(std::function<void()> callba
 void BrushMenu::setBrushSizeValueText(const std::string &value)
 {
     m_brushSizeValueText->setContent(value);
+}
+
+void BrushMenu::setBrushTypeButtonCallback(int index, std::function<void()> callback)
+{
+    if (index >= 0 && index < m_brushTypesButtons.size()) {
+        m_brushTypesButtons[index]->initOnClickCallback(callback);
+    }
+}
+
+void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImagePaths)
+{
+    sf::Vector2f menuPosition = m_brushSizeUIStartPosition + sf::Vector2f(1780, 150);
+    m_brushTypeBox = UIFactory::createBox(menuPosition, {110, 50 + static_cast<float>(brushImagePaths.size()) * 75});
+    m_brushTypeBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+    m_brushTypeText = UIFactory::createText(menuPosition + sf::Vector2f(10, 10), "Brushes:", 20);
+    m_brushTypeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+
+    sf::Vector2f buttonPosition = menuPosition + sf::Vector2f(30, 50);
+    for (const auto& path : brushImagePaths) {
+        auto *button = UIFactory::createSpriteButton(path, buttonPosition, sf::Vector2f(32, 32), "", 12);
+        m_brushTypesButtons.push_back(button);
+        buttonPosition.y += 75;
+        // initButtonStyle(button);
+        button->initIconStatesColor(
+            sf::Color(123, 101, 81),
+            sf::Color(255, 245, 196),
+            sf::Color(255, 236, 168),
+            sf::Color(255, 255, 220)
+        );
+    }
 }
 
 void BrushMenu::initBrushSizeWidgets(sf::Vector2f brushSizeUIStartPosition)
@@ -69,4 +100,7 @@ void BrushMenu::initWidgetsList()
     m_widgets.push_back(m_incrementBrushSize);
     m_widgets.push_back(m_decrementBrushSize);
     m_widgets.push_back(m_brushSizeValueText);
+    m_widgets.push_back(m_brushTypeBox);
+    m_widgets.push_back(m_brushTypeText);
+    m_widgets.insert(m_widgets.end(), m_brushTypesButtons.begin(), m_brushTypesButtons.end());
 }

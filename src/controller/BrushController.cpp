@@ -5,25 +5,31 @@
 #include "BrushController.hpp"
 
 BrushController::BrushController(const sf::Vector2f uiStartPosition)
-    : m_brushMenu(uiStartPosition)
-    , m_mouseWorldPosition(-1, -1)
+    : m_mouseWorldPosition(-1, -1)
     , m_brushSize(0)
     , m_brushSizeMin(0)
     , m_brushSizeMax(10)
     , m_currentBrushImage(0)
+    , m_brushView(std::make_unique<BrushView>())
+    , m_brushMenu(nullptr)
 {
-    m_brushMenu.setIncrementBrushSizeButtonCallback([this]() { incrementBrushSize(); });
-    m_brushMenu.setDecrementBrushSizeButtonCallback([this]() { decrementBrushSize(); });
-    m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
+    std::vector<std::string> brushImagePaths = {
+        "assets/textures/brushes/Carre_Plein.png",
+        "assets/textures/brushes/Hexagone.png",
+        "assets/textures/brushes/Brosse_Bruit.png",
+        "assets/textures/brushes/Etoile_Trouee.png",
+        "assets/textures/brushes/Cercle_Dur.png",
+        "assets/textures/brushes/Cercle_Flou_Petit.png",
+        "assets/textures/brushes/Cercle_Flou_Grand.png",
+        "assets/textures/brushes/Etoile.png"
+    };
+    m_brushMenu = std::make_unique<BrushMenu>(uiStartPosition, brushImagePaths);
+    m_brushMenu->setIncrementBrushSizeButtonCallback([this]() { incrementBrushSize(); });
+    m_brushMenu->setDecrementBrushSizeButtonCallback([this]() { decrementBrushSize(); });
+    m_brushMenu->setBrushSizeValueText(getBrushSizeValue());
 
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Carre_Plein.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Hexagone.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Brosse_Bruit.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Etoile_Trouee.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Cercle_Dur.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Cercle_Flou_Petit.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Cercle_Flou_Grand.png"));
-    m_brushesImages.push_back(ResourceManager::getInstance().getImage("assets/textures/brushes/Etoile.png"));
+    for (const auto& path : brushImagePaths)
+        m_brushesImages.push_back(ResourceManager::getInstance().getImage(path));
 }
 
 void BrushController::handleEvents(const sf::RenderWindow &window, const sf::Event &event)
@@ -50,22 +56,22 @@ void BrushController::draw(sf::RenderWindow &window, const Camera &camera)
     
     // MODE CORNER: Draw the full smooth Unity overlay + pins
     if (!m_tilesToHilight.empty() && m_brushSelectionTiles.empty()) {
-        m_brushView.drawBrushOverlay(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage], hilightTransparency);
+        m_brushView->drawBrushOverlay(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage], hilightTransparency);
     }
     
     if (m_brushSelectionTiles.empty() && !m_brushSelectionTileCorners.empty()) {
-        m_brushView.drawTileCorners(window, m_brushSelectionTileCorners, camera);
+        m_brushView->drawTileCorners(window, m_brushSelectionTileCorners, camera);
     }
         
     // MODE TILE: Draw only the border outline of the brush + colored tiles
     if (!m_brushSelectionTiles.empty()) {
         
         // 1. Draw the actual colored tiles with opacity based on their weight
-        m_brushView.drawTiles(window, m_brushSelectionTiles, camera);
+        m_brushView->drawTiles(window, m_brushSelectionTiles, camera);
         
         // 2. Draw the perfect smooth border of the brush image on top
         if (!m_tilesToHilight.empty()) {
-            m_brushView.drawBrushBorder(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage]);
+            m_brushView->drawBrushBorder(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage]);
         }
     }
 }
@@ -195,8 +201,10 @@ void BrushController::fillHoveredSelection(WorldModel &worldModel, SelectionMode
     m_hoveredTiles.clear();
     m_tilesToHilight.clear();
 
-    int viewRadius = static_cast<int>(std::ceil(m_brushSize)) + 1; 
+    if (m_brushSelectionTileCorners.empty() && m_brushSelectionTiles.empty())
+        return;
 
+    int viewRadius = static_cast<int>(std::ceil(m_brushSize)) + 1; 
     int centerCol = static_cast<int>(std::round(m_brushCenterWorldPosition.x));
     int centerRow = static_cast<int>(std::round(m_brushCenterWorldPosition.y));
     m_tilesToHilight = getClosestTilesInRadius(worldModel, centerCol, centerRow, (viewRadius), true);
@@ -366,7 +374,7 @@ void BrushController::incrementBrushSize()
     m_brushSize += 1.0f;
     if (m_brushSize > m_brushSizeMax)
         m_brushSize = m_brushSizeMax;
-    m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
+    m_brushMenu->setBrushSizeValueText(getBrushSizeValue());
 }
 
 void BrushController::decrementBrushSize()
@@ -374,7 +382,7 @@ void BrushController::decrementBrushSize()
     m_brushSize -= 1.0f;
     if (m_brushSize <= m_brushSizeMin)
         m_brushSize = m_brushSizeMin;
-    m_brushMenu.setBrushSizeValueText(getBrushSizeValue());
+    m_brushMenu->setBrushSizeValueText(getBrushSizeValue());
 }
 
 std::string BrushController::getBrushSizeValue() const

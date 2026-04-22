@@ -17,7 +17,7 @@ LandcraftEditor::LandcraftEditor()
     , m_worldController(nullptr)
     , m_uiController(nullptr)
 {
-    m_window.setPosition(sf::Vector2i(00, 600));
+    // m_window.setPosition(sf::Vector2i(00, 600));
     m_uiController = std::make_unique<UIController>();
     m_uiController->setOnDestroy([] {
         UIFactory::init(nullptr);

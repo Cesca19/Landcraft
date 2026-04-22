@@ -12,6 +12,10 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_highlightTextAlign(HighlightTextAlign::Top)
     , m_highlightTextColor(sf::Color::White)
     , m_backgroundBaseColor(sf::Color::Transparent)
+    , m_iconBaseColor(sf::Color::White)
+    , m_iconHoverColor(sf::Color::White)
+    , m_iconFocusColor(sf::Color::White)
+    , m_iconPressColor(sf::Color::White)
     , m_isVisible(true)
     , m_isSelected(false)
     , m_isInteractable(true)
@@ -80,6 +84,17 @@ void SpriteButton::initBackgroundStatesColor(const sf::Color &baseColor, const s
     m_backgroundPressColor = pressColor;
 
     m_background.setFillColor(m_backgroundBaseColor);
+}
+
+void SpriteButton::initIconStatesColor(const sf::Color &baseColor, const sf::Color &hoverColor,
+    const sf::Color &focusColor, const sf::Color &pressColor)
+{
+    m_iconBaseColor = baseColor;
+    m_iconHoverColor = hoverColor;
+    m_iconFocusColor = focusColor;
+    m_iconPressColor = pressColor;
+
+    m_iconSprite.setColor(m_iconBaseColor);
 }
 
 void SpriteButton::initOnClickCallback(std::function<void()> callback)
@@ -221,6 +236,7 @@ void SpriteButton::onBase()
     m_background.setOutlineColor(m_baseColor);
     m_background.setFillColor(m_backgroundBaseColor);
     m_iconSprite.setScale(m_baseScale);
+    m_iconSprite.setColor(m_iconBaseColor);
     // m_highlightText.setFillColor(m_highlightTextColor);
     m_isHighLightTextVisible = false;
 
@@ -236,6 +252,7 @@ void SpriteButton::onHover()
     m_background.setOutlineColor(m_hoverColor);
     m_background.setFillColor(m_backgroundHoverColor);
     m_iconSprite.setScale(m_hoverScale);
+    m_iconSprite.setColor(m_iconHoverColor);
     m_isHighLightTextVisible = true;
 }
 
@@ -244,6 +261,7 @@ void SpriteButton::onFocus()
     m_background.setOutlineColor(m_focusColor);
     m_background.setFillColor(m_backgroundFocusColor);
     m_iconSprite.setScale(m_hoverScale);
+    m_iconSprite.setColor(m_iconFocusColor);
     m_isHighLightTextVisible = true;
 }
 
@@ -252,6 +270,7 @@ void SpriteButton::onPress()
     m_background.setOutlineColor(m_pressColor);
     m_background.setFillColor(m_backgroundPressColor);
     m_iconSprite.setScale(m_pressScale);
+    m_iconSprite.setColor(m_iconPressColor);
     m_highlightText.setFillColor(m_highlightTextColor);
     m_isHighLightTextVisible = true;
 

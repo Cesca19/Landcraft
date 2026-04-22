@@ -51,8 +51,8 @@ private:
     void decrementBrushSize();
     std::string getBrushSizeValue() const;
 
-    BrushView m_brushView;
-    BrushMenu m_brushMenu;
+    std::unique_ptr<BrushView> m_brushView;
+    std::unique_ptr<BrushMenu> m_brushMenu;
 
     std::vector<TileCorner*> m_hoveredTileCorners;
     std::vector<Tile*> m_hoveredTiles;
