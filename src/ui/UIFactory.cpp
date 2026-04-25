@@ -45,6 +45,30 @@ Text * UIFactory::createText(const sf::Vector2f& position, const std::string &co
     return textPtr;
 }
 
+void UIFactory::applyDefaultTextStyle(Text* text, const TextVariant variant)
+{
+    if (!text) return;
+
+    switch (variant) {
+        case TextVariant::Title:
+            text->init(sf::Color(100, 80, 150), sf::Text::Bold | sf::Text::Underlined);
+            break;
+        case TextVariant::Underlined:
+            text->init(sf::Color(100, 80, 150), sf::Text::Underlined);
+            break;
+        case TextVariant::Label:
+            text->init(sf::Color(110, 95, 150), sf::Text::Bold | sf::Text::Italic);
+            break;
+        case TextVariant::Value:
+            text->init(sf::Color(90, 70, 130), sf::Text::Bold);
+            break;
+        case TextVariant::Default:
+        default:
+            text->init(sf::Color(110, 95, 150), sf::Text::Regular);
+            break;
+    }
+}
+
 TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, sf::Color textColor, unsigned int characterSize)
 {
     if (!s_uiController) {
@@ -73,32 +97,39 @@ SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Ve
 
 }
 
-void UIFactory::applyDefaultSpriteButtonStyle(SpriteButton* button, HighlightTextAlign align)
+void UIFactory::applyDefaultSpriteButtonStyle(SpriteButton* button, const HighlightTextAlign align)
 {
     if (!button) return;
-    
     button->initOutlineStatesColors(
-        sf::Color(255, 255, 255, 255),  // base
-        sf::Color(178, 247, 239),        // hover
-        sf::Color(115, 80, 135),         // focus
-        sf::Color(255, 255, 255, 225),   // press
-        sf::Color(123, 101, 81)          // selected
+        sf::Color(220, 210, 240),  // normal
+        sf::Color(180, 150, 230),  // hover (VISIBLE)
+        sf::Color(160, 120, 220),  // focus
+        sf::Color(130, 95, 185),   // pressed
+        sf::Color(160, 120, 220)   // selected
     );
     button->initBackgroundStatesColor(
-        sf::Color(253, 247, 216),  // base
-        sf::Color(255, 240, 180),  // hover
-        sf::Color(250, 239, 250),  // focus
-        sf::Color(253, 249, 221)   // press
+        sf::Color(248, 246, 252),  // normal
+        sf::Color(235, 225, 250),  // hover
+        sf::Color(235, 225, 250),  // focus
+        sf::Color(210, 190, 240),  // pressed
+        sf::Color(235, 225, 250)
     );
+    button->initHighLightTextColor(sf::Color(90, 70, 130));
     button->initHighlightTextAlign(align);
+    button->initIconStatesColor(
+        sf::Color(110, 95, 150),   // normal
+        sf::Color(140, 110, 200),  // hover
+        sf::Color(140, 110, 200),  // focus
+        sf::Color(110, 80, 170),   // pressed
+        sf::Color(110, 95, 150)    // selected
+    );
 }
 
 void UIFactory::applyDefaultBoxStyle(Box* box)
 {
     if (!box) return;
-    
     box->initColors(
-        sf::Color(205, 185, 220),  // background
-        sf::Color(255, 255, 255)   // outline
+        sf::Color(255, 255, 255),
+        sf::Color(220, 210, 240)
     );
 }

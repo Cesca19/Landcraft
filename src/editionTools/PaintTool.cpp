@@ -14,7 +14,7 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     UIFactory::applyDefaultBoxStyle(m_paintToolBox);
 
     m_paintToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(7.5, 10),"Textures", 20);
-    m_paintToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+    UIFactory::applyDefaultTextStyle(m_paintToolText, UIFactory::TextVariant::Title);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(25, 55);
     SpriteButton *clearTextureButton = UIFactory::createSpriteButton("assets/textures/ui/clear_512.png", startBtnPosition + sf::Vector2f(0, 225),

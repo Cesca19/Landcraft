@@ -56,7 +56,7 @@ void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImageP
     m_brushTypeBox = UIFactory::createBox(menuPosition, {110, 50 + static_cast<float>(brushImagePaths.size()) * 75});
     UIFactory::applyDefaultBoxStyle(m_brushTypeBox);
     m_brushTypeText = UIFactory::createText(menuPosition + sf::Vector2f(10, 10), "Brushes:", 20);
-    m_brushTypeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+    UIFactory::applyDefaultTextStyle(m_brushTypeText, UIFactory::TextVariant::Title);
 
     sf::Vector2f buttonPosition = menuPosition + sf::Vector2f(30, 50);
     for (const auto &path: brushImagePaths) {
@@ -64,23 +64,23 @@ void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImageP
         m_brushTypesButtons.push_back(button);
         buttonPosition.y += 75;
         UIFactory::applyDefaultSpriteButtonStyle(button);
-        button->initIconStatesColor(sf::Color(123, 101, 81),sf::Color(123, 101, 81),
-            sf::Color(123, 101, 81),sf::Color(123, 101, 81)
-        );
+        // button->initIconStatesColor(sf::Color(123, 101, 81),sf::Color(123, 101, 81),
+        //     sf::Color(123, 101, 81),sf::Color(123, 101, 81)
+        // );
     }
     m_brushTypesButtons[0]->resetIconScale();
 }
 
 void BrushMenu::initBrushSizeWidgets(const sf::Vector2f brushSizeUIStartPosition) {
-    m_brushSizeBox = UIFactory::createBox(brushSizeUIStartPosition, {280, 80});
+    m_brushSizeBox = UIFactory::createBox(brushSizeUIStartPosition, {280, 90});
     UIFactory::applyDefaultBoxStyle(m_brushSizeBox);
     m_brushSizeText = UIFactory::createText(brushSizeUIStartPosition + sf::Vector2f(10, 30), "Brush size", 15);
-    m_brushSizeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+    UIFactory::applyDefaultTextStyle(m_brushSizeText, UIFactory::TextVariant::Label);
 
-    const sf::Vector2f startButtonPosition = brushSizeUIStartPosition + sf::Vector2f(40, 0);
+    const sf::Vector2f startButtonPosition = brushSizeUIStartPosition + sf::Vector2f(40, 5);
 
     m_brushSizeValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(130, 27), "", 20);
-    m_brushSizeValueText->init(sf::Color::White, sf::Text::Bold);
+    UIFactory::applyDefaultTextStyle(m_brushSizeValueText, UIFactory::TextVariant::Value);
 
     m_decrementBrushSize = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png",
                                                          startButtonPosition + sf::Vector2f(70, 15),

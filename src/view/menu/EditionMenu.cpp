@@ -16,7 +16,7 @@ EditionMenu::EditionMenu(sf::Vector2f globalUIPosition)
     m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 210});
     UIFactory::applyDefaultBoxStyle(m_editionToolsBox);
     m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 10), "Tools:", 20);
-    m_toolsText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+    UIFactory::applyDefaultTextStyle(m_toolsText, UIFactory::TextVariant::Title);
     const sf::Vector2f toolStartPos = m_editionToolsBoxPosition + sf::Vector2f(15, 60);
     SpriteButton *elevationButton = UIFactory::createSpriteButton("assets/textures/ui/elevation_tool_512.png", toolStartPos, {32, 32}, "Elevation", 15);
     SpriteButton *paintButton = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_64.png", toolStartPos + sf::Vector2f(0, 80), {32, 32}, "Paint", 15);

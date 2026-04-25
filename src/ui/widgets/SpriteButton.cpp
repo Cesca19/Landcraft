@@ -76,23 +76,25 @@ void SpriteButton::initOutlineStatesColors(const sf::Color &baseColor, const sf:
 }
 
 void SpriteButton::initBackgroundStatesColor(const sf::Color &baseColor, const sf::Color &hoverColor, 
-    const sf::Color &focusColor, const sf::Color &pressColor)
+    const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color& selectedColor)
 {
     m_backgroundBaseColor = baseColor;
     m_backgroundHoverColor = hoverColor;
     m_backgroundFocusColor = focusColor;
     m_backgroundPressColor = pressColor;
+    m_backgroundSelectedColor = selectedColor;
 
     m_background.setFillColor(m_backgroundBaseColor);
 }
 
 void SpriteButton::initIconStatesColor(const sf::Color &baseColor, const sf::Color &hoverColor,
-    const sf::Color &focusColor, const sf::Color &pressColor)
+    const sf::Color &focusColor, const sf::Color &pressColor, const sf::Color &selectedColor)
 {
     m_iconBaseColor = baseColor;
     m_iconHoverColor = hoverColor;
     m_iconFocusColor = focusColor;
     m_iconPressColor = pressColor;
+    m_iconSelectedColor = selectedColor;
 
     m_iconSprite.setColor(m_iconBaseColor);
 }
@@ -170,13 +172,16 @@ void SpriteButton::setSelected(const bool isSelected)
     m_isHighLightTextVisible = isSelected;
     if (m_isSelected) {
         m_background.setOutlineColor(m_selectedColor);
-        m_background.setOutlineThickness(m_baseThickness * 2);
+        m_background.setFillColor(m_backgroundSelectedColor);
+        m_background.setOutlineThickness(m_baseThickness * 1.5);
+        m_iconSprite.setColor(m_iconSelectedColor);
 
     }
     else {
         m_background.setOutlineColor(m_baseColor);
+        m_background.setFillColor(m_backgroundBaseColor);
         m_background.setOutlineThickness(m_baseThickness);
-
+        m_iconSprite.setColor(m_iconBaseColor);
     }
 }
 

@@ -10,6 +10,8 @@ EnvironmentView::EnvironmentView()
     , m_worldReferenceVertexArray(sf::Lines)
     , m_gizmoVertexArray(sf::Lines)
     , m_wasViewResized(false)
+    , m_skyBoxTopColor(247, 245, 251)
+    , m_skyBoxBottomColor(235, 230, 250)
 {
 }
 
@@ -74,7 +76,7 @@ void EnvironmentView::updateWorldReference(const Camera &camera, const sf::Vecto
     // const float screenViewRadius = (std::round(screenViewDiagonalLength / minTileScale) * 2);
     const float calculatedRadius = std::round(screenViewDiagonalLength / minTileScale) * 2;
     const float screenViewRadius = std::min(calculatedRadius, 200.0f); // crash guard security
-    const sf::Color linesColor(255, 255, 255, 50); // White semi-transparent lines (Wireframe)
+    const sf::Color linesColor(210, 212, 218, 100/*255, 255, 255, 50*/); // White semi-transparent lines (Wireframe)
 
     m_worldReferenceVertexArray.clear();
     // We create a non-rotated wireframe tile-grid
@@ -128,17 +130,17 @@ void EnvironmentView::initSkyBox(const sf::Vector2u windowSize)
     // may be create a shader and add some particles for night or day
     // sf::Color bottomColor(120, 72, 153);   // purple
     // sf::Color topColor(255, 179, 193);  // pink
-    const sf::Color bottomColor(255, 179, 193);  // pink
-    const sf::Color topColor(196, 218, 242);
+  //  const sf::Color bottomColor(230, 232, 236/*255, 179, 193*/);  // pink
+    // const sf::Color topColor(245, 246, 248/*196, 218, 242*/);
 
     m_skyBox[0].position = sf::Vector2f(0, 0);
-    m_skyBox[0].color = topColor;
+    m_skyBox[0].color = m_skyBoxTopColor;
     m_skyBox[1].position = sf::Vector2f(static_cast<float>(windowSize.x), 0);
-    m_skyBox[1].color = topColor;
+    m_skyBox[1].color = m_skyBoxTopColor;
     m_skyBox[2].position = sf::Vector2f(static_cast<float>(windowSize.x), static_cast<float>(windowSize.y));
-    m_skyBox[2].color = bottomColor;
+    m_skyBox[2].color = m_skyBoxBottomColor;
     m_skyBox[3].position = sf::Vector2f(0, static_cast<float>(windowSize.y));
-    m_skyBox[3].color = bottomColor;
+    m_skyBox[3].color = m_skyBoxBottomColor;
 }
 
 void EnvironmentView::initWorldGizmo()

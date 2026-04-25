@@ -13,16 +13,16 @@ void WorldController::init(const std::string &mapName,
 {
     float globalToolBoxOffset = 450;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
-    Box *globalActions = UIFactory::createBox(globalUIPosition, {225, 85});
-    globalActions->initColors(sf::Color(sf::Color(205, 185, 220)), sf::Color(255, 255, 255));
+    Box *globalActions = UIFactory::createBox(globalUIPosition, {225, 90});
+    UIFactory::applyDefaultBoxStyle(globalActions);
 
-    m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));
+    m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
     float selectionMenuOffset = 185;
     m_brushController = std::make_unique<BrushController>(sf::Vector2f{static_cast<float>(viewSettings.windowSize.x) / 2.f - selectionMenuOffset, 10});
-    m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 0));
+    m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
 
     m_worldModel.loadMap(mapName);
-    m_worldView.init(viewSettings.center, viewSettings.size, 10);
+    m_worldView.init(viewSettings.center, viewSettings.size, 15);
     m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles());

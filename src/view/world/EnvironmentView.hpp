@@ -33,6 +33,8 @@ private:
     sf::VertexArray m_gizmoVertexArray;
     sf::View m_view;
     bool m_wasViewResized;
+    sf::Color m_skyBoxTopColor;
+    sf::Color m_skyBoxBottomColor;
 };
 
 

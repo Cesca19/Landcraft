@@ -22,8 +22,8 @@ public:
     SpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size, const std::string &highlightText, int highlightTextSize);
     void initHighLightTextColor(const sf::Color& highlightTextColor);
     void initOutlineStatesColors(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& selectedColor);
-    void initBackgroundStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor,const sf::Color& focusColor, const sf::Color& pressColor);
-    void initIconStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor);
+    void initBackgroundStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor,const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& selectedColor);
+    void initIconStatesColor(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor, const sf::Color& selectedColor);
     void initOnClickCallback(std::function<void()> callback);
     void initHighlightTextAlign(HighlightTextAlign align);
 
@@ -73,10 +73,12 @@ protected:
     sf::Color m_backgroundHoverColor;
     sf::Color m_backgroundFocusColor;
     sf::Color m_backgroundPressColor;
+    sf::Color m_backgroundSelectedColor;
     sf::Color m_iconBaseColor;
     sf::Color m_iconHoverColor;
     sf::Color m_iconFocusColor;
     sf::Color m_iconPressColor;
+    sf::Color m_iconSelectedColor;
 
     bool m_isVisible;
     bool m_isSelected;

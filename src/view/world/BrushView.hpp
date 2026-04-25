@@ -27,11 +27,17 @@ private:
 
     std::map<const sf::Image*, sf::Texture> m_brushTexturesCache;
 
+    sf::Color m_brushOutlineColor;
+    sf::Color m_brushFillLightColor;
+    sf::Color m_brushFillStrongColor;
+
     float m_tileCornerRadius;
     sf::VertexArray m_highlightedTilesVertexArray;
     sf::CircleShape m_highlightedTileCorner;
     sf::Color m_highlightedTileCornerColor;
     sf::Color m_highlightedTileColor;
+
+
 };
 
 

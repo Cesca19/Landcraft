@@ -36,7 +36,7 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     UIFactory::applyDefaultBoxStyle(m_elevationToolBox);
 
     m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 10),"Elevation", 20);
-    m_elevationToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+    UIFactory::applyDefaultTextStyle(m_elevationToolText, UIFactory::TextVariant::Title);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
     initSelectionModeUI(startMenuPosition + sf::Vector2f(0, 10));
@@ -272,11 +272,11 @@ void ElevationTool::setUIVisibility(const bool isVisible) const
 
 void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
 {
-    m_selectionModeText =  UIFactory::createText(startMenuPosition + sf::Vector2f(35, 55),"Selection Mode", 15);
-    m_selectionModeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
-
     m_selectionModeBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 45), {150, 130});
-    m_selectionModeBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_selectionModeBox);
+
+    m_selectionModeText =  UIFactory::createText(startMenuPosition + sf::Vector2f(35, 55),"Selection Mode", 15);
+    UIFactory::applyDefaultTextStyle(m_selectionModeText, UIFactory::TextVariant::Label);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
     SpriteButton *tileCornerMode = UIFactory::createSpriteButton("assets/textures/ui/corner_512.png", startBtnPosition + sf::Vector2f(0, 0),
@@ -298,10 +298,10 @@ void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
 void ElevationTool::initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition)
 {
     m_digOrElevateBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 200), {150, 125});
-    m_digOrElevateBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_digOrElevateBox);
 
     m_digOrElevateText = UIFactory::createText(startMenuPosition + sf::Vector2f(35, 210),"Action", 15);
-    m_digOrElevateText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+    UIFactory::applyDefaultTextStyle(m_digOrElevateText, UIFactory::TextVariant::Label);
 
     m_digButton = UIFactory::createSpriteButton("assets/textures/ui/dig_512.png", startButtonPosition + sf::Vector2f(65, 155),
         sf::Vector2f(32, 32), "Dig", 15);
@@ -322,13 +322,13 @@ void ElevationTool::initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vecto
 void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, const sf::Vector2f startButtonPosition)
 {
     m_elevationStepBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 200), {150, 110});
-    m_elevationStepBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_elevationStepBox);
 
     m_elevationStepText = UIFactory::createText(startMenuPosition + sf::Vector2f(35, 210),"Height Step", 15);
-    m_elevationStepText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+    UIFactory::applyDefaultTextStyle(m_elevationStepText, UIFactory::TextVariant::Label);
 
     m_elevationStepValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(47, 145), getHeightStepValue(), 20);
-    m_elevationStepValueText->init(sf::Color::White, sf::Text::Bold);
+    UIFactory::applyDefaultTextStyle(m_elevationStepValueText, UIFactory::TextVariant::Value);
 
     m_elevationStepDecrement = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", startButtonPosition + sf::Vector2f(0, 140),
         sf::Vector2f(20, 20), "Reduce", 15);

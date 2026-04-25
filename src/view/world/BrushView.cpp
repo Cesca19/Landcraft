@@ -5,11 +5,14 @@
 #include "BrushView.hpp"
 
 BrushView::BrushView()
-    : m_tileCornerRadius(5)
+    : m_brushOutlineColor(160, 120, 220)
+    , m_brushFillLightColor(160, 120, 220, 40)
+    , m_brushFillStrongColor(160, 120, 220, 90)
+    , m_tileCornerRadius(5)
     , m_highlightedTilesVertexArray(sf::Triangles)
     , m_highlightedTileCorner(m_tileCornerRadius)
-    , m_highlightedTileCornerColor(255, 150, 70, 255)
-    , m_highlightedTileColor(255, 150, 70, 150)
+    , m_highlightedTileCornerColor(m_brushOutlineColor)
+    , m_highlightedTileColor(m_brushFillStrongColor)
 {
     m_highlightedTileCorner.setFillColor(m_highlightedTileCornerColor);
     m_highlightedTileCorner.setOrigin(m_tileCornerRadius, m_tileCornerRadius); 
@@ -91,8 +94,8 @@ void BrushView::drawBrushOverlay(sf::RenderWindow &window, const std::vector<Til
     float minX = brushCenter.x - (boundingBoxWidth / 2.0f);
     float minY = brushCenter.y - (boundingBoxWidth / 2.0f);
 
-    sf::Color overlayColor = m_highlightedTileColor;
-    overlayColor.a = overlayAlpha; 
+    // sf::Color overlayColor = m_highlightedTileColor;
+    // overlayColor.a = overlayAlpha;
     
     for (const Tile* tile : tilesToHighlight) {
         auto processCorner = [&](const TileCorner* corner) {
@@ -100,7 +103,7 @@ void BrushView::drawBrushOverlay(sf::RenderWindow &window, const std::vector<Til
             sf::Vector2f screenPos = camera.world_to_screen(worldPos.x, worldPos.y, corner->getHeight());
             
             m_highlightedTilesVertexArray[index].position = screenPos;
-            m_highlightedTilesVertexArray[index].color = overlayColor;
+            m_highlightedTilesVertexArray[index].color = m_brushFillLightColor;
             
             float u = (worldPos.x - minX) / boundingBoxWidth;
             float v = (worldPos.y - minY) / boundingBoxWidth;
