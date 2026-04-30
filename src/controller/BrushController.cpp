@@ -41,7 +41,13 @@ void BrushController::handleEvents(const sf::RenderWindow &window, const sf::Eve
         selectBrush((m_currentBrushImage + 1) % static_cast<int>(m_brushesImages.size()));
     }
     else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract) {
-        selectBrush(m_currentBrushImage - 1 + static_cast<int>(m_brushesImages.size()) % static_cast<int>(m_brushesImages.size()));
+        selectBrush((m_currentBrushImage - 1 + static_cast<int>(m_brushesImages.size())) % static_cast<int>(m_brushesImages.size()));
+    }
+    else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::RBracket) {
+        incrementOutlineThickness();
+    }
+    else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LBracket) {
+        decrementOutlineThickness();
     }
 }
 
@@ -52,30 +58,17 @@ void BrushController::update(float deltaTime, const sf::RenderWindow &window, co
     // should we hide the mouse cursor when something is hovered inside the map
 }
 
-void BrushController::draw(sf::RenderWindow &window, const Camera &camera)
+void BrushController::draw(sf::RenderWindow &window, const Camera &camera) const
 {
-    float radius = static_cast<float>(m_brushSize);
-    float hilightTransparency = (m_brushSelectionTiles.empty()) ? 100 : 75;
-    
-    // MODE CORNER: Draw the full smooth Unity overlay + pins
-    if (!m_tilesToHilight.empty() && m_brushSelectionTiles.empty()) {
-        m_brushView->drawBrushOverlay(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage], hilightTransparency);
-    }
-    
-    if (m_brushSelectionTiles.empty() && !m_brushSelectionTileCorners.empty()) {
+    const float radius = static_cast<float>(m_brushSize);
+
+    if (!m_tilesToHilight.empty())
+        m_brushView->drawBrushOverlay(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage]);
+
+    if (!m_brushSelectionTileCorners.empty())
         m_brushView->drawTileCorners(window, m_brushSelectionTileCorners, camera);
-    }
-        
-    // MODE TILE: Draw only the border outline of the brush + colored tiles
     if (!m_brushSelectionTiles.empty()) {
-        
-        // 1. Draw the actual colored tiles with opacity based on their weight
-        m_brushView->drawTiles(window, m_brushSelectionTiles, camera);
-        
-        // 2. Draw the perfect smooth border of the brush image on top
-        if (!m_tilesToHilight.empty()) {
-            m_brushView->drawBrushBorder(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, radius, m_brushesImages[m_currentBrushImage]);
-        }
+        // m_brushView->drawTiles(window, m_brushSelectionTiles, camera);
     }
 }
 
@@ -396,6 +389,16 @@ void BrushController::decrementBrushSize()
     if (m_brushSize <= m_brushSizeMin)
         m_brushSize = m_brushSizeMin;
     m_brushMenu->setBrushSizeValueText(getBrushSizeValue());
+}
+
+void BrushController::incrementOutlineThickness()
+{
+    m_brushView->setOutlineThickness(m_brushView->getOutlineThickness() + 1.0f);
+}
+
+void BrushController::decrementOutlineThickness()
+{
+    m_brushView->setOutlineThickness(m_brushView->getOutlineThickness() - 1.0f);
 }
 
 std::string BrushController::getBrushSizeValue() const

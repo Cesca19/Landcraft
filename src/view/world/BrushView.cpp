@@ -3,29 +3,57 @@
 //
 
 #include "BrushView.hpp"
+#include <iostream>
+#include <algorithm>
+#include <cmath>
 
 BrushView::BrushView()
-    : m_brushOutlineColor(160, 120, 220)
-    , m_brushFillLightColor(160, 120, 220, 40)
-    , m_brushFillStrongColor(160, 120, 220, 90)
+    : m_brushOutlineColor(120, 70, 200, 220)
+    , m_brushFillLightColor(160, 120, 220, 80)
+    , m_brushFillStrongColor(140, 90, 210, 110)
     , m_tileCornerRadius(5)
     , m_highlightedTilesVertexArray(sf::Triangles)
     , m_highlightedTileCorner(m_tileCornerRadius)
     , m_highlightedTileCornerColor(m_brushOutlineColor)
     , m_highlightedTileColor(m_brushFillStrongColor)
+    , m_hasShader(false)
+    , m_outlineThickness(8.0f)
+    , m_brushTextureUpscale(1.0f)
 {
     m_highlightedTileCorner.setFillColor(m_highlightedTileCornerColor);
-    m_highlightedTileCorner.setOrigin(m_tileCornerRadius, m_tileCornerRadius); 
+    m_highlightedTileCorner.setOrigin(m_tileCornerRadius, m_tileCornerRadius);
+
+    if (sf::Shader::isAvailable()) {
+        if (!m_alphaCutoffShader.loadFromFile("assets/shaders/brush.frag", sf::Shader::Fragment)) {
+            std::cerr << "[Erreur] Echec du chargement du shader BrushView depuis assets/shaders/brush.frag, fallback sans contour shader." << std::endl;
+            m_hasShader = false;
+        } else {
+            m_hasShader = true;
+        }
+    }
 }
 
 BrushView::~BrushView()
 {
 }
 
+void BrushView::setOutlineThickness(const float thickness)
+{
+    const float clamped = std::clamp(thickness, 2.0f, 120.0f);
+    if (m_outlineThickness == clamped) return;
+    m_outlineThickness = clamped;
+    m_brushOutlineTexturesCache.clear();
+}
+
+float BrushView::getOutlineThickness() const
+{
+    return m_outlineThickness;
+}
+
 void BrushView::drawTiles(sf::RenderWindow &window, const std::vector<BrushTileHit> &tilesToHighlight, const Camera &camera)
 {
     m_highlightedTilesVertexArray.clear();
-    m_highlightedTilesVertexArray.resize(tilesToHighlight.size() * 6); 
+    m_highlightedTilesVertexArray.resize(tilesToHighlight.size() * 6);
 
     int index = 0;
 
@@ -36,13 +64,11 @@ void BrushView::drawTiles(sf::RenderWindow &window, const std::vector<BrushTileH
         currentColor.a = static_cast<sf::Uint8>(m_highlightedTileColor.a * hit.weight);
         const Tile* tile = hit.tile;
 
-        // up-right triangle
         for (const TileCorner* corner : tile->getUpRightTriangleCorners()) {
             m_highlightedTilesVertexArray[index].position = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             m_highlightedTilesVertexArray[index++].color = currentColor;
         }
 
-        // down-left triangle
         for (const TileCorner* corner : tile->getDownLeftTriangleCorners()) {
             m_highlightedTilesVertexArray[index].position = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             m_highlightedTilesVertexArray[index++].color = currentColor;
@@ -53,15 +79,13 @@ void BrushView::drawTiles(sf::RenderWindow &window, const std::vector<BrushTileH
 
 void BrushView::drawTileCorners(sf::RenderWindow &window, const std::vector<BrushTileCornerHit> &cornersToHighlight, const Camera &camera)
 {
-    const float pinSize = 2.5f;
-    for (const BrushTileCornerHit& hit : cornersToHighlight)  {
-        
-        if (hit.weight <= 0.01f) continue;
+    for (const auto&[corner, weight] : cornersToHighlight)  {
+        constexpr float pinSize = 3.5f;
+
+        if (weight <= 0.01f) continue;
 
         sf::Color currentColor = m_highlightedTileCornerColor;
-        currentColor.a = static_cast<sf::Uint8>(m_highlightedTileCornerColor.a * hit.weight);
-
-        const TileCorner* corner = hit.corner;
+        currentColor.a = static_cast<sf::Uint8>(m_highlightedTileCornerColor.a * weight);
 
         sf::Vector2f baseScreenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
         sf::Vector2f topScreenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight() + pinSize);
@@ -78,50 +102,72 @@ void BrushView::drawTileCorners(sf::RenderWindow &window, const std::vector<Brus
     }
 }
 
-void BrushView::drawBrushOverlay(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera, 
-    sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage, float overlayAlpha)
+void BrushView::drawBrushOverlay(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera,
+                                const sf::Vector2f brushCenter, const float brushRadius, const sf::Image& brushImage)
 {
     if (tilesToHighlight.empty()) return;
-
     m_highlightedTilesVertexArray.clear();
     m_highlightedTilesVertexArray.resize(tilesToHighlight.size() * 6);
-
     int index = 0;
     const sf::Texture& brushTexture = getBrushTexture(brushImage);
-    sf::Vector2u texSize = brushTexture.getSize();
-    
-    float boundingBoxWidth = (2.0f * brushRadius) + 1.0f; 
-    float minX = brushCenter.x - (boundingBoxWidth / 2.0f);
-    float minY = brushCenter.y - (boundingBoxWidth / 2.0f);
+    const sf::Texture& outlineTexture = getBrushOutlineTexture(brushImage);
+    float boundingBoxWidth = (2.0f * brushRadius) + 1.0f;
+    float minX = brushCenter.x - boundingBoxWidth / 2.0f;
+    float minY = brushCenter.y - boundingBoxWidth / 2.0f;
+    const float padding = 64.0f;
 
-    // sf::Color overlayColor = m_highlightedTileColor;
-    // overlayColor.a = overlayAlpha;
-    
+    sf::Color color = m_brushFillLightColor;
+
     for (const Tile* tile : tilesToHighlight) {
-        auto processCorner = [&](const TileCorner* corner) {
+        auto processCorner = [&](const TileCorner* corner)
+        {
             sf::Vector2f worldPos(corner->getColumn(), corner->getRow());
             sf::Vector2f screenPos = camera.world_to_screen(worldPos.x, worldPos.y, corner->getHeight());
-            
-            m_highlightedTilesVertexArray[index].position = screenPos;
-            m_highlightedTilesVertexArray[index].color = m_brushFillLightColor;
-            
             float u = (worldPos.x - minX) / boundingBoxWidth;
             float v = (worldPos.y - minY) / boundingBoxWidth;
-            
-            float texX = (u * brushImage.getSize().x) + 1.0f;
-            float texY = (v * brushImage.getSize().y) + 1.0f;
-            
-            m_highlightedTilesVertexArray[index].texCoords = sf::Vector2f(texX, texY);
+            float texX = (u * brushImage.getSize().x * m_brushTextureUpscale) + padding;
+            float texY = (v * brushImage.getSize().y * m_brushTextureUpscale) + padding;
+
+            m_highlightedTilesVertexArray[index].position = screenPos;
+            m_highlightedTilesVertexArray[index].color = color;
+            m_highlightedTilesVertexArray[index].texCoords = {texX, texY};
             index++;
         };
-
-        for (const TileCorner* corner : tile->getUpRightTriangleCorners()) processCorner(corner);
-        for (const TileCorner* corner : tile->getDownLeftTriangleCorners()) processCorner(corner);
+        for (auto c : tile->getUpRightTriangleCorners()) processCorner(c);
+        for (auto c : tile->getDownLeftTriangleCorners()) processCorner(c);
     }
 
+    drawBrushFillPass(window, brushTexture, brushImage, padding);
+    drawBrushOutlinePass(window, outlineTexture, brushImage, padding);
+}
+
+void BrushView::drawBrushFillPass(sf::RenderWindow& window, const sf::Texture& brushTexture,
+    const sf::Image& brushImage, const float padding)
+{
     sf::RenderStates states;
-    states.blendMode = sf::BlendAlpha; 
     states.texture = &brushTexture;
+    states.blendMode = sf::BlendAlpha;
+    sf::Color fallbackColor = m_brushFillLightColor;
+    fallbackColor.a = static_cast<sf::Uint8>(m_brushFillLightColor.a);
+    for (std::size_t i = 0; i < m_highlightedTilesVertexArray.getVertexCount(); ++i) {
+        m_highlightedTilesVertexArray[i].color = fallbackColor;
+    }
+
+    window.draw(m_highlightedTilesVertexArray, states);
+}
+
+void BrushView::drawBrushOutlinePass(sf::RenderWindow& window, const sf::Texture& brushTexture,
+    const sf::Image& brushImage, const float padding)
+{
+    sf::RenderStates states;
+    states.texture = &brushTexture;
+    states.blendMode = sf::BlendAlpha;
+
+    // Neutral vertex color for outline pass (alpha is managed by shader).
+    for (std::size_t i = 0; i < m_highlightedTilesVertexArray.getVertexCount(); ++i) {
+        m_highlightedTilesVertexArray[i].color = m_brushOutlineColor;
+    }
+
     window.draw(m_highlightedTilesVertexArray, states);
 }
 
@@ -132,112 +178,170 @@ const sf::Texture& BrushView::getBrushTexture(const sf::Image& brushImage)
         return it->second;
     }
 
-    sf::Image renderImg;
-    renderImg.create(brushImage.getSize().x + 2, brushImage.getSize().y + 2, sf::Color::Transparent);
-    
-    for (unsigned int y = 0; y < brushImage.getSize().y; ++y) {
-        for (unsigned int x = 0; x < brushImage.getSize().x; ++x) {
-            sf::Color p = brushImage.getPixel(x, y);
-            float intensity = (p.r / 255.0f) * (p.a / 255.0f);
-            
-            renderImg.setPixel(x + 1, y + 1, sf::Color(255, 255, 255, static_cast<sf::Uint8>(intensity * 255.0f)));
-        }
-    }
-    
-    sf::Texture& tex = m_brushTexturesCache[&brushImage];
-    tex.loadFromImage(renderImg);
-    // tex.setSmooth(true);
-    // tex.generateMipmap();
-    
-    return tex;
-}
+    const int padding = 64;
+    int w = static_cast<int>(brushImage.getSize().x);
+    int h = static_cast<int>(brushImage.getSize().y);
+    int upW = static_cast<int>(w * m_brushTextureUpscale);
+    int upH = static_cast<int>(h * m_brushTextureUpscale);
+    int fullW = upW + padding * 2;
+    int fullH = upH + padding * 2;
 
-const sf::Texture& BrushView::getBrushBorderTexture(const sf::Image& brushImage)
-{
-    // On retourne le cache s'il existe
-    auto it = m_brushBorderTexturesCache.find(&brushImage);
-    if (it != m_brushBorderTexturesCache.end()) {
-        return it->second;
+    std::vector<sf::Uint8> pixels(fullW * fullH * 4, 0);
+    // Transparent background initialized to white to avoid dark halos in filtered mip levels.
+    for (std::size_t i = 0; i < pixels.size(); i += 4) {
+        pixels[i + 0] = 255;
+        pixels[i + 1] = 255;
+        pixels[i + 2] = 255;
+        pixels[i + 3] = 0;
     }
 
-    sf::Image renderImg;
-    int w = brushImage.getSize().x;
-    int h = brushImage.getSize().y;
-    renderImg.create(w + 2, h + 2, sf::Color(255, 255, 255, 0)); // Transparent
-
-    auto getWeight = [&](int x, int y) -> float {
-        if (x < 0 || x >= w || y < 0 || y >= h) return 0.0f;
-        sf::Color p = brushImage.getPixel(x, y);
-        return (p.r / 255.0f) * (p.a / 255.0f);
-    };
-
-    int borderThickness = 4; 
+    const sf::Uint8* origPixels = brushImage.getPixelsPtr();
 
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
-            float currentWeight = getWeight(x, y);
-            
-            if (currentWeight > 0.05f) {
-                bool isBorder = false;
+            int origIdx = (y * w + x) * 4;
+            int newIdx = ((y + padding) * fullW + (x + padding)) * 4;
 
-                for (int dy = -borderThickness; dy <= borderThickness; ++dy) {
-                    for (int dx = -borderThickness; dx <= borderThickness; ++dx) {
-                        
-                        if (getWeight(x + dx, y + dy) <= 0.05f) {
-                            isBorder = true;
-                            break;
-                        }
-                    }
-                    if (isBorder) break; 
-                }
-                if (isBorder) {
-                    renderImg.setPixel(x + 1, y + 1, sf::Color(255, 255, 255, 255));
-                }
+            const sf::Uint8 a = origPixels[origIdx + 3];
+            pixels[newIdx + 3] = a;
+            if (a == 0) {
+                // Keep transparent texels bright to prevent dark fringes when minified.
+                pixels[newIdx + 0] = 255;
+                pixels[newIdx + 1] = 255;
+                pixels[newIdx + 2] = 255;
+            } else {
+                pixels[newIdx + 0] = origPixels[origIdx + 0];
+                pixels[newIdx + 1] = origPixels[origIdx + 1];
+                pixels[newIdx + 2] = origPixels[origIdx + 2];
             }
         }
     }
 
-    sf::Texture& tex = m_brushBorderTexturesCache[&brushImage];
+    sf::Image renderImg;
+    renderImg.create(fullW, fullH, pixels.data());
+
+    sf::Texture& tex = m_brushTexturesCache[&brushImage];
     tex.loadFromImage(renderImg);
-    // tex.setSmooth(true);
-    // tex.generateMipmap();
+    tex.setSmooth(true);
     
+    tex.generateMipmap(); 
+    tex.setRepeated(false);
+
     return tex;
 }
 
-void BrushView::drawBrushBorder(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera, sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage)
+const sf::Texture& BrushView::getBrushOutlineTexture(const sf::Image& brushImage)
 {
-    if (tilesToHighlight.empty()) return;
+    auto it = m_brushOutlineTexturesCache.find(&brushImage);
+    if (it != m_brushOutlineTexturesCache.end()) {
+        return it->second;
+    }
+
+    const int padding = 64;
+    const int w = static_cast<int>(brushImage.getSize().x);
+    const int h = static_cast<int>(brushImage.getSize().y);
+    const int fullW = w + padding * 2;
+    const int fullH = h + padding * 2;
+    // Keep CPU outline generation bounded to avoid frame stalls/freezes.
+    const int t = std::clamp(static_cast<int>(std::round(m_outlineThickness * 1.5f)), 2, 18);
+
+    std::vector<sf::Uint8> outlinePixels(fullW * fullH * 4, 0);
+    const sf::Uint8* src = brushImage.getPixelsPtr();
+
+    auto alphaAt = [&](int x, int y) -> sf::Uint8 {
+        if (x < 0 || y < 0 || x >= w || y >= h) return 0;
+        return src[(y * w + x) * 4 + 3];
+    };
+
+    constexpr sf::Uint8 alphaThreshold = 16;
+    const float strongOutlineAlpha = static_cast<float>(std::max<sf::Uint8>(m_brushOutlineColor.a, 220));
+
+    static const int dirX[8] = {1, -1, 0, 0, 1, -1, 1, -1};
+    static const int dirY[8] = {0, 0, 1, -1, 1, 1, -1, -1};
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            const bool centerInside = alphaAt(x, y) > alphaThreshold;
+            float minOutsideDist = static_cast<float>(t) + 1.0f;
+
+            if (centerInside) {
+                // Sample along principal directions only for inside pixels.
+                for (int d = 0; d < 8; ++d) {
+                    const int dx = dirX[d];
+                    const int dy = dirY[d];
+                    for (int s = 1; s <= t; ++s) {
+                        if (alphaAt(x + dx * s, y + dy * s) <= alphaThreshold) {
+                            minOutsideDist = std::min(minOutsideDist, static_cast<float>(s));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            const int dst = ((y + padding) * fullW + (x + padding)) * 4;
+            sf::Uint8 outlineA = 0;
+            if (centerInside && minOutsideDist <= static_cast<float>(t)) {
+                // Smooth falloff toward inner side to reduce stair-stepping when zoomed out.
+                const float width = static_cast<float>(std::max(1, t));
+                const float weight = std::clamp(1.0f - (minOutsideDist / (width + 0.5f)), 0.0f, 1.0f);
+                outlineA = static_cast<sf::Uint8>(std::round(strongOutlineAlpha * weight));
+            }
+            outlinePixels[dst + 0] = 255;
+            outlinePixels[dst + 1] = 255;
+            outlinePixels[dst + 2] = 255;
+            outlinePixels[dst + 3] = outlineA;
+        }
+    }
+
+    sf::Image outImg;
+    outImg.create(fullW, fullH, outlinePixels.data());
+
+    sf::Texture& tex = m_brushOutlineTexturesCache[&brushImage];
+    tex.loadFromImage(outImg);
+    tex.setSmooth(true);
+    tex.generateMipmap();
+    tex.setRepeated(false);
+    return tex;
+}
+
+void BrushView::drawMaskedSelectedTiles(sf::RenderWindow &window, const std::vector<BrushTileHit> &selectedTiles, const Camera &camera,
+                                        const sf::Vector2f brushCenter, const float brushRadius, const sf::Image& brushImage)
+{
+    if (selectedTiles.empty()) return;
 
     m_highlightedTilesVertexArray.clear();
-    m_highlightedTilesVertexArray.resize(tilesToHighlight.size() * 6);
+    m_highlightedTilesVertexArray.resize(selectedTiles.size() * 6);
 
     int index = 0;
-    // Use our new edge-detection texture instead of the full shape
-    const sf::Texture& borderTexture = getBrushBorderTexture(brushImage);
-    sf::Vector2u texSize = borderTexture.getSize();
+    const sf::Texture& brushTexture = getBrushTexture(brushImage);
 
-    float boundingBoxWidth = (2.0f * brushRadius) + 1.0f; 
+    float boundingBoxWidth = (2.0f * brushRadius) + 1.0f;
     float minX = brushCenter.x - (boundingBoxWidth / 2.0f);
     float minY = brushCenter.y - (boundingBoxWidth / 2.0f);
 
-    sf::Color overlayColor = sf::Color::Cyan; 
-    overlayColor.a = 255; // Strong opaque border
+    const float padding = 64.0f;
+    const float margin = 16.0f;
 
-    for (const Tile* tile : tilesToHighlight) {
+    for (const BrushTileHit& hit : selectedTiles) {
+        if (hit.weight <= 0.01f) continue;
+
+        const Tile* tile = hit.tile;
+
+        sf::Color tileColor = m_brushFillStrongColor;
+        tileColor.a = static_cast<sf::Uint8>(tileColor.a * hit.weight);
+
         auto processCorner = [&](const TileCorner* corner) {
             sf::Vector2f worldPos(corner->getColumn(), corner->getRow());
             sf::Vector2f screenPos = camera.world_to_screen(worldPos.x, worldPos.y, corner->getHeight());
-            
-            m_highlightedTilesVertexArray[index].position = screenPos;
-            m_highlightedTilesVertexArray[index].color = overlayColor;
-            
+
             float u = (worldPos.x - minX) / boundingBoxWidth;
             float v = (worldPos.y - minY) / boundingBoxWidth;
-            
-            float texX = (u * brushImage.getSize().x) + 1.0f;
-            float texY = (v * brushImage.getSize().y) + 1.0f;
-            
+
+            float texX = (u * brushImage.getSize().x * m_brushTextureUpscale) + padding;
+            float texY = (v * brushImage.getSize().y * m_brushTextureUpscale) + padding;
+
+            m_highlightedTilesVertexArray[index].position = screenPos;
+            m_highlightedTilesVertexArray[index].color = tileColor;
             m_highlightedTilesVertexArray[index].texCoords = sf::Vector2f(texX, texY);
             index++;
         };
@@ -247,7 +351,28 @@ void BrushView::drawBrushBorder(sf::RenderWindow &window, const std::vector<Tile
     }
 
     sf::RenderStates states;
-    states.blendMode = sf::BlendAlpha; 
-    states.texture = &borderTexture;
+    states.blendMode = sf::BlendAlpha;
+    states.texture = &brushTexture;
+
+    if (m_hasShader) {
+        m_alphaCutoffShader.setUniform("currentTexture", sf::Shader::CurrentTexture);
+        float texW = brushTexture.getSize().x;
+        float texH = brushTexture.getSize().y;
+        m_alphaCutoffShader.setUniform("textureSize", sf::Vector2f(texW, texH));
+        m_alphaCutoffShader.setUniform("validBounds", sf::Glsl::Vec4(
+            (padding - margin) / texW,
+            (padding - margin) / texH,
+            (padding + brushImage.getSize().x * m_brushTextureUpscale + margin) / texW,
+            (padding + brushImage.getSize().y * m_brushTextureUpscale + margin) / texH
+        ));
+        m_alphaCutoffShader.setUniform("outlineThickness", m_outlineThickness * m_brushTextureUpscale);
+        m_alphaCutoffShader.setUniform("outlineColor", sf::Glsl::Vec4(
+            m_brushOutlineColor.r / 255.f,
+            m_brushOutlineColor.g / 255.f,
+            m_brushOutlineColor.b / 255.f,
+            m_brushOutlineColor.a / 255.f
+        ));
+        states.shader = &m_alphaCutoffShader;
+    }
     window.draw(m_highlightedTilesVertexArray, states);
 }

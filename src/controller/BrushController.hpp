@@ -20,7 +20,7 @@ public:
     void handleEvents(const sf::RenderWindow &window, const sf::Event &event);
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
                  WorldModel &worldModel, const Camera &camera);
-    void draw(sf::RenderWindow &window, const Camera &camera);
+    void draw(sf::RenderWindow &window, const Camera &camera) const;
     sf::Vector2i getMouseWorldPosition() const;
     bool isAnyTileCornerSelected() const;
 
@@ -50,6 +50,8 @@ private:
     void selectBrush(int index);
     void incrementBrushSize();
     void decrementBrushSize();
+    void incrementOutlineThickness();
+    void decrementOutlineThickness();
     std::string getBrushSizeValue() const;
 
     std::unique_ptr<BrushView> m_brushView;

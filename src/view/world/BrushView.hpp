@@ -15,30 +15,40 @@ class BrushView {
 public:
     BrushView();
     ~BrushView();
+    void setOutlineThickness(float thickness);
+    float getOutlineThickness() const;
     void drawTiles(sf::RenderWindow &window, const std::vector<BrushTileHit> &tilesToHighlight, const Camera &camera);
     void drawTileCorners(sf::RenderWindow &window, const std::vector<BrushTileCornerHit> &cornersToHighlight, const Camera &camera);
     void drawBrushOverlay(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera,
-         sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage, float overlayAlpha = 75.0f);
-    void drawBrushBorder(sf::RenderWindow &window, const std::vector<Tile*> &tilesToHighlight, const Camera &camera, sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage);
+         sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage);
+    void drawMaskedSelectedTiles(sf::RenderWindow &window, const std::vector<BrushTileHit> &selectedTiles, const Camera &camera,
+        sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage);
+    
 private:
     const sf::Texture& getBrushTexture(const sf::Image& brushImage);
-    const sf::Texture& getBrushBorderTexture(const sf::Image& brushImage);
-    std::map<const sf::Image*, sf::Texture> m_brushBorderTexturesCache;
-
+    const sf::Texture& getBrushOutlineTexture(const sf::Image& brushImage);
+    void drawBrushFillPass(sf::RenderWindow& window, const sf::Texture& brushTexture,
+        const sf::Image& brushImage, float padding);
+    void drawBrushOutlinePass(sf::RenderWindow& window, const sf::Texture& brushTexture,
+        const sf::Image& brushImage, float padding);
+    
     std::map<const sf::Image*, sf::Texture> m_brushTexturesCache;
+    std::map<const sf::Image*, sf::Texture> m_brushOutlineTexturesCache;
 
+    sf::Color m_brushBaseColor;
     sf::Color m_brushOutlineColor;
     sf::Color m_brushFillLightColor;
     sf::Color m_brushFillStrongColor;
-
     float m_tileCornerRadius;
     sf::VertexArray m_highlightedTilesVertexArray;
     sf::CircleShape m_highlightedTileCorner;
     sf::Color m_highlightedTileCornerColor;
     sf::Color m_highlightedTileColor;
 
-
+    sf::Shader m_alphaCutoffShader;
+    bool m_hasShader;
+    float m_outlineThickness;
+    float m_brushTextureUpscale;
 };
-
 
 #endif //LANDCRAFT_BRUSHVIEW_HPP

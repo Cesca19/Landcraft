@@ -22,7 +22,7 @@ void WorldController::init(const std::string &mapName,
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
 
     m_worldModel.loadMap(mapName);
-    m_worldView.init(viewSettings.center, viewSettings.size, 15);
+    m_worldView.init(viewSettings.center, viewSettings.size, 10);
     m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles());
