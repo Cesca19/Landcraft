@@ -14,8 +14,8 @@ LandcraftEditor::LandcraftEditor()
     , m_projectionAngleX(30)
     , m_projectionAngleY(15) // 35.264 realistic isometric angle
     , m_window(sf::VideoMode(m_windowSize.x, m_windowSize.y), "Landcraft", sf::Style::Default, sf::ContextSettings(0, 0, 4))
-    , m_worldController(nullptr)
     , m_uiController(nullptr)
+    , m_worldController(nullptr)
 {
     // m_window.setPosition(sf::Vector2i(00, 600));
     m_uiController = std::make_unique<UIController>();
@@ -25,31 +25,38 @@ LandcraftEditor::LandcraftEditor()
     UIFactory::init(m_uiController.get());
     m_worldController = std::make_unique<WorldController>();
 
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
-	m_window.setVerticalSyncEnabled(true);
+    m_window.setVerticalSyncEnabled(true);
     applyWindowIcon();
-
-    m_worldController->init("assets/maps/map.txt",
-        {m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY},
-        {sf::Vector2f{0, 0}, sf::Vector2f{static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y)}, m_windowSize});
 }
 
 void LandcraftEditor::run()
 {
+    const CameraSettings cameraSettings{
+        m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY
+    };
+    const ViewSettings viewSettings{
+        sf::Vector2f{0, 0},
+        sf::Vector2f{static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y)},
+        m_windowSize
+    };
+
+    if (!m_appLoadingController.initializeWorld(m_window, m_windowSize, *m_worldController, cameraSettings, viewSettings)) {
+        return;
+    }
+
     m_clock.restart();
-    float deltaTime = 0;
+    float deltaTime = 0.0f;
     while (m_window.isOpen())
     {
         handleEvents();
         deltaTime = m_clock.restart().asSeconds();
-		if (deltaTime > 0.1f) deltaTime = 0.1f;
+        if (deltaTime > 0.1f) deltaTime = 0.1f;
 
-		if (m_hasFocus) {
-			handleContinuousEvents(deltaTime);
-		    m_uiController->update(deltaTime, m_window);
-        	m_worldController->update(deltaTime, m_window);
-		}
+        if (m_hasFocus) {
+            handleContinuousEvents(deltaTime);
+            m_uiController->update(deltaTime, m_window);
+            m_worldController->update(deltaTime, m_window);
+        }
 
         m_window.clear(sf::Color(196, 218, 242));
         m_worldController->draw(m_window);
@@ -76,7 +83,7 @@ void LandcraftEditor::handleEvents()
                 break;
             case sf::Event::GainedFocus:
                 m_hasFocus = true;
-				m_clock.restart();
+                m_clock.restart();
                 applyWindowIcon();
                 break;
             case sf::Event::Resized:
@@ -99,7 +106,7 @@ void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
 {
     m_uiController->handleContinuousEvents(deltaTime, m_window);
     if (!m_uiController->isMouseHoverUI())
-	    m_worldController->handleContinuousEvents(deltaTime, m_window);
+        m_worldController->handleContinuousEvents(deltaTime, m_window);
 }
 
 void LandcraftEditor::applyWindowIcon()

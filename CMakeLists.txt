@@ -69,6 +69,7 @@ add_executable(${MY_TARGET}
         src/model/TileCorner.cpp
         src/view/world/TileMap.cpp
         src/controller/BrushController.cpp
+        src/controller/EditorLoadingController.cpp
         src/view/world/BrushView.cpp
         src/view/world/EnvironmentView.cpp
         src/commands/EditTilesCornersHeightCommand.cpp
