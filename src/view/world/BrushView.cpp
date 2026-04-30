@@ -17,7 +17,7 @@ BrushView::BrushView()
     , m_highlightedTileCornerColor(m_brushOutlineColor)
     , m_highlightedTileColor(m_brushFillStrongColor)
     , m_hasShader(false)
-    , m_outlineThickness(8.0f)
+    , m_outlineThickness(9.0f)
     , m_brushTextureUpscale(1.0f)
 {
     m_highlightedTileCorner.setFillColor(m_highlightedTileCornerColor);
@@ -62,8 +62,8 @@ void BrushView::drawTiles(sf::RenderWindow &window, const std::vector<BrushTileH
 
         sf::Color currentColor = m_highlightedTileColor;
         currentColor.a = static_cast<sf::Uint8>(m_highlightedTileColor.a * hit.weight);
-        const Tile* tile = hit.tile;
 
+        const Tile* tile = hit.tile;
         for (const TileCorner* corner : tile->getUpRightTriangleCorners()) {
             m_highlightedTilesVertexArray[index].position = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
             m_highlightedTilesVertexArray[index++].color = currentColor;
@@ -137,54 +137,49 @@ void BrushView::drawBrushOverlay(sf::RenderWindow &window, const std::vector<Til
         for (auto c : tile->getDownLeftTriangleCorners()) processCorner(c);
     }
 
-    drawBrushFillPass(window, brushTexture, brushImage, padding);
-    drawBrushOutlinePass(window, outlineTexture, brushImage, padding);
+    drawBrushFillPass(window, brushTexture);
+    drawBrushOutlinePass(window, outlineTexture);
 }
 
-void BrushView::drawBrushFillPass(sf::RenderWindow& window, const sf::Texture& brushTexture,
-    const sf::Image& brushImage, const float padding)
+void BrushView::drawBrushFillPass(sf::RenderWindow &window, const sf::Texture &brushTexture)
 {
     sf::RenderStates states;
     states.texture = &brushTexture;
     states.blendMode = sf::BlendAlpha;
     sf::Color fallbackColor = m_brushFillLightColor;
-    fallbackColor.a = static_cast<sf::Uint8>(m_brushFillLightColor.a);
-    for (std::size_t i = 0; i < m_highlightedTilesVertexArray.getVertexCount(); ++i) {
-        m_highlightedTilesVertexArray[i].color = fallbackColor;
-    }
 
+    fallbackColor.a = 125;
+    for (std::size_t i = 0; i < m_highlightedTilesVertexArray.getVertexCount(); ++i)
+        m_highlightedTilesVertexArray[i].color = fallbackColor;
     window.draw(m_highlightedTilesVertexArray, states);
 }
 
-void BrushView::drawBrushOutlinePass(sf::RenderWindow& window, const sf::Texture& brushTexture,
-    const sf::Image& brushImage, const float padding)
+void BrushView::drawBrushOutlinePass(sf::RenderWindow &window, const sf::Texture &brushTexture)
 {
     sf::RenderStates states;
     states.texture = &brushTexture;
     states.blendMode = sf::BlendAlpha;
 
     // Neutral vertex color for outline pass (alpha is managed by shader).
-    for (std::size_t i = 0; i < m_highlightedTilesVertexArray.getVertexCount(); ++i) {
+    for (std::size_t i = 0; i < m_highlightedTilesVertexArray.getVertexCount(); ++i)
         m_highlightedTilesVertexArray[i].color = m_brushOutlineColor;
-    }
-
     window.draw(m_highlightedTilesVertexArray, states);
 }
 
 const sf::Texture& BrushView::getBrushTexture(const sf::Image& brushImage)
 {
-    auto it = m_brushTexturesCache.find(&brushImage);
+    const auto it = m_brushTexturesCache.find(&brushImage);
     if (it != m_brushTexturesCache.end()) {
         return it->second;
     }
 
-    const int padding = 64;
-    int w = static_cast<int>(brushImage.getSize().x);
-    int h = static_cast<int>(brushImage.getSize().y);
-    int upW = static_cast<int>(w * m_brushTextureUpscale);
-    int upH = static_cast<int>(h * m_brushTextureUpscale);
-    int fullW = upW + padding * 2;
-    int fullH = upH + padding * 2;
+    constexpr int padding = 64;
+    const int w = static_cast<int>(brushImage.getSize().x);
+    const int h = static_cast<int>(brushImage.getSize().y);
+    const int upW = static_cast<int>(m_brushTextureUpscale) * w;
+    const int upH = static_cast<int>(m_brushTextureUpscale) * h;
+    const int fullW = upW + padding * 2;
+    const int fullH = upH + padding * 2;
 
     std::vector<sf::Uint8> pixels(fullW * fullH * 4, 0);
     // Transparent background initialized to white to avoid dark halos in filtered mip levels.
@@ -196,11 +191,10 @@ const sf::Texture& BrushView::getBrushTexture(const sf::Image& brushImage)
     }
 
     const sf::Uint8* origPixels = brushImage.getPixelsPtr();
-
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
             int origIdx = (y * w + x) * 4;
-            int newIdx = ((y + padding) * fullW + (x + padding)) * 4;
+            const int newIdx = ((y + padding) * fullW + (x + padding)) * 4;
 
             const sf::Uint8 a = origPixels[origIdx + 3];
             pixels[newIdx + 3] = a;
@@ -223,8 +217,8 @@ const sf::Texture& BrushView::getBrushTexture(const sf::Image& brushImage)
     sf::Texture& tex = m_brushTexturesCache[&brushImage];
     tex.loadFromImage(renderImg);
     tex.setSmooth(true);
-    
-    tex.generateMipmap(); 
+
+    tex.generateMipmap();
     tex.setRepeated(false);
 
     return tex;
@@ -237,7 +231,7 @@ const sf::Texture& BrushView::getBrushOutlineTexture(const sf::Image& brushImage
         return it->second;
     }
 
-    const int padding = 64;
+    constexpr int padding = 64;
     const int w = static_cast<int>(brushImage.getSize().x);
     const int h = static_cast<int>(brushImage.getSize().y);
     const int fullW = w + padding * 2;
@@ -253,14 +247,14 @@ const sf::Texture& BrushView::getBrushOutlineTexture(const sf::Image& brushImage
         return src[(y * w + x) * 4 + 3];
     };
 
-    constexpr sf::Uint8 alphaThreshold = 16;
     const float strongOutlineAlpha = static_cast<float>(std::max<sf::Uint8>(m_brushOutlineColor.a, 220));
 
-    static const int dirX[8] = {1, -1, 0, 0, 1, -1, 1, -1};
-    static const int dirY[8] = {0, 0, 1, -1, 1, 1, -1, -1};
+    static constexpr int dirX[8] = {1, -1, 0, 0, 1, -1, 1, -1};
+    static constexpr int dirY[8] = {0, 0, 1, -1, 1, 1, -1, -1};
 
     for (int y = 0; y < h; ++y) {
         for (int x = 0; x < w; ++x) {
+            constexpr sf::Uint8 alphaThreshold = 16;
             const bool centerInside = alphaAt(x, y) > alphaThreshold;
             float minOutsideDist = static_cast<float>(t) + 1.0f;
 

@@ -25,12 +25,10 @@ public:
         sf::Vector2f brushCenter, float brushRadius, const sf::Image& brushImage);
     
 private:
+    void drawBrushFillPass(sf::RenderWindow &window, const sf::Texture &brushTexture);
+    void drawBrushOutlinePass(sf::RenderWindow &window, const sf::Texture &brushTexture);
     const sf::Texture& getBrushTexture(const sf::Image& brushImage);
     const sf::Texture& getBrushOutlineTexture(const sf::Image& brushImage);
-    void drawBrushFillPass(sf::RenderWindow& window, const sf::Texture& brushTexture,
-        const sf::Image& brushImage, float padding);
-    void drawBrushOutlinePass(sf::RenderWindow& window, const sf::Texture& brushTexture,
-        const sf::Image& brushImage, float padding);
     
     std::map<const sf::Image*, sf::Texture> m_brushTexturesCache;
     std::map<const sf::Image*, sf::Texture> m_brushOutlineTexturesCache;
