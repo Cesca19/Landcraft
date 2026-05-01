@@ -36,13 +36,6 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
             [this, i] () {
             this->selectPaintTexture(i);
         });
-        m_paintTextureButtons[i]->initBackgroundStatesColor(
-        sf::Color(248, 246, 252),  // normal
-        sf::Color(235, 225, 250),  // hover
-        sf::Color(235, 225, 250),  // focus
-        sf::Color::Transparent,  // pressed
-        sf::Color(235, 225, 250)
-    );
     }
     selectPaintTexture(1);
     initToolWidgetsList();
@@ -86,21 +79,21 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
 {
     // tile painting texture picking
     // Later it will we be ui button that will change the current textureId
-    if (event.type == sf::Event::KeyPressed) {
+    if (event.type == sf::Event::KeyPressed && !m_isEditing) {
         if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) selectPaintTexture(0); // clear
         if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) selectPaintTexture(1); // grass
         if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) selectPaintTexture(2); // water
         if (event.key.code == sf::Keyboard::Num3 || event.key.code == sf::Keyboard::Numpad3) selectPaintTexture(3); // sand
     }
 
-    // // paint starting
-    // if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == m_paintMouseButton
-    //     && m_ongoingPaintCommand == nullptr) {
-    //     m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(brushController.getSelectedTiles(), m_currentTextureId);
-    //     m_ongoingPaintCommand->execute(model, view);
-    //     m_previousMousePosition = brushController.getMouseWorldPosition();
-    //     m_isEditing = true;
-    // }
+    // paint starting
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == m_paintMouseButton
+        && m_ongoingPaintCommand == nullptr) {
+        m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(m_currentTextureId);
+        m_ongoingPaintCommand->AddTiles(brushController.getBrushTilesSelection(), model, view);
+        m_previousMousePosition = brushController.getMouseWorldPosition();
+        m_isEditing = true;
+    }
     // paint ending
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == m_paintMouseButton
         && m_ongoingPaintCommand != nullptr) {
@@ -115,36 +108,36 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
 void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController,
     CommandHistory &history)
 {
-    // // tiles painting
-    // const std::vector<Tile *>& selectedTiles = brushController.getSelectedTiles();
-    // if (!sf::Mouse::isButtonPressed(m_paintMouseButton)
-    //     || m_ongoingPaintCommand == nullptr
-    //     || selectedTiles.empty())
-    //     return;
+    // tiles painting
+    const std::vector<BrushTileHit>& selectedTiles = brushController.getBrushTilesSelection();
+    if (!sf::Mouse::isButtonPressed(m_paintMouseButton)
+        || m_ongoingPaintCommand == nullptr
+        || selectedTiles.empty())
+        return;
 
-    // const sf::Vector2i currentMousePosition = brushController.getMouseWorldPosition();
-    // if (currentMousePosition == m_previousMousePosition)
-    //     return;
+    const sf::Vector2i currentMousePosition = brushController.getMouseWorldPosition();
+    if (currentMousePosition == m_previousMousePosition)
+        return;
 
-    // if (m_previousMousePosition == sf::Vector2i{-1, -1}) {
-    //     m_ongoingPaintCommand->AddTiles(selectedTiles, model, view);
-    //     m_previousMousePosition = currentMousePosition;
-    //     return;
-    // }
+    if (m_previousMousePosition == sf::Vector2i{-1, -1}) {
+        m_ongoingPaintCommand->AddTiles(selectedTiles, model, view);
+        m_previousMousePosition = currentMousePosition;
+        return;
+    }
 
-    // std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
-    // if (worldTiles.empty() || worldTiles[0].empty())
-    //     return;
+    const std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
+    if (worldTiles.empty() || worldTiles[0].empty())
+        return;
 
-    // const std::vector<sf::Vector2i> lineTilesPositions =
-    //         MathUtils::getBresenhamLine(m_previousMousePosition, currentMousePosition);
-    // for (const sf::Vector2i& pos : lineTilesPositions)
-    //     if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
-    //     && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
-    //         std::vector<Tile *> tilesInBrush = brushController.getNeighborsTilesInBrush(model, pos.x, pos.y);
-    //         m_ongoingPaintCommand->AddTiles(tilesInBrush, model, view);
-    //     }
-    // m_previousMousePosition = currentMousePosition;
+    const std::vector<sf::Vector2i> lineTilesPositions =
+            MathUtils::getBresenhamLine(m_previousMousePosition, currentMousePosition);
+    for (const sf::Vector2i& pos : lineTilesPositions)
+        if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
+        && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
+            std::vector<BrushTileHit> tilesInBrush = brushController.getNeighborsTilesInBrush(model, pos.x, pos.y);
+            m_ongoingPaintCommand->AddTiles(tilesInBrush, model, view);
+        }
+    m_previousMousePosition = currentMousePosition;
 }
 
 void PaintTool::selectPaintTexture(const int textureId)

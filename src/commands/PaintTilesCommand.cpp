@@ -4,22 +4,21 @@
 
 #include "PaintTilesCommand.hpp"
 
-PaintTilesCommand::PaintTilesCommand(const std::vector<Tile *> &tiles, const int textureId)
+PaintTilesCommand::PaintTilesCommand(const int textureId)
     : m_textureId(textureId)
+    , m_minWeight(0.3)
 {
-    for (Tile * tile: tiles) {
-        if (tile->getTextureId() == textureId)
-            continue;
-        m_tiles.push_back(tile);
-        m_previousTextureIds.push_back(tile->getTextureId());
-        tile->setTextureId(textureId);
-    }
 }
 
-void PaintTilesCommand::AddTiles(const std::vector<Tile *> &tiles, WorldModel &model, const WorldView &view)
+void PaintTilesCommand::AddTiles(const std::vector<BrushTileHit> &tiles, WorldModel &model, const WorldView &view)
 {
-    for (Tile * tile: tiles)
+    for (const auto& [tile, weight] : tiles) {
+        if (tile->getTextureId() == m_textureId)
+            continue;
+        if (weight < m_minWeight)
+            continue;
         AddTile(tile, model, view);
+    }
 }
 
 void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, const WorldView &view)
