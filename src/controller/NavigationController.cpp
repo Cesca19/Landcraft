@@ -72,7 +72,7 @@ void NavigationController::handleContinuousPanEvents(const float deltaTime, Worl
     }
 }
 
-void NavigationController::handleRotationEvents(const sf::RenderWindow &window, const sf::Event &event, const WorldView& view)
+void NavigationController::handleRotationEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView& view) const
 {
     // mouse
     // right button + vertical / horizontal scroll
@@ -86,17 +86,31 @@ void NavigationController::handleRotationEvents(const sf::RenderWindow &window, 
         view.updateContinuousRotation(window);
 
     // keyboard
-    // yaw
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
-        view.rotateYaw(m_yawRotationStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)
-        view.rotateYaw(-m_yawRotationStep);
-    // pitch
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
-        view.rotatePitch(m_pitchRotationStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F)
-        view.rotatePitch(-m_pitchRotationStep);
-    // add gizmo axes click like blender
+    if (event.type == sf::Event::KeyPressed) {
+        switch (event.key.code) {
+            // yaw
+            case sf::Keyboard::K:
+                view.rotateYaw(m_yawRotationStep);
+                break;
+            case sf::Keyboard::M:
+                view.rotateYaw(-m_yawRotationStep);
+                break;
+            // pitch
+            case sf::Keyboard::Q:
+                view.rotatePitch(m_pitchRotationStep);
+                break;
+            case sf::Keyboard::L:
+                view.rotatePitch(-m_pitchRotationStep);
+                break;
+            // recenter
+            case sf::Keyboard::R:
+                view.recenter();
+                break;
+            default:
+                break;
+        }
+    }
+    // TO DO : add gizmo axes click like blender
 }
 
 void NavigationController::handleZoomEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView &view) const
@@ -112,6 +126,6 @@ void NavigationController::handleZoomEvents(const sf::RenderWindow &window, cons
     // keyboard
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::I)
         view.zoom(-m_zoomStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::O)
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)
         view.zoom(m_zoomStep);
 }

@@ -31,10 +31,18 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     m_paintTextureButtons.push_back(waterTextureButton);
     m_paintTextureButtons.push_back(sandTextureButton);
     for (int i = 0; i < m_paintTextureButtons.size(); i++) {
-        UIFactory::applyDefaultSpriteButtonStyle(m_paintTextureButtons[i]);
-        m_paintTextureButtons[i]->initOnClickCallback([this, i] () {
+        UIFactory::applyDefaultSpriteButtonStyle(m_paintTextureButtons[i], HighlightTextAlign::Top, false);
+        m_paintTextureButtons[i]->initOnClickCallback(
+            [this, i] () {
             this->selectPaintTexture(i);
         });
+        m_paintTextureButtons[i]->initBackgroundStatesColor(
+        sf::Color(248, 246, 252),  // normal
+        sf::Color(235, 225, 250),  // hover
+        sf::Color(235, 225, 250),  // focus
+        sf::Color::Transparent,  // pressed
+        sf::Color(235, 225, 250)
+    );
     }
     selectPaintTexture(1);
     initToolWidgetsList();

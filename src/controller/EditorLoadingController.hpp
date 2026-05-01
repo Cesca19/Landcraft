@@ -2,10 +2,11 @@
 // Created by fran on 30/04/2026.
 //
 
-#ifndef LANDCRAFT_APPLOADINGCONTROLLER_HPP
-#define LANDCRAFT_APPLOADINGCONTROLLER_HPP
+#ifndef LANDCRAFT_EDITORLOADINGCONTROLLER_HPP
+#define LANDCRAFT_EDITORLOADINGCONTROLLER_HPP
 
 #include "WorldController.hpp"
+#include "../utils/ResourceManager.hpp"
 
 class EditorLoadingController {
 public:
@@ -19,4 +20,4 @@ private:
     bool drawLoadingScreen(sf::RenderWindow& window, const sf::Vector2u& windowSize, const std::string& message) const;
 };
 
-#endif //LANDCRAFT_APPLOADINGCONTROLLER_HPP
+#endif //LANDCRAFT_EDITORLOADINGCONTROLLER_HPP

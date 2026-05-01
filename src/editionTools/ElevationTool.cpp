@@ -109,12 +109,13 @@ void ElevationTool::handleSelectionModeEditingEvents(const sf::Event &event)
 
 void ElevationTool::handleHeightStepEditingEvents(const sf::Event &event)
 {
-    if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::P)
-           incrementHeightStepFactor();
-        if (event.key.code == sf::Keyboard::M)
-            decrementHeightStepFactor();
-    }
+    // to remove
+    // if (event.type == sf::Event::KeyPressed) {
+    //     if (event.key.code == sf::Keyboard::P)
+    //        incrementHeightStepFactor();
+    //     if (event.key.code == sf::Keyboard::M)
+    //         decrementHeightStepFactor();
+    // }
 }
 
 void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view,

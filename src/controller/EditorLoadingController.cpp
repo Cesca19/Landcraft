@@ -3,7 +3,6 @@
 //
 
 #include "EditorLoadingController.hpp"
-#include "../utils/ResourceManager.hpp"
 
 bool EditorLoadingController::initializeWorld(sf::RenderWindow& window,
     const sf::Vector2u& windowSize,

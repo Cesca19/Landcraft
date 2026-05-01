@@ -6,6 +6,8 @@
 #define LANDCRAFT_BRUSHCONTROLLER_HPP
 
 #include <set>
+#include <algorithm>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 #include "../model/WorldModel.hpp"
 #include "../view/world/BrushView.hpp"
@@ -35,25 +37,21 @@ private:
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void getSelectedTiles(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void fillHoveredSelection(WorldModel &worldModel, SelectionMode selectionMode);
-    int getSearchRadius(const Camera &camera, const WorldModel &worldModel) const;
-    TileCorner *getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition,
-                                                sf::Vector2f pointScreenPosition, int radius) const;
-    std::vector<TileCorner *> getPointNeighborsInRadius(WorldModel &worldModel, int x, int y, int radius) const;
 
+    static int getSearchRadius(const Camera &camera, const WorldModel &worldModel);
+    static TileCorner *getClosestNeighborCornerInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition,
+                                                        sf::Vector2f pointScreenPosition, int radius);
+    static std::vector<TileCorner *> getPointNeighborsInRadius(WorldModel &worldModel, int x, int y, int radius);
     Tile *getSelectedTileInRadius(const Camera &camera, WorldModel &worldModel, sf::Vector2i pointWorldPosition, sf::Vector2f pointScreenPosition, int radius) const;
-    std::vector<Tile *> getClosestTilesInRadius(WorldModel &worldModel, int x, int y, int radius, bool includeInside = false) const;
-    bool isPointInsideTile(const Camera &camera, Tile *tile, sf::Vector2f pointScreenPosition) const;
-    sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner) const;
+    static std::vector<Tile *> getClosestTilesInRadius(WorldModel &worldModel, int x, int y, int radius, bool includeInside = false);
+    static bool isPointInsideTile(const Camera &camera, const Tile *tile, sf::Vector2f pointScreenPosition);
+    static sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner);
 
     float getPointWeightInBrush(const sf::Vector2f& pointWorldPosition, const sf::Vector2f& brushCenterWorldPosition) const;
-
     static void sanitizeBrushImage(sf::Image& img);
-
     void selectBrush(int index);
     void incrementBrushSize();
     void decrementBrushSize();
-    void incrementOutlineThickness();
-    void decrementOutlineThickness();
     std::string getBrushSizeValue() const;
 
     std::unique_ptr<BrushView> m_brushView;

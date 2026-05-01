@@ -29,7 +29,7 @@ class UIFactory {
     
     // Default style functions
     static void applyDefaultTextStyle(Text* text, TextVariant variant = TextVariant::Default);
-    static void applyDefaultSpriteButtonStyle(SpriteButton* button, HighlightTextAlign align = HighlightTextAlign::Top);
+    static void applyDefaultSpriteButtonStyle(SpriteButton* button, HighlightTextAlign align = HighlightTextAlign::Top, bool shouldInitIcon = true);
     static void applyDefaultBoxStyle(Box* box);
 private:
     static UIController* s_uiController;

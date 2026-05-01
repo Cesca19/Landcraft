@@ -16,6 +16,7 @@ SpriteButton::SpriteButton(const std::string &iconPath, const sf::Vector2f posit
     , m_iconHoverColor(sf::Color::White)
     , m_iconFocusColor(sf::Color::White)
     , m_iconPressColor(sf::Color::White)
+    , m_iconSelectedColor(sf::Color::White)
     , m_isVisible(true)
     , m_isSelected(false)
     , m_isInteractable(true)
