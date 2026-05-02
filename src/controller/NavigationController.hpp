@@ -5,7 +5,7 @@
 #ifndef LANDCRAFT_NAVIGATIONCONTROLLER_HPP
 #define LANDCRAFT_NAVIGATIONCONTROLLER_HPP
 
-#include "../view/WorldView.hpp"
+#include "../view/world/WorldView.hpp"
 #include "../model/WorldModel.hpp"
 #include "../ui/UIFactory.hpp"
 
@@ -18,7 +18,7 @@ public:
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
     void handleContinuousPanEvents(float deltaTime, WorldView& view) const;
-    void handleRotationEvents(const sf::RenderWindow& window, const sf::Event &event,  WorldModel& model, const WorldView& view);
+    void handleRotationEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view) const;
     void handleZoomEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view) const;
 
     float m_movementStep;

@@ -8,12 +8,12 @@ Box::Box(const sf::Vector2f &position, const sf::Vector2f &size)
     : m_isVisible(true)
     , m_backgroundColor(sf::Color::Transparent)
     , m_outlineColor(sf::Color::Transparent)
+    , m_rectangle(size, 10, 10)
 {
     m_rectangle.setPosition(position);
-    m_rectangle.setSize(size);
     m_rectangle.setFillColor(m_backgroundColor);
     m_rectangle.setOutlineColor(m_outlineColor);
-    m_rectangle.setOutlineThickness(-2.f);
+    m_rectangle.setOutlineThickness(-2.0f);
 }
 
 void Box::initColors(const sf::Color &backgroundColor, const sf::Color &outlineColor)

@@ -48,7 +48,7 @@ public:
 
     void startContinuousRotation(const sf::RenderWindow &window) const;
     void stopContinuousRotation() const;
-    void updateContinuousRotation(const sf::RenderWindow &window, const std::vector<std::vector<Tile>>& tiles) const;
+    void updateContinuousRotation(const sf::RenderWindow &window) const;
 
     void updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const;
     void paintTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<Tile *> & tilesToPaint, int textureId) const;

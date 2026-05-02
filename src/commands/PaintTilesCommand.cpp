@@ -4,25 +4,24 @@
 
 #include "PaintTilesCommand.hpp"
 
-PaintTilesCommand::PaintTilesCommand(const std::vector<Tile *> &tiles, const int textureId)
+PaintTilesCommand::PaintTilesCommand(const int textureId)
     : m_textureId(textureId)
+    , m_minWeight(0.3)
 {
-    for (Tile * tile: tiles) {
-        if (tile->getTextureId() == textureId)
+}
+
+void PaintTilesCommand::AddTiles(const std::vector<BrushTileHit> &tiles, WorldModel &model, const WorldView &view)
+{
+    for (const auto& [tile, weight] : tiles) {
+        if (tile->getTextureId() == m_textureId)
             continue;
-        m_tiles.push_back(tile);
-        m_previousTextureIds.push_back(tile->getTextureId());
-        tile->setTextureId(textureId);
+        if (weight < m_minWeight)
+            continue;
+        AddTile(tile, model, view);
     }
 }
 
-void PaintTilesCommand::AddTiles(const std::vector<Tile *> tiles, WorldModel &model, WorldView &view)
-{
-    for (Tile * tile: tiles)
-        AddTile(tile, model, view);
-}
-
-void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, WorldView &view)
+void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, const WorldView &view)
 {
     if (tile->getTextureId() == m_textureId)
         return; // skip if the tile already has the target texture to avoid unnecessary painting

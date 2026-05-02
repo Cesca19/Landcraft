@@ -28,7 +28,7 @@ void Tile::setCorners(const std::vector<TileCorner*> &corners)
     updateTriangleCorners();
 }
 
-std::vector<TileCorner*> Tile::getCorners() const
+const std::vector<TileCorner*> &Tile::getCorners() const
 {
     return m_corners;
 }
@@ -58,6 +58,11 @@ sf::Vector2i Tile::getGridPosition() const
         static_cast<int>(m_corners[0]->getColumn()),
         static_cast<int>(m_corners[0]->getRow())
     );
+}
+
+sf::Vector2f Tile::getCenterGridPosition() const
+{
+    return getPosition() + sf::Vector2f(0.5f, 0.5f);
 }
 
 int Tile::getTextureId() const

@@ -8,16 +8,16 @@ EditTilesCornersHeightCommand::EditTilesCornersHeightCommand()
 {
 }
 
-void EditTilesCornersHeightCommand::addCorners(const std::vector<TileCorner *> &corners, float heightStep, WorldModel &model, const WorldView &view)
+void EditTilesCornersHeightCommand::addCorners(const std::vector<BrushTileCornerHit> &brushSelection, const float heightStep, WorldModel &model, const WorldView &view)
 {
     std::vector<TileCorner *> cornersToUpdate;
-    for (TileCorner * corner: corners) {
-        corner->addHeight(heightStep);
+    for (const auto &[corner, weight]: brushSelection) {
+        corner->addHeight(heightStep * weight);
         model.onTileCornerHeightChanged(corner->getHeight());
         if (m_cornersHeightStep.find(corner) != m_cornersHeightStep.end())
-            m_cornersHeightStep[corner] += heightStep;
+            m_cornersHeightStep[corner] += heightStep * weight;
         else
-            m_cornersHeightStep.insert({corner, heightStep});
+            m_cornersHeightStep.insert({corner, heightStep * weight});
         cornersToUpdate.push_back(corner);
     }
     view.updateTileCorners(model.getTiles(), cornersToUpdate);

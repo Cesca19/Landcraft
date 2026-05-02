@@ -19,8 +19,8 @@ public:
     void onToolSelected() const override;
     void onToolUnSelected() const override;
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
-                              SelectionController& selectionController, CommandHistory& history) override;
-    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
+                              BrushController& brushController, CommandHistory& history) override;
+    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
 private:
     void selectPaintTexture(int textureId);
     void setUIVisibility(bool isVisible) const;

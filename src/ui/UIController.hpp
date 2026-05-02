@@ -29,6 +29,7 @@ public:
     bool isUserOverUI() const;
     bool isMouseHoverUI() const;
     bool isKeyBoardNavigatingHoverUI() const;
+    bool shouldForwardEventToWorld(const sf::Event &event) const;
 private:
     void handleMouseEvents(const sf::Event &event, const sf::RenderWindow& window);
     void handleKeyBoardEvents(const sf::Event &event);

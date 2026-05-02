@@ -12,11 +12,7 @@ NavigationController::NavigationController(WorldModel &model, WorldView &view, c
 {
     m_recenterViewButton = UIFactory::createSpriteButton("assets/textures/ui/recenter_view_512.png",
        globalUIPosition  + sf::Vector2f(155, 16), {28, 28}, "Recenter", 12);
-    m_recenterViewButton->initHighlightTextAlign(HighlightTextAlign::Down);
-    m_recenterViewButton->initOutlineStatesColors(sf::Color(255, 255, 255, 175),sf::Color(178, 247, 239),
-            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-    m_recenterViewButton->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
-        sf::Color(250, 239, 250), sf::Color(253, 249, 221));
+    UIFactory::applyDefaultSpriteButtonStyle(m_recenterViewButton, HighlightTextAlign::Down);
     m_recenterViewButton->initOnClickCallback([&view] {
        view.recenter();
     });
@@ -33,7 +29,7 @@ void NavigationController::handleEvents(const sf::RenderWindow &window, const sf
     handlePanEvents(window, event, view);
     if (!isEditing) {
         handleZoomEvents(window, event, view);
-        handleRotationEvents(window, event, model, view);
+        handleRotationEvents(window, event, view);
     }
 }
 
@@ -76,7 +72,7 @@ void NavigationController::handleContinuousPanEvents(const float deltaTime, Worl
     }
 }
 
-void NavigationController::handleRotationEvents(const sf::RenderWindow &window, const sf::Event &event, WorldModel& model, const WorldView& view)
+void NavigationController::handleRotationEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView& view) const
 {
     // mouse
     // right button + vertical / horizontal scroll
@@ -86,21 +82,35 @@ void NavigationController::handleRotationEvents(const sf::RenderWindow &window, 
         view.startContinuousRotation(window);
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == mouseButton)
         view.stopContinuousRotation(); 
-    if (event.type == sf::Event::MouseMoved)
-        view.updateContinuousRotation(window, model.getTiles());
+    if (event.type == sf::Event::MouseMoved && sf::Mouse::isButtonPressed(mouseButton))
+        view.updateContinuousRotation(window);
 
     // keyboard
-    // yaw
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A)
-        view.rotateYaw(m_yawRotationStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::E)
-        view.rotateYaw(-m_yawRotationStep);
-    // pitch
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
-        view.rotatePitch(m_pitchRotationStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F)
-        view.rotatePitch(-m_pitchRotationStep);
-    // add gizmo axes click like blender
+    if (event.type == sf::Event::KeyPressed) {
+        switch (event.key.code) {
+            // yaw
+            case sf::Keyboard::K:
+                view.rotateYaw(m_yawRotationStep);
+                break;
+            case sf::Keyboard::M:
+                view.rotateYaw(-m_yawRotationStep);
+                break;
+            // pitch
+            case sf::Keyboard::Q:
+                view.rotatePitch(m_pitchRotationStep);
+                break;
+            case sf::Keyboard::L:
+                view.rotatePitch(-m_pitchRotationStep);
+                break;
+            // recenter
+            case sf::Keyboard::R:
+                view.recenter();
+                break;
+            default:
+                break;
+        }
+    }
+    // TO DO : add gizmo axes click like blender
 }
 
 void NavigationController::handleZoomEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView &view) const
@@ -116,6 +126,6 @@ void NavigationController::handleZoomEvents(const sf::RenderWindow &window, cons
     // keyboard
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::I)
         view.zoom(-m_zoomStep);
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::O)
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)
         view.zoom(m_zoomStep);
 }

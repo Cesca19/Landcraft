@@ -11,10 +11,10 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     , m_ongoingPaintCommand(nullptr)
 {
     m_paintToolBox = UIFactory::createBox(startMenuPosition, {110, 350});
-    m_paintToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_paintToolBox);
 
-    m_paintToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(7.5, 5),"Textures", 20);
-    m_paintToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+    m_paintToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(7.5, 10),"Textures", 20);
+    UIFactory::applyDefaultTextStyle(m_paintToolText, UIFactory::TextVariant::Title);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(25, 55);
     SpriteButton *clearTextureButton = UIFactory::createSpriteButton("assets/textures/ui/clear_512.png", startBtnPosition + sf::Vector2f(0, 225),
@@ -31,11 +31,9 @@ PaintTool::PaintTool(const sf::Vector2f startMenuPosition)
     m_paintTextureButtons.push_back(waterTextureButton);
     m_paintTextureButtons.push_back(sandTextureButton);
     for (int i = 0; i < m_paintTextureButtons.size(); i++) {
-        m_paintTextureButtons[i]->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
-            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-        m_paintTextureButtons[i]->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
-            sf::Color(250, 239, 250), sf::Color(253, 249, 221));
-        m_paintTextureButtons[i]->initOnClickCallback([this, i] () {
+        UIFactory::applyDefaultSpriteButtonStyle(m_paintTextureButtons[i], HighlightTextAlign::Top, false);
+        m_paintTextureButtons[i]->initOnClickCallback(
+            [this, i] () {
             this->selectPaintTexture(i);
         });
     }
@@ -76,12 +74,12 @@ void PaintTool::onToolUnSelected() const
     setUIVisibility(false);
 }
 
-void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController,
                              CommandHistory &history)
 {
     // tile painting texture picking
     // Later it will we be ui button that will change the current textureId
-    if (event.type == sf::Event::KeyPressed) {
+    if (event.type == sf::Event::KeyPressed && !m_isEditing) {
         if (event.key.code == sf::Keyboard::Num0 || event.key.code == sf::Keyboard::Numpad0) selectPaintTexture(0); // clear
         if (event.key.code == sf::Keyboard::Num1 || event.key.code == sf::Keyboard::Numpad1) selectPaintTexture(1); // grass
         if (event.key.code == sf::Keyboard::Num2 || event.key.code == sf::Keyboard::Numpad2) selectPaintTexture(2); // water
@@ -91,9 +89,9 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
     // paint starting
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == m_paintMouseButton
         && m_ongoingPaintCommand == nullptr) {
-        m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(selectionController.getSelectedTiles(), m_currentTextureId);
-        m_ongoingPaintCommand->execute(model, view);
-        m_previousMousePosition = selectionController.getMouseWorldPosition();
+        m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(m_currentTextureId);
+        m_ongoingPaintCommand->AddTiles(brushController.getBrushTilesSelection(), model, view);
+        m_previousMousePosition = brushController.getMouseWorldPosition();
         m_isEditing = true;
     }
     // paint ending
@@ -107,17 +105,17 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
     }
 }
 
-void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController,
     CommandHistory &history)
 {
     // tiles painting
-    const std::vector<Tile *>& selectedTiles = selectionController.getSelectedTiles();
+    const std::vector<BrushTileHit>& selectedTiles = brushController.getBrushTilesSelection();
     if (!sf::Mouse::isButtonPressed(m_paintMouseButton)
         || m_ongoingPaintCommand == nullptr
         || selectedTiles.empty())
         return;
 
-    const sf::Vector2i currentMousePosition = selectionController.getMouseWorldPosition();
+    const sf::Vector2i currentMousePosition = brushController.getMouseWorldPosition();
     if (currentMousePosition == m_previousMousePosition)
         return;
 
@@ -127,7 +125,7 @@ void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldMode
         return;
     }
 
-    std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
+    const std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
     if (worldTiles.empty() || worldTiles[0].empty())
         return;
 
@@ -136,7 +134,8 @@ void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldMode
     for (const sf::Vector2i& pos : lineTilesPositions)
         if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
         && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
-            m_ongoingPaintCommand->AddTile(&worldTiles[pos.y][pos.x], model, view);
+            std::vector<BrushTileHit> tilesInBrush = brushController.getNeighborsTilesInBrush(model, pos.x, pos.y);
+            m_ongoingPaintCommand->AddTiles(tilesInBrush, model, view);
         }
     m_previousMousePosition = currentMousePosition;
 }

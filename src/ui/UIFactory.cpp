@@ -72,3 +72,65 @@ SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Ve
     return buttonPtr;
 
 }
+
+void UIFactory::applyDefaultTextStyle(Text* text, const TextVariant variant)
+{
+    if (!text) return;
+
+    switch (variant) {
+        case TextVariant::Title:
+            text->init(sf::Color(100, 80, 150), sf::Text::Bold | sf::Text::Underlined);
+            break;
+        case TextVariant::Underlined:
+            text->init(sf::Color(100, 80, 150), sf::Text::Underlined);
+            break;
+        case TextVariant::Label:
+            text->init(sf::Color(110, 95, 150), sf::Text::Bold | sf::Text::Italic);
+            break;
+        case TextVariant::Value:
+            text->init(sf::Color(90, 70, 130), sf::Text::Bold);
+            break;
+        case TextVariant::Default:
+        default:
+            text->init(sf::Color(110, 95, 150), sf::Text::Regular);
+            break;
+    }
+}
+
+void UIFactory::applyDefaultSpriteButtonStyle(SpriteButton* button, const HighlightTextAlign align, const bool shouldInitIcon)
+{
+    if (!button) return;
+    button->initOutlineStatesColors(
+        sf::Color(220, 210, 240),  // normal
+        sf::Color(180, 150, 230),  // hover (VISIBLE)
+        sf::Color(160, 120, 220),  // focus
+        sf::Color(130, 95, 185),   // pressed
+        sf::Color(160, 120, 220)   // selected
+    );
+    button->initBackgroundStatesColor(
+        sf::Color(248, 246, 252),  // normal
+        sf::Color(235, 225, 250),  // hover
+        sf::Color(235, 225, 250),  // focus
+        sf::Color(210, 190, 240),  // pressed
+        sf::Color(235, 225, 250)
+    );
+    button->initHighLightTextColor(sf::Color(90, 70, 130));
+    button->initHighlightTextAlign(align);
+    if (shouldInitIcon)
+        button->initIconStatesColor(
+            sf::Color(110, 95, 150),   // normal
+            sf::Color(140, 110, 200),  // hover
+            sf::Color(140, 110, 200),  // focus
+            sf::Color(110, 80, 170),   // pressed
+            sf::Color(110, 95, 150)    // selected
+        );
+}
+
+void UIFactory::applyDefaultBoxStyle(Box* box)
+{
+    if (!box) return;
+    box->initColors(
+        sf::Color(255, 255, 255),
+        sf::Color(220, 210, 240)
+    );
+}

@@ -5,7 +5,9 @@
 #include "ElevationTool.hpp"
 
 ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
-    : m_heightStep(1)
+    : m_shouldDig(false)
+    , m_shouldElevate(false)
+    , m_heightStep(1)
     , m_heightStepFactor(1)
     , m_maxHeightStepFactor(10)
     , m_isEditing(false)
@@ -18,29 +20,27 @@ ElevationTool::ElevationTool(const sf::Vector2f startMenuPosition)
     , m_ongoingEditCornersHeightCommand(nullptr)
     , m_elevationStepIncrement(nullptr)
     , m_elevationStepDecrement(nullptr)
+    , m_digButton(nullptr)
+    , m_elevateButton(nullptr)
     , m_elevationToolBox(nullptr)
     , m_selectionModeBox(nullptr)
     , m_elevationStepBox(nullptr)
+    , m_digOrElevateBox(nullptr)
     , m_elevationToolText(nullptr)
     , m_selectionModeText(nullptr)
     , m_elevationStepText(nullptr)
     , m_elevationStepValueText(nullptr)
-    , m_digOrElevateBox(nullptr)
     , m_digOrElevateText(nullptr)
-    , m_digButton(nullptr)
-    , m_elevateButton(nullptr)
-    , m_shouldDig(false)
-    , m_shouldElevate(false)
 {
-    m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 475});
-    m_elevationToolBox->initColors(sf::Color(205, 185, 220), sf::Color(255, 255, 255));
+    m_elevationToolBox = UIFactory::createBox(startMenuPosition, {190, 470});
+    UIFactory::applyDefaultBoxStyle(m_elevationToolBox);
 
-    m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 5),"Elevation", 20);
-    m_elevationToolText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Underlined);
+    m_elevationToolText = UIFactory::createText(startMenuPosition + sf::Vector2f(50, 10),"Elevation", 20);
+    UIFactory::applyDefaultTextStyle(m_elevationToolText, UIFactory::TextVariant::Title);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
-    initSelectionModeUI(startMenuPosition);
-    initDigOrElevateUI(startMenuPosition + sf::Vector2f(0, -5), startBtnPosition + sf::Vector2f(0, -5));
+    initSelectionModeUI(startMenuPosition + sf::Vector2f(0, 10));
+    initDigOrElevateUI(startMenuPosition + sf::Vector2f(0, 0), startBtnPosition + sf::Vector2f(0, -5));
     initElevationStepUI(startMenuPosition + sf::Vector2f(0, 140), startBtnPosition + sf::Vector2f(0, 150));
     initToolWidgetsList();
     setUIVisibility(false);
@@ -83,16 +83,16 @@ void ElevationTool::onToolUnSelected() const
 }
 
 void ElevationTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view,
-                                 SelectionController &selectionController, CommandHistory &history)
+                                 BrushController &brushController, CommandHistory &history)
 {
     handleSelectionModeEditingEvents(event);
     handleHeightStepEditingEvents(event);
 }
 
-void ElevationTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController,
+void ElevationTool::handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController,
                                            CommandHistory &history)
 {
-    handleHeightEditingEvents(window, model, view, selectionController, history);
+    handleHeightEditingEvents(window, model, view, brushController, history);
 }
 
 void ElevationTool::handleSelectionModeEditingEvents(const sf::Event &event)
@@ -109,25 +109,26 @@ void ElevationTool::handleSelectionModeEditingEvents(const sf::Event &event)
 
 void ElevationTool::handleHeightStepEditingEvents(const sf::Event &event)
 {
-    if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::P)
-           incrementHeightStepFactor();
-        if (event.key.code == sf::Keyboard::M)
-            decrementHeightStepFactor();
-    }
+    // to remove
+    // if (event.type == sf::Event::KeyPressed) {
+    //     if (event.key.code == sf::Keyboard::P)
+    //        incrementHeightStepFactor();
+    //     if (event.key.code == sf::Keyboard::M)
+    //         decrementHeightStepFactor();
+    // }
 }
 
 void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view,
-                                              const SelectionController &selectionController, CommandHistory &history)
+                                              const BrushController &brushController, CommandHistory &history)
 {
     bool isMouseButtonPressed = sf::Mouse::isButtonPressed(m_editingMouseButton);
 
     if ((m_shouldElevate || m_shouldDig) && isMouseButtonPressed) {
         const float heightFactor = (m_shouldElevate ? 1.0f : -1.0f ) * m_heightStep * static_cast<float>(m_heightStepFactor);
         if (m_ongoingEditCornersHeightCommand == nullptr)
-            startContinuousElevation(window, model, view, selectionController, heightFactor);
+            startContinuousElevation(window, model, view, brushController, heightFactor);
         else
-            updateContinuousElevation(window, model, view, selectionController, heightFactor);
+            updateContinuousElevation(window, model, view, brushController, heightFactor);
         m_isEditing = true;
     } else {
         if (m_ongoingEditCornersHeightCommand != nullptr)
@@ -137,33 +138,33 @@ void ElevationTool::handleHeightEditingEvents(const sf::RenderWindow& window, Wo
 }
 
 void ElevationTool::startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
-    const SelectionController &selectionController, const float heightStep)
+    const BrushController &brushController, const float heightStep)
 {
-    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-    if (selectedCorners.empty()) return;
+    const std::vector<BrushTileCornerHit> &brushSelection = (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) ? brushController.getBrushTileCornersSelection() : brushController.getBrushTilesSelectionAsTileCorners();
+    if (brushSelection.empty()) return;
     m_ongoingEditCornersHeightCommand = std::make_unique<EditTilesCornersHeightCommand>(/*selectedCorners, heightStep*/);
-    m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+    m_ongoingEditCornersHeightCommand->addCorners(brushSelection, heightStep, model, view);
     m_isSelectionLocked = true;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Mouse::getPosition(window);
-    m_lastMouseWorldPosition = selectionController.getMouseWorldPosition();
+    m_lastMouseWorldPosition = brushController.getMouseWorldPosition();
 }
 
 void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
-    const SelectionController &selectionController, const float heightStep)
+    const BrushController &brushController, const float heightStep)
 {
     if (m_ongoingEditCornersHeightCommand == nullptr)
         return;
     const sf::Vector2i currentMouseScreenPosition = sf::Mouse::getPosition(window);
     const bool hasScreenMouseMoved = MathUtils::distanceBetweenPoints(static_cast<sf::Vector2f>(m_lastMouseScreenPosition),
                                 static_cast<sf::Vector2f>(currentMouseScreenPosition)) > m_mouseMovementThreshold;
-    const sf::Vector2i currentMouseWorldPosition = selectionController.getMouseWorldPosition();
+    const sf::Vector2i currentMouseWorldPosition = brushController.getMouseWorldPosition();
     const bool hasAnyMouseMoved = hasScreenMouseMoved || view.isMoving();
 
     if (!hasAnyMouseMoved) {
         m_isSelectionLocked = true;
         if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-            applyElevationOnCurrentSelection(model, view, selectionController, heightStep);
+            applyElevationOnCurrentSelection(model, view, brushController, heightStep);
             m_continuousElevationClock.restart();
         }
         return;
@@ -174,13 +175,13 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
         return;
     }
     if (m_lastMouseWorldPosition != currentMouseWorldPosition) {
-        applyElevationAlongPath(currentMouseWorldPosition, model, view, selectionController, heightStep);
+        applyElevationAlongPath(currentMouseWorldPosition, model, view, brushController, heightStep);
         m_lastMouseWorldPosition = currentMouseWorldPosition;
         m_lastMouseScreenPosition = currentMouseScreenPosition;
         m_continuousElevationClock.restart();
         m_isSelectionLocked = true;
     } else if (m_continuousElevationClock.getElapsedTime().asSeconds() >= m_continuousElevationInterval) {
-        applyElevationOnCurrentSelection(model, view, selectionController, heightStep);
+        applyElevationOnCurrentSelection(model, view, brushController, heightStep);
         m_continuousElevationClock.restart();
         m_lastMouseScreenPosition = currentMouseScreenPosition;
         m_isSelectionLocked = true;
@@ -189,23 +190,28 @@ void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, Wo
 }
 
 void ElevationTool::applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view,
-    const SelectionController &selectionController, const float heightStep) const
+    const BrushController &brushController, const float heightStep) const
 {
-    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-    if (selectedCorners.empty()) return;
-    m_ongoingEditCornersHeightCommand->addCorners(selectedCorners, heightStep, model, view);
+    const std::vector<BrushTileCornerHit> &brushSelection =  (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) ? brushController.getBrushTileCornersSelection() : brushController.getBrushTilesSelectionAsTileCorners();
+    if (brushSelection.empty()) return;
+    m_ongoingEditCornersHeightCommand->addCorners(brushSelection, heightStep, model, view);
 }
 
 void ElevationTool::applyElevationAlongPath(const sf::Vector2i &currentWorldPosition, WorldModel &model,
-    const WorldView &view, const SelectionController &selectionController, const float heightStep) const
+    const WorldView &view, const BrushController &brushController, const float heightStep) const
 {
-    const std::vector<TileCorner *> selectedCorners = selectionController.getSelectedTileCorners();
-    std::set<TileCorner *> cornersToElevate(selectedCorners.begin(), selectedCorners.end());
-    std::set<TileCorner *> bresenhamLineCorners = getTilesCornersFromBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition, model);
+    const std::vector<sf::Vector2i> lineTilesPositions = MathUtils::getBresenhamLine(m_lastMouseWorldPosition, currentWorldPosition);
 
-    cornersToElevate.insert(bresenhamLineCorners.begin(), bresenhamLineCorners.end());
-    if (!cornersToElevate.empty())
-        m_ongoingEditCornersHeightCommand->addCorners({cornersToElevate.begin(), cornersToElevate.end()}, heightStep, model, view);
+    for (size_t i = 1; i < lineTilesPositions.size(); ++i) {
+        const sf::Vector2i& pos = lineTilesPositions[i];
+        std::vector<BrushTileCornerHit> stepSelection;
+        if (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER)
+            stepSelection = brushController.getNeighborsTileCornersInBrush(model, pos.x, pos.y);
+        else
+            stepSelection = brushController.getNeighborsTilesInBrushAsTileCorners(model, pos.x, pos.y);
+        if (!stepSelection.empty())
+            m_ongoingEditCornersHeightCommand->addCorners(stepSelection, heightStep, model, view);
+    }
 }
 
 void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history)
@@ -218,10 +224,11 @@ void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, 
     model.onTileCornerHeightChanged();
 }
 
-std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf::Vector2i startPosition,
-    const sf::Vector2i endPosition, WorldModel &model) const
+
+std::unordered_map<TileCorner *, float> ElevationTool::getTilesCornersFromBresenhamLine(const sf::Vector2i startPosition,
+    const sf::Vector2i endPosition, WorldModel &model, const BrushController &brushController) const
 {
-    std::set<TileCorner *> cornersToElevate = {};
+    std::unordered_map<TileCorner *, float> cornersToElevate = {};
     if (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) {
         const std::vector<std::vector<std::unique_ptr<TileCorner>>> &worldTilesCorners = model.getCorners();
         if (worldTilesCorners.empty() || worldTilesCorners[0].empty())
@@ -231,7 +238,12 @@ std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf:
         for (const sf::Vector2i& pos : lineTilesPositions)
             if (pos.y >= 0 && pos.y < static_cast<int>(worldTilesCorners.size())
             && pos.x >= 0 && pos.x < static_cast<int>(worldTilesCorners[0].size())) {
-                cornersToElevate.insert(worldTilesCorners[pos.y][pos.x].get());
+                std::vector<BrushTileCornerHit> brushSelection = brushController.getNeighborsTileCornersInBrush(model, pos.x, pos.y);
+                for (const auto &[corner, weight] : brushSelection) {
+                    if (cornersToElevate.find(corner) == cornersToElevate.end()
+                        || cornersToElevate[corner] < weight)
+                         cornersToElevate[corner] = weight;
+                }
             }
     } else {
         const std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
@@ -243,8 +255,11 @@ std::set<TileCorner *> ElevationTool::getTilesCornersFromBresenhamLine(const sf:
         for (const sf::Vector2i& pos : lineTilesPositions)
             if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
             && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
-                const std::vector<TileCorner *>  corners = worldTiles[pos.y][pos.x].getCorners();
-                cornersToElevate.insert(corners.begin(), corners.end());
+                std::vector<BrushTileCornerHit> brushSelection = brushController.getNeighborsTilesInBrushAsTileCorners(model, pos.x, pos.y);
+                for (const auto &[corner, weight] : brushSelection)
+                    if (cornersToElevate.find(corner) == cornersToElevate.end()
+                        || cornersToElevate[corner] < weight)
+                        cornersToElevate[corner] = weight;
             }
     }
     return cornersToElevate;
@@ -256,22 +271,13 @@ void ElevationTool::setUIVisibility(const bool isVisible) const
         widget->setVisibility(isVisible);
 }
 
-void ElevationTool::initButtonStyle(SpriteButton *button, const HighlightTextAlign align)
-{
-    button->initOutlineStatesColors(sf::Color(255, 255, 255, 175), sf::Color(178, 247, 239),
-            sf::Color(115, 80, 135), sf::Color(255, 255, 255, 225), sf::Color(123, 101, 81));
-    button->initBackgroundStatesColor(sf::Color(253, 247, 216), sf::Color(255, 240, 180),
-        sf::Color(250, 239, 250), sf::Color(253, 249, 221));
-    button->initHighlightTextAlign(align);
-}
-
 void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
 {
-    m_selectionModeText =  UIFactory::createText(startMenuPosition + sf::Vector2f(35, 55),"Selection Mode", 15);
-    m_selectionModeText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
-
     m_selectionModeBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 45), {150, 130});
-    m_selectionModeBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_selectionModeBox);
+
+    m_selectionModeText =  UIFactory::createText(startMenuPosition + sf::Vector2f(35, 55),"Selection Mode", 15);
+    UIFactory::applyDefaultTextStyle(m_selectionModeText, UIFactory::TextVariant::Label);
 
     const sf::Vector2f startBtnPosition = startMenuPosition + sf::Vector2f(35, 100);
     SpriteButton *tileCornerMode = UIFactory::createSpriteButton("assets/textures/ui/corner_512.png", startBtnPosition + sf::Vector2f(0, 0),
@@ -283,7 +289,7 @@ void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
     m_selectionModesButtons.push_back(tileMode);
 
     for (int i = 0; i < m_selectionModesButtons.size(); i++) {
-        initButtonStyle( m_selectionModesButtons[i]);
+        UIFactory::applyDefaultSpriteButtonStyle(m_selectionModesButtons[i]);
         m_selectionModesButtons[i]->initOnClickCallback([this, i] () {
             this->setSelectionMode(i);
         });
@@ -293,18 +299,18 @@ void ElevationTool::initSelectionModeUI(const sf::Vector2f startMenuPosition)
 void ElevationTool::initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition)
 {
     m_digOrElevateBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 200), {150, 125});
-    m_digOrElevateBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_digOrElevateBox);
 
     m_digOrElevateText = UIFactory::createText(startMenuPosition + sf::Vector2f(35, 210),"Action", 15);
-    m_digOrElevateText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+    UIFactory::applyDefaultTextStyle(m_digOrElevateText, UIFactory::TextVariant::Label);
 
     m_digButton = UIFactory::createSpriteButton("assets/textures/ui/dig_512.png", startButtonPosition + sf::Vector2f(65, 155),
         sf::Vector2f(32, 32), "Dig", 15);
     m_elevateButton = UIFactory::createSpriteButton("assets/textures/ui/elevate_512.png", startButtonPosition + sf::Vector2f(0, 155),
         sf::Vector2f(32, 32), "Elevate", 15);
 
-    initButtonStyle(m_digButton);
-    initButtonStyle(m_elevateButton);
+    UIFactory::applyDefaultSpriteButtonStyle(m_digButton);
+    UIFactory::applyDefaultSpriteButtonStyle(m_elevateButton);
 
     m_digButton->initOnClickCallback([this] () {
         this->dig();
@@ -317,13 +323,13 @@ void ElevationTool::initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vecto
 void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, const sf::Vector2f startButtonPosition)
 {
     m_elevationStepBox = UIFactory::createBox(startMenuPosition + sf::Vector2f(20, 200), {150, 110});
-    m_elevationStepBox->initColors(sf::Color::Transparent, sf::Color(255, 255, 255));
+    UIFactory::applyDefaultBoxStyle(m_elevationStepBox);
 
     m_elevationStepText = UIFactory::createText(startMenuPosition + sf::Vector2f(35, 210),"Height Step", 15);
-    m_elevationStepText->init(sf::Color(123, 101, 81), sf::Text::Bold | sf::Text::Italic);
+    UIFactory::applyDefaultTextStyle(m_elevationStepText, UIFactory::TextVariant::Label);
 
     m_elevationStepValueText = UIFactory::createText(startButtonPosition + sf::Vector2f(47, 145), getHeightStepValue(), 20);
-    m_elevationStepValueText->init(sf::Color::White, sf::Text::Bold);
+    UIFactory::applyDefaultTextStyle(m_elevationStepValueText, UIFactory::TextVariant::Value);
 
     m_elevationStepDecrement = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", startButtonPosition + sf::Vector2f(0, 140),
         sf::Vector2f(20, 20), "Reduce", 15);
@@ -333,8 +339,8 @@ void ElevationTool::initElevationStepUI(const sf::Vector2f startMenuPosition, co
     m_elevationStepDecrement->setContinuousClick(true, 0.5);
     m_elevationStepIncrement->setContinuousClick(true, 0.5);
 
-    initButtonStyle(m_elevationStepDecrement);
-    initButtonStyle(m_elevationStepIncrement);
+    UIFactory::applyDefaultSpriteButtonStyle(m_elevationStepDecrement);
+    UIFactory::applyDefaultSpriteButtonStyle(m_elevationStepIncrement);
 
     m_elevationStepDecrement->initOnClickCallback([this] () {
         this->decrementHeightStepFactor();

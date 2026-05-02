@@ -7,8 +7,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "../model/WorldModel.hpp"
-#include "../view/WorldView.hpp"
-#include "../controller/SelectionController.hpp"
+#include "../view/world/WorldView.hpp"
+#include "../controller/BrushController.hpp"
 #include "../commands/CommandHistory.hpp"
 
 class IEditionTool {
@@ -18,9 +18,9 @@ public:
     virtual bool isSelectionLocked() const = 0;
     virtual SelectionMode getRequiredSelectionMode() const = 0;
     virtual void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
-                              SelectionController& selectionController, CommandHistory& history) = 0;
+                              BrushController& brushController, CommandHistory& history) = 0;
     virtual void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view,
-                                        SelectionController& selectionController, CommandHistory& history) = 0;
+                                        BrushController& brushController, CommandHistory& history) = 0;
     virtual void onToolSelected() const = 0;
     virtual void onToolUnSelected() const = 0;
 };

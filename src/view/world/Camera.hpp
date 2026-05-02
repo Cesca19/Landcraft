@@ -7,7 +7,7 @@
 
 #include <SFML/System/Vector2.hpp>
 #include <algorithm>
-#include "../utils/MathUtils.hpp"
+#include "../../utils/MathUtils.hpp"
 
 class Camera {
 public:
@@ -68,6 +68,7 @@ public:
     float getTileSizeY() const { return m_tileSizeY; }
     float getHeightScale() const { return m_heightScale; }
     bool isRotating() const { return m_isRotating; }
+    bool isContinuousRotationActive() const { return m_isDraggingForRotation; }
 
     void resetRotation();
 private:
@@ -80,19 +81,13 @@ private:
      */
     void rotateAroundXAxis(float newProjectionAngleY);
 
-    /**
-     * @brief Rotates a 2D point around a specific center
-     * This is the Yaw (lacet) rotation :  the rotation around the Z-axis (the vertical axis)
-     *      -> it's similar to turning the head left or right (rotating the map on itself).
-     * @param angle The rotation angle in RADIANS.
-     * @param point The point to rotate.
-     * @param rotationCenter
-     * @return The new rotated coordinates.
-     */
-    static sf::Vector2f rotateAroundZAxis(float angle, sf::Vector2f point, sf::Vector2f rotationCenter);
+    void refreshProjectionCache();
+    void refreshYawCache();
 private:
     float m_projectionAngleX;
     float m_projectionAngleY;
+    float m_projectionCosX;
+    float m_projectionSinY;
     float m_tileSizeX;
     float m_tileSizeY;
     float m_heightScale;
@@ -106,6 +101,8 @@ private:
     float m_yawRotationSpeed;
     float m_currentYawRotationAngle;
     float m_targetYawRotationAngle;
+    float m_yawCos;
+    float m_yawSin;
     float m_epsilon = 0.5f;
 
     sf::Vector2i m_mouseLastDragPosition;

@@ -12,27 +12,26 @@
 class ElevationTool : public IEditionTool {
 public:
     ElevationTool(sf::Vector2f startMenuPosition);
-    ~ElevationTool();
+    ~ElevationTool() override;
     bool isEditing() const override;
     bool isSelectionLocked() const override;
     SelectionMode getRequiredSelectionMode() const override;
     void onToolSelected() const override;
     void onToolUnSelected() const override;
-    void handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
-    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, SelectionController &selectionController, CommandHistory &history) override;
+    void handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
+    void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
 private:
     void handleSelectionModeEditingEvents(const sf::Event& event);
     void handleHeightStepEditingEvents(const sf::Event& event);
-    void handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, const SelectionController &selectionController, CommandHistory &history);
-    void startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep);
-    void updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep);
-    void applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep) const;
-    void applyElevationAlongPath(const sf::Vector2i& currentWorldPosition, WorldModel &model, const WorldView &view, const SelectionController &selectionController, float heightStep) const;
+    void handleHeightEditingEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, const BrushController &brushController, CommandHistory &history);
+    void startContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const BrushController &brushController, float heightStep);
+    void updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view, const BrushController &brushController, float heightStep);
+    void applyElevationOnCurrentSelection(WorldModel &model, const WorldView &view, const BrushController &brushController, float heightStep) const;
+    void applyElevationAlongPath(const sf::Vector2i& currentWorldPosition, WorldModel &model, const WorldView &view, const BrushController &brushController, float heightStep) const;
     void stopContinuousElevation(WorldModel &model, WorldView &view, CommandHistory &history);
-    std::set<TileCorner*> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model) const;
+    std::unordered_map<TileCorner *, float> getTilesCornersFromBresenhamLine(sf::Vector2i startPosition, sf::Vector2i endPosition, WorldModel &model, const BrushController &brushController) const;
 
     void setUIVisibility(bool isVisible) const;
-    void initButtonStyle(SpriteButton *button, HighlightTextAlign align = HighlightTextAlign::Top);
     void initSelectionModeUI(sf::Vector2f startMenuPosition);
     void initDigOrElevateUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);
     void initElevationStepUI(sf::Vector2f startMenuPosition, sf::Vector2f startButtonPosition);

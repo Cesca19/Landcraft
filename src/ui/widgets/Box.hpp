@@ -6,6 +6,7 @@
 #define LANDCRAFT_BOX_HPP
 
 #include "IWidget.hpp"
+#include "RoundedRectangleShape.hpp"
 
 class Box : public IWidget {
 public:
@@ -35,7 +36,11 @@ private:
     bool m_isVisible;
     sf::Color m_backgroundColor;
     sf::Color m_outlineColor;
-    sf::RectangleShape m_rectangle;
+    RoundedRectangleShape m_rectangle;
+
+    // Au lieu de m_background.setSize(size);
+    // m_background = RoundedRectangleShape(size, 8.0f); // 8 pixels de rayon pour l'arrondi
+    // m_background.setPosition(position);
 };
 
 
