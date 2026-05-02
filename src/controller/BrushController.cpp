@@ -10,7 +10,7 @@ BrushController::BrushController(const sf::Vector2f uiStartPosition)
     , m_mouseWorldPosition(-1, -1)
     , m_brushSize(2)
     , m_brushSizeMin(0)
-    , m_brushSizeMax(10)
+    , m_brushSizeMax(20)
     , m_currentBrushImage(-1)
 {
     std::vector<std::string> brushImagePaths = {
