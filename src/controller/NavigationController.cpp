@@ -96,7 +96,7 @@ void NavigationController::handleRotationEvents(const sf::RenderWindow &window, 
                 view.rotateYaw(-m_yawRotationStep);
                 break;
             // pitch
-            case sf::Keyboard::Q:
+            case sf::Keyboard::O:
                 view.rotatePitch(m_pitchRotationStep);
                 break;
             case sf::Keyboard::L:
