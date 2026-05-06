@@ -90,6 +90,7 @@ add_executable(${MY_TARGET}
         src/view/menu/EditionMenu.cpp
         src/ui/widgets/RoundedRectangleShape.cpp
         src/view/menu/BrushMenu.cpp
+        src/utils/FileUtils.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

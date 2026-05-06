@@ -71,8 +71,6 @@ int Tile::getTextureId() const
 }
 
 void Tile::setTextureId(const int textureId) {
-    for (TileCorner* corner : m_corners)
-        corner->setTextureId(textureId);
     m_textureId = textureId;
 }
 

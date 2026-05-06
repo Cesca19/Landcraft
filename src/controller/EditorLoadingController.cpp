@@ -13,7 +13,7 @@ bool EditorLoadingController::initializeWorld(sf::RenderWindow& window,
     if (!drawLoadingScreen(window, windowSize, "Loading editor...")) return false;
     if (!drawLoadingScreen(window, windowSize, "Loading world...")) return false;
 
-    worldController.init("assets/maps/map.txt", cameraSettings, viewSettings);
+    worldController.init("assets/maps/landcraft-map.legend", cameraSettings, viewSettings);
     return true;
 }
 

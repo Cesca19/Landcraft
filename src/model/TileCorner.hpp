@@ -10,19 +10,16 @@
 
 class TileCorner {
 public:
-    TileCorner(int row, int col, int height, int textureID);
+    TileCorner(int row, int col, int height);
     float getRow() const;
     float getColumn() const;
     float getHeight() const;
-    int getTextureID() const;
     sf::Vector2f getPosition() const;
     void addHeight(float heightStep);
-    void setTextureId(int textureId);
 private:    
     int m_row;
     int m_col;
     float m_height;
-    int m_textureID;
 };
 
 
