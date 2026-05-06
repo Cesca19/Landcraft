@@ -18,8 +18,10 @@ void WorldController::init(const std::string &mapName,
 
     m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
     float selectionMenuOffset = 185;
-    m_brushController = std::make_unique<BrushController>(sf::Vector2f{static_cast<float>(viewSettings.windowSize.x) / 2.f - selectionMenuOffset, 10});
+    sf::Vector2f brushMenuPosition = sf::Vector2f{static_cast<float>(viewSettings.windowSize.x) / 2.f - selectionMenuOffset, 10};
+    m_brushController = std::make_unique<BrushController>(brushMenuPosition);
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
+    m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0));
 
     m_worldModel.loadMap(mapName);
     m_worldView.init(viewSettings.center, viewSettings.size, 10);
@@ -35,6 +37,7 @@ void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &win
     m_navigationController->handleEvents(window, event, m_worldModel, m_worldView, m_editionController->isEditing());
     m_brushController->handleEvents(window, event);
     m_editionController->handleEvents(window, event, m_worldModel, m_worldView, *m_brushController);
+    m_mapLoadSaveController->handleEvents(event, window);
 }
 
 void WorldController::handleContinuousEvents(float deltaTime, const sf::RenderWindow &window)

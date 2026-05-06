@@ -15,6 +15,12 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     m_tilesetTexture = &ResourceManager::getInstance().getTexture(tilesetFilepath);
 }
 
+void TileMap::clear()
+{
+    m_shadedTilesVertexArray.clear();
+    m_wireframeTilesVertexArray.clear();
+}
+
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
 {
     if (tiles.empty() || tiles[0].empty())

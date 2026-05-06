@@ -91,6 +91,8 @@ add_executable(${MY_TARGET}
         src/ui/widgets/RoundedRectangleShape.cpp
         src/view/menu/BrushMenu.cpp
         src/utils/FileUtils.cpp
+        src/controller/MapLoadSaveController.cpp
+        src/view/menu/MapSaveLoadMenu.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

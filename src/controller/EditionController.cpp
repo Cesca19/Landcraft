@@ -54,6 +54,11 @@ SelectionMode EditionController::getSelectionMode() const
     return m_editionTools[m_currentEditionTool]->getRequiredSelectionMode();
 }
 
+void EditionController::clearCommandHistory()
+{
+    m_commandHistory.clearHistory();
+}
+
 void EditionController::handleUndoRedoEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view)
 {
     const bool isCtrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);

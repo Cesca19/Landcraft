@@ -10,7 +10,7 @@
 
 class TileCorner {
 public:
-    TileCorner(int row, int col, int height);
+    TileCorner(int row, int col, float height);
     float getRow() const;
     float getColumn() const;
     float getHeight() const;

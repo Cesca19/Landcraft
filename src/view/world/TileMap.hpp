@@ -15,6 +15,7 @@ class TileMap  : public sf::Drawable, public sf::Transformable
 {
 public:
     TileMap(const std::string &tilesetFilepath, sf::Vector2u tilesSize);
+    void clear();
     void init(const std::vector<std::vector<Tile>>& tiles, const Camera& camera);
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const Camera& camera);
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &modifiedCorners, const Camera& camera);

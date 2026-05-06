@@ -18,6 +18,8 @@ public:
     void init(sf::Vector2f center, sf::Vector2f size, int defaultZoom);
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
+    void clearTileMap();
+    void resetTileMap(const std::vector<std::vector<Tile>>& tiles);
     void initEnvironment(sf::Vector2u windowSize);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;

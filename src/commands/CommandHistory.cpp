@@ -51,6 +51,13 @@ void CommandHistory::redoCommand(WorldModel &model, WorldView &view)
     addHistoryMessage(std::to_string(m_currentIndex) + ": " + m_commandList[m_currentIndex]->getName() + " redone");
 }
 
+void CommandHistory::clearHistory()
+{
+    m_commandList.clear();
+    m_historyMessages.clear();
+    m_currentIndex = -1;
+}
+
 void CommandHistory::addHistoryMessage(const std::string &message)
 {
     m_historyMessages.push_back(message);

@@ -14,6 +14,7 @@ public:
     void addCommand(std::unique_ptr<ICommand> command, WorldModel& model, WorldView& view, bool shouldExecute = false);
     void undoCommand(WorldModel& model, WorldView& view);
     void redoCommand(WorldModel& model, WorldView& view);
+    void clearHistory();
 private:
     void addHistoryMessage(const std::string& message);
 

@@ -4,7 +4,7 @@
 
 #include "TileCorner.hpp"
 
-TileCorner::TileCorner(const int row, const int col, const int height)
+TileCorner::TileCorner(const int row, const int col, const float height)
     : m_row(row)
     , m_col(col)
     , m_height(height)

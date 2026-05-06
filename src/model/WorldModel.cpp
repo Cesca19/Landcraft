@@ -13,22 +13,56 @@ WorldModel::~WorldModel()
 {
 }
 
-void WorldModel::loadMap(std::string mapName, bool quitOnFailure)
+bool WorldModel::loadMap(std::string mapName, bool quitOnFailure)
 {
-    m_tileCornersHeightmap.clear();
-    m_tileTextureIdMap.clear();
     std::unique_ptr<WorldMap> worldMap = loadMapFromFile(mapName, quitOnFailure);
     if (!worldMap) {
         if (quitOnFailure)
             throw std::runtime_error("Failed to load world map from file: " + mapName);
-        return;
+            std::cerr << "Failed to load world map from file: " << mapName << std::endl;
+        return false;
     }
+    m_tileCornersHeightmap.clear();
+    m_tileTextureIdMap.clear();
     m_tileCornersHeightmap = std::move(worldMap->TileCornersHeightMap);
     m_tileTextureIdMap = std::move(worldMap->TileTextureIdMap);
     worldMap = nullptr;
     createWorldTileCorners();
     createWorldTiles();
     onTileCornerHeightChanged();
+    return true;
+}
+
+bool WorldModel::saveMapToFile(std::string mapName)
+{
+        std::ofstream mapFile(mapName);
+        if (!mapFile.is_open()) {
+            std::cerr << "Failed to open map file for writing: " << mapName << std::endl;
+            return false;
+        }
+        // Write map size
+        mapFile << "[MAP_SIZE]\n";
+        mapFile << m_tileTextureIdMap[0].size() << " " << m_tileTextureIdMap.size() << "\n\n";
+    
+        // Write tile corners heightmap
+        mapFile << "[TILES_CORNERS]\n";
+        for (const auto & row : m_corners) {
+            for (const auto & corner : row) {
+                mapFile << corner->getHeight() << " ";
+            }
+            mapFile << "\n";
+        }
+        mapFile << "\n";
+    
+        // Write tile texture ID map
+        mapFile << "[TILES]\n";
+        for (const auto & row : m_tiles) {
+            for (const auto & tile : row) {
+                mapFile << tile.getTextureId() << " ";
+            }
+            mapFile << "\n";
+        }
+        return true;
 }
 
 std::vector<std::vector<Tile>> &WorldModel::getTiles()
@@ -82,7 +116,6 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName, bool 
             throw std::runtime_error("Failed to open map file: " + mapName);
         return nullptr;
     }
-    std::cout << "Map file opened successfully: " << mapName << std::endl;
 
     sf::Vector2i mapSize = loadMapSize(mapFile);
     if (mapSize.x <= 0 || mapSize.y <= 0) {
@@ -92,15 +125,13 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName, bool 
     }
     int nbCols = mapSize.x;
     int nbRows = mapSize.y;
-    std::cout << "Map size: " << nbCols << " cols, " << nbRows << " rows" << std::endl;
 
-    std::vector<std::vector<int>> heightmap = loadTileCornersHeightmap(mapFile, nbRows, nbCols);
+    std::vector<std::vector<float>> heightmap = loadTileCornersHeightmap(mapFile, nbRows, nbCols);
     if (heightmap.empty()) {
         if (quitOnFailure)
             throw std::runtime_error("Failed to load tile corners heightmap from file: " + mapName);
         return nullptr;
     }
-    std::cout << "Tile corners heightmap loaded successfully" << std::endl;
 
     std::vector<std::vector<int>> textureIdMap = loadTileTextureIdMap(mapFile, nbRows, nbCols);
     if (textureIdMap.empty()) {
@@ -108,8 +139,8 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName, bool 
             throw std::runtime_error("Failed to load tile texture ID map from file: " + mapName);
         return nullptr;
     }
-    std::cout << "Tile texture ID map loaded successfully" << std::endl;
 
+    std::cout << "Map file loaded successfully: " << mapName << std::endl;
     std::unique_ptr<WorldMap> worldMap = std::make_unique<WorldMap>();
     worldMap->TileCornersHeightMap = heightmap;
     worldMap->TileTextureIdMap = textureIdMap;
@@ -137,9 +168,9 @@ sf::Vector2i WorldModel::loadMapSize(std::ifstream &mapFile) const
     return sf::Vector2i(-1, -1);
 }
 
-std::vector<std::vector<int>> WorldModel::loadTileCornersHeightmap(std::ifstream &mapFile, int nb_rows, int nb_cols) const
+std::vector<std::vector<float>> WorldModel::loadTileCornersHeightmap(std::ifstream &mapFile, int nb_rows, int nb_cols) const
 {
-    std::vector<std::vector<int>> heightmap;
+    std::vector<std::vector<float>> heightmap;
     std::string line;
     while (std::getline(mapFile, line)) {
         if (line.empty())
@@ -152,17 +183,17 @@ std::vector<std::vector<int>> WorldModel::loadTileCornersHeightmap(std::ifstream
     while (std::getline(mapFile, line)) {
         if (line.empty())
             break;
-        std::vector<int> row;
+        std::vector<float> row;
         std::istringstream iss(line);
-        int height;
+        float height;
         while (iss >> height)
             row.push_back(height);
         if (row.size() != static_cast<size_t>(nb_cols) + 1)
-            return std::vector<std::vector<int>>(); // return empty heightmap if row size is incorrect
+            return std::vector<std::vector<float>>(); // return empty heightmap if row size is incorrect
         heightmap.push_back(row);
     }
     if (heightmap.size() != static_cast<size_t>(nb_rows) + 1)
-        return std::vector<std::vector<int>>(); // return empty heightmap if number of rows is incorrect
+        return std::vector<std::vector<float>>(); // return empty heightmap if number of rows is incorrect
     return heightmap;
 }
 
@@ -227,7 +258,7 @@ void WorldModel::createWorldTileCorners()
         std::vector<std::unique_ptr<TileCorner>> rowCorners;
         for (int col = 0; col < m_tileCornersHeightmap[row].size(); col++) {
             std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
-                row, col, m_tileCornersHeightmap[row][col] /*, 0 // default white texture*/
+                row, col, m_tileCornersHeightmap[row][col]
             );
             rowCorners.push_back(std::move(tileCorner));
         }

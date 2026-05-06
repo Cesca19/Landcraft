@@ -10,6 +10,7 @@
 #include "EditionController.hpp"
 #include "BrushController.hpp"
 #include "NavigationController.hpp"
+#include "MapLoadSaveController.hpp"
 
 
 struct CameraSettings {
@@ -45,6 +46,7 @@ private:
     std::unique_ptr<EditionController> m_editionController;
     std::unique_ptr<BrushController> m_brushController;
     std::unique_ptr<NavigationController> m_navigationController;
+    std::unique_ptr<MapLoadSaveController> m_mapLoadSaveController;
 };
 
 

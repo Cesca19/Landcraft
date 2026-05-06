@@ -19,6 +19,7 @@ public:
     bool isEditing() const;
     bool isSelectionLocked() const;
     SelectionMode getSelectionMode() const;
+    void clearCommandHistory();
 private:
     void handleUndoRedoEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void handleEditionToolSwitchEvents(const sf::Event& event);
