@@ -27,6 +27,8 @@ public:
     void update(float deltaTime) override;
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
+    
+    void setPosition(const sf::Vector2f& position) override;
 protected:
     void onBase() override;
     void onHover() override;
@@ -37,10 +39,6 @@ private:
     sf::Color m_backgroundColor;
     sf::Color m_outlineColor;
     RoundedRectangleShape m_rectangle;
-
-    // Au lieu de m_background.setSize(size);
-    // m_background = RoundedRectangleShape(size, 8.0f); // 8 pixels de rayon pour l'arrondi
-    // m_background.setPosition(position);
 };
 
 

@@ -31,6 +31,7 @@ public:
     void update(float deltaTime) override;
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
+    void setPosition(const sf::Vector2f& position) override;
 protected:
     void onBase() override;
     void onHover() override;

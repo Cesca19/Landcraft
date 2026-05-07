@@ -13,7 +13,7 @@ EditionMenu::EditionMenu(sf::Vector2f globalUIPosition)
         globalUIPosition + sf::Vector2f(15, 16), {28, 28}, "Undo", 12);
     m_redoButton = UIFactory::createSpriteButton("assets/textures/ui/redo_512.png",
         globalUIPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
-    m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 210});
+    m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {85, 220});
     UIFactory::applyDefaultBoxStyle(m_editionToolsBox);
     m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 10), "Tools:", 20);
     UIFactory::applyDefaultTextStyle(m_toolsText, UIFactory::TextVariant::Title);

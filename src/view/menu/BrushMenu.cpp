@@ -74,7 +74,7 @@ void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImageP
 void BrushMenu::initBrushSizeWidgets(const sf::Vector2f brushSizeUIStartPosition) {
     m_brushSizeBox = UIFactory::createBox(brushSizeUIStartPosition, {280, 90});
     UIFactory::applyDefaultBoxStyle(m_brushSizeBox);
-    m_brushSizeText = UIFactory::createText(brushSizeUIStartPosition + sf::Vector2f(10, 30), "Brush size", 15);
+    m_brushSizeText = UIFactory::createText(brushSizeUIStartPosition + sf::Vector2f(10, 35), "Brush size", 15);
     UIFactory::applyDefaultTextStyle(m_brushSizeText, UIFactory::TextVariant::Label);
 
     const sf::Vector2f startButtonPosition = brushSizeUIStartPosition + sf::Vector2f(40, 5);

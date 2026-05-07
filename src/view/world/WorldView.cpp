@@ -42,6 +42,16 @@ void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, 
 void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
 {
     m_tileMap = std::make_unique<TileMap>("assets/textures/tileset.png", sf::Vector2u{256, 256});
+    resetTileMap(tiles);
+}
+
+void WorldView::clearTileMap()
+{
+    m_tileMap->clear();
+}
+
+void WorldView::resetTileMap(const std::vector<std::vector<Tile>>& tiles)
+{
     m_tileMap->init(tiles, *m_camera);
 }
 

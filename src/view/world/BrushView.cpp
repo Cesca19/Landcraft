@@ -21,7 +21,7 @@ BrushView::BrushView()
     m_highlightedTileCorner.setOrigin(m_tileCornerRadius, m_tileCornerRadius);
     if (sf::Shader::isAvailable()) {
         if (!m_alphaCutoffShader.loadFromFile("assets/shaders/brush.frag", sf::Shader::Fragment)) {
-            std::cerr << "[Error] Failed to loas brush shader from assets/shaders/brush.frag" << std::endl;
+            std::cerr << "[Error] Failed to load brush shader from assets/shaders/brush.frag" << std::endl;
             m_hasShader = false;
         } else
             m_hasShader = true;

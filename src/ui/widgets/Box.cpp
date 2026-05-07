@@ -74,6 +74,11 @@ void Box::setState(WidgetState state)
     // This widget does not have different states, so this function does nothing.
 }
 
+void Box::setPosition(const sf::Vector2f &position)
+{
+    m_rectangle.setPosition(position);
+}
+
 void Box::onBase()
 {
 }

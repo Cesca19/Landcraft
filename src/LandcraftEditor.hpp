@@ -12,13 +12,16 @@
 
 class LandcraftEditor {
 public:
-    LandcraftEditor();
+    LandcraftEditor(std::string mapName);
     void run();
 private:
     void applyWindowIcon();
     void handleEvents();
     void handleContinuousEvents(float deltaTime) const;
+    void initWorldController();
+    void onCloseEditorRequested();
 
+    std::string m_startingMapName;
     bool m_hasFocus;
     sf::Vector2u m_windowSize;
     sf::Vector2u m_viewSize;

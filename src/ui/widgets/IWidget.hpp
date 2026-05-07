@@ -34,6 +34,8 @@ public:
     virtual void update(float deltaTime) = 0;
     virtual void draw(sf::RenderWindow& window) const = 0;
     virtual void setState(WidgetState state) = 0;
+
+    virtual void setPosition(const sf::Vector2f& position) = 0;
 protected:
     virtual void onBase() = 0;
     virtual void onHover() = 0;

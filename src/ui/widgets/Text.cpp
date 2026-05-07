@@ -71,6 +71,11 @@ void Text::setState(WidgetState state)
 {
 }
 
+void Text::setPosition(const sf::Vector2f &position)
+{
+    m_text.setPosition(position);
+}
+
 void Text::onBase()
 {
 }

@@ -10,9 +10,15 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_wireframeTilesVertexArray(sf::Lines)
     , m_shadedTileColor(sf::Color(252, 252, 254/*205, 185, 220*/))
     // , m_shadedTileColor(sf::Color(200, 180, 220))
-    , m_wireframeTileColor(sf::Color(220, 222, 230, 150/*255, 255, 255, 100*/))
+    , m_wireframeTileColor(sf::Color(110, 110, 120, 25))
 {
     m_tilesetTexture = &ResourceManager::getInstance().getTexture(tilesetFilepath);
+}
+
+void TileMap::clear()
+{
+    m_shadedTilesVertexArray.clear();
+    m_wireframeTilesVertexArray.clear();
 }
 
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
