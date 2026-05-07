@@ -44,6 +44,7 @@ public:
     void setState(WidgetState state) override;
 
     void resetIconScale();
+    void setPosition(const sf::Vector2f& position) override;
 protected:
     void onBase() override;
     void onHover() override;

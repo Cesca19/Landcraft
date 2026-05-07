@@ -2,6 +2,7 @@
 // Created by fran on 08/04/2026.
 //
 
+#include <stdexcept>
 #include "UIFactory.hpp"
 
 UIController* UIFactory::s_uiController = nullptr;
@@ -14,8 +15,7 @@ void UIFactory::init(UIController *uiController)
 void UIFactory::removeWidget(IWidget *widget)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
-        return;
+        throw std::runtime_error("UIFactory not initialized with a UIController");
     }
     s_uiController->removeWidget(widget);
 }
@@ -23,8 +23,7 @@ void UIFactory::removeWidget(IWidget *widget)
 Box *UIFactory::createBox(const sf::Vector2f &position, const sf::Vector2f &size)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
-        return nullptr;
+        throw std::runtime_error("UIFactory not initialized with a UIController");
     }
 
     std::unique_ptr<Box> box = std::make_unique<Box>(position, size);
@@ -36,8 +35,7 @@ Box *UIFactory::createBox(const sf::Vector2f &position, const sf::Vector2f &size
 Text * UIFactory::createText(const sf::Vector2f& position, const std::string &content, int characterSize)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
-        return nullptr;
+        throw std::runtime_error("UIFactory not initialized with a UIController");
     }
     std::unique_ptr<Text> text = std::make_unique<Text>(position, content, characterSize);
     Text* textPtr = text.get();
@@ -45,14 +43,13 @@ Text * UIFactory::createText(const sf::Vector2f& position, const std::string &co
     return textPtr;
 }
 
-TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, sf::Color textColor, unsigned int characterSize)
+TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, unsigned int characterSize)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
-        return nullptr;
+        throw std::runtime_error("UIFactory not initialized with a UIController");
     }
 
-    std::unique_ptr<TextButton> button = std::make_unique<TextButton>(position, text, textColor, characterSize);
+    std::unique_ptr<TextButton> button = std::make_unique<TextButton>(position, text, characterSize);
     TextButton* buttonPtr = button.get();
     s_uiController->addWidget(std::move(button));
     return buttonPtr;
@@ -62,8 +59,7 @@ SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Ve
     const std::string &highlightText, int highlightTextSize)
 {
     if (!s_uiController) {
-        std::cerr << "UIFactory not initialized with an UIController" << std::endl;
-        return nullptr;
+        throw std::runtime_error("UIFactory not initialized with a UIController");
     }
 
     std::unique_ptr<SpriteButton> button = std::make_unique<SpriteButton>(iconPath, position, size, highlightText, highlightTextSize);
@@ -124,6 +120,34 @@ void UIFactory::applyDefaultSpriteButtonStyle(SpriteButton* button, const Highli
             sf::Color(110, 80, 170),   // pressed
             sf::Color(110, 95, 150)    // selected
         );
+}
+
+void UIFactory::applyDefaultTextButtonStyle(TextButton *button, TextVariant textVariant)
+{
+    if (!button) 
+        return;
+
+    button->initOutlineStatesColors(
+        sf::Color(220, 210, 240),  // normal
+        sf::Color(180, 150, 230),  // hover (VISIBLE)
+        sf::Color(160, 120, 220),  // focus 
+        sf::Color(130, 95, 185),   // pressed
+        sf::Color(160, 120, 220)   // selected  
+    );
+    button->initBackgroundStatesColor(
+        sf::Color(248, 246, 252),  // normal
+        sf::Color(235, 225, 250),  // hover
+        sf::Color(235, 225, 250),  // focus
+        sf::Color(210, 190, 240),  // pressed
+        sf::Color(235, 225, 250)   // selected
+    );
+    button->initTextColor(
+        sf::Color(110, 95, 150),   // normal
+        sf::Color(140, 110, 200),  // hover
+        sf::Color(140, 110, 200),  // focus
+        sf::Color(110, 80, 170),   // pressed
+        sf::Color(110, 95, 150)    // selected
+    );
 }
 
 void UIFactory::applyDefaultBoxStyle(Box* box)

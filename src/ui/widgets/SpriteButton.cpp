@@ -245,6 +245,20 @@ void SpriteButton::resetIconScale()
     m_iconSprite.setScale(m_baseScale);
 }
 
+void SpriteButton::setPosition(const sf::Vector2f &position)
+{
+    const float bgWidth = m_background.getSize().x;
+    const float bgHeight = m_background.getSize().y;
+
+    m_background.setPosition(position);
+
+    const float centerX = position.x + (bgWidth / 2.0f);
+    const float centerY = position.y + (bgHeight / 2.0f);
+    m_iconSprite.setPosition(centerX, centerY);
+
+    initHighlightTextAlign(m_highlightTextAlign);
+}
+
 void SpriteButton::onBase()
 {
     m_background.setOutlineColor(m_baseColor);

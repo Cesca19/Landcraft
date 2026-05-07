@@ -15,9 +15,9 @@ class MapLoadSaveController {
 public:
     MapLoadSaveController(WorldModel *m_worldModel, WorldView *m_worldView, EditionController *m_editionController, sf::Vector2f globalUIPosition);
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
-private:
     void saveMapToFile();
     void loadMapFromFile();
+private:
     void resetEditor();
 
     WorldView *m_worldView;

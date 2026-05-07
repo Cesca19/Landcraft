@@ -2,6 +2,7 @@
 // Created by fran on 06/05/2026.
 //
 
+#include <exception>
 #include "MapLoadSaveController.hpp"
 
 MapLoadSaveController::MapLoadSaveController(WorldModel *m_worldModel, WorldView *m_worldView, EditionController *m_editionController, sf::Vector2f globalUIPosition)
@@ -34,17 +35,18 @@ void MapLoadSaveController::saveMapToFile()
     std::string savePath = FileUtils::getFileToSavePathFromFileDialog(m_mapFileFilters);
 
     if (savePath.empty()) {
-        std::cerr << "Save operation cancelled by user." << std::endl;
+        std::cout << "Save operation cancelled." << std::endl;
         return;
     }
 
     if (savePath.find(".legend") == std::string::npos)
         savePath += ".legend";
-    std::cout << "Save path: " << savePath << std::endl;
-    if (m_worldModel->saveMapToFile(savePath))
+    try {
+        m_worldModel->saveMapToFile(savePath);
         std::cout << "Map saved successfully." << std::endl;
-    else
-        std::cerr << "Failed to save map." << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "Failed to save map: " << exception.what() << std::endl;
+    }
 }
 
 void MapLoadSaveController::loadMapFromFile()
@@ -52,15 +54,17 @@ void MapLoadSaveController::loadMapFromFile()
     std::string openPath = FileUtils::getFileToOpenPathFromFileDialog(m_mapFileFilters);
 
     if (openPath.empty()) {
-        std::cerr << "Load operation cancelled by user." << std::endl;
+        std::cout << "Load operation cancelled." << std::endl;
         return;
     }
 
-    if (m_worldModel->loadMap(openPath, false)) {
+    try {
+        m_worldModel->loadMap(openPath);
         resetEditor();
         std::cout << "Map loaded successfully." << std::endl;
-    } else
-        std::cerr << "Failed to load map." << std::endl;
+    } catch (const std::exception& exception) {
+        std::cerr << "Failed to load map: " << exception.what() << std::endl;
+    }
 }
 
 void MapLoadSaveController::resetEditor()

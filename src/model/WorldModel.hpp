@@ -22,8 +22,8 @@ class WorldModel
 public:
     WorldModel();
     ~WorldModel();
-    bool loadMap(std::string mapName, bool quitOnFailure = true);
-    bool saveMapToFile(std::string mapName);
+    void loadMap(std::string mapName);
+    void saveMapToFile(std::string mapName);
     std::vector<std::vector<Tile>>& getTiles();
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
     sf::Vector2f getCenter() const;
@@ -31,7 +31,7 @@ public:
     void onTileCornerHeightChanged(float height);
     float getHighestTileCornerHeight() const;
 private:
-    std::unique_ptr<WorldMap> loadMapFromFile(std::string mapName, bool quitOnFailure = true);
+    std::unique_ptr<WorldMap> loadMapFromFile(std::string mapName);
     sf::Vector2i loadMapSize(std::ifstream &mapFile) const;
     std::vector<std::vector<float>> loadTileCornersHeightmap(std::ifstream &mapFile, int nb_rows, int nb_cols) const;
     std::vector<std::vector<int>> loadTileTextureIdMap(std::ifstream &mapFile, int nb_rows, int nb_cols) const;

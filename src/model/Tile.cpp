@@ -2,6 +2,7 @@
 // Created by fran on 11/03/2026.
 //
 
+#include <stdexcept>
 #include "Tile.hpp"
 
 Tile::Tile()
@@ -13,18 +14,16 @@ Tile::Tile(const std::vector<TileCorner*> &corners, const int textureId)
     : m_corners(corners)
     , m_textureId(textureId)
 {
-    // TODO: Add proper error handling with exceptions or assertions
     if (corners.size() != 4)
-        std::cerr << "A tile must have exactly 4 corners." << std::endl;
+        throw std::invalid_argument("A tile must have exactly 4 corners.");
     updateTriangleCorners();
 }
 
 void Tile::setCorners(const std::vector<TileCorner*> &corners)
 {
     m_corners = corners;
-    // TODO: Add proper error handling with exceptions or assertions
     if (corners.size() != 4)
-        std::cerr << "A tile must have exactly 4 corners." << std::endl;
+        throw std::invalid_argument("A tile must have exactly 4 corners.");
     updateTriangleCorners();
 }
 

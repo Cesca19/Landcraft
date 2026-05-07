@@ -4,16 +4,14 @@
 
 #include "EditorLoadingController.hpp"
 
-bool EditorLoadingController::initializeWorld(sf::RenderWindow& window,
-    const sf::Vector2u& windowSize,
-    WorldController& worldController,
-    const CameraSettings& cameraSettings,
+bool EditorLoadingController::initializeWorld(sf::RenderWindow& window, const sf::Vector2u& windowSize,
+    std::string mapName, WorldController& worldController, const CameraSettings& cameraSettings,
     const ViewSettings& viewSettings) const
 {
-    if (!drawLoadingScreen(window, windowSize, "Loading editor...")) return false;
+    // if (!drawLoadingScreen(window, windowSize, "Loading editor...")) return false;
     if (!drawLoadingScreen(window, windowSize, "Loading world...")) return false;
 
-    worldController.init("assets/maps/landcraft-map.legend", cameraSettings, viewSettings);
+    worldController.init(mapName, cameraSettings, viewSettings);
     return true;
 }
 

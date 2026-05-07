@@ -4,8 +4,9 @@
 
 #include "LandcraftEditor.hpp"
 
-LandcraftEditor::LandcraftEditor()
-    : m_hasFocus(true)
+LandcraftEditor::LandcraftEditor(std::string mapName)
+    : m_startingMapName(mapName)
+    , m_hasFocus(true)
     , m_windowSize(sf::Vector2f(1920, 1080))
     , m_viewSize(m_windowSize)
     , m_tileSizeX(64)
@@ -31,19 +32,7 @@ LandcraftEditor::LandcraftEditor()
 
 void LandcraftEditor::run()
 {
-    const CameraSettings cameraSettings{
-        m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY
-    };
-    const ViewSettings viewSettings{
-        sf::Vector2f{0, 0},
-        sf::Vector2f{static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y)},
-        m_windowSize
-    };
-
-    if (!m_appLoadingController.initializeWorld(m_window, m_windowSize, *m_worldController, cameraSettings, viewSettings)) {
-        return;
-    }
-
+    initWorldController();
     m_clock.restart();
     float deltaTime = 0.0f;
     while (m_window.isOpen())
@@ -75,7 +64,7 @@ void LandcraftEditor::handleEvents()
             || (event.type == sf::Event::KeyPressed
                 && event.key.code == sf::Keyboard::Escape
                 && !m_uiController->isKeyBoardNavigatingHoverUI()))
-            m_window.close();
+            onCloseEditorRequested();
         switch (event.type) {
             case sf::Event::LostFocus:
                 m_hasFocus = false;
@@ -107,6 +96,38 @@ void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
     m_uiController->handleContinuousEvents(deltaTime, m_window);
     if (!m_uiController->isMouseHoverUI())
         m_worldController->handleContinuousEvents(deltaTime, m_window);
+}
+
+void LandcraftEditor::initWorldController()
+{
+    const CameraSettings cameraSettings{
+        m_tileSizeX, m_tileSizeY, m_heightScale, m_projectionAngleX, m_projectionAngleY
+    };
+    const ViewSettings viewSettings{
+        sf::Vector2f{0, 0},
+        sf::Vector2f{static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y)},
+        m_windowSize
+    };
+
+    if (!m_appLoadingController.initializeWorld(m_window, m_windowSize, m_startingMapName,
+        *m_worldController, cameraSettings, viewSettings)) {
+        return;
+    }
+    m_worldController->setSaveMapButtonOnClickCallback([this] () {
+        this->m_worldController->saveMapToFile();
+        this->m_window.close();
+    });
+    m_worldController->setDontSaveButtonOnClickCallback([this] () {
+        this->m_window.close();
+    });
+    m_worldController->setCancelButtonOnClickCallback([this] () {
+        this->m_worldController->setQuitMenuVisibility(false);
+    });
+}
+
+void LandcraftEditor::onCloseEditorRequested()
+{
+    m_worldController->setQuitMenuVisibility(true);
 }
 
 void LandcraftEditor::applyWindowIcon()

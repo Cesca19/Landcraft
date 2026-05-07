@@ -12,6 +12,7 @@ class EditorLoadingController {
 public:
     bool initializeWorld(sf::RenderWindow& window,
         const sf::Vector2u& windowSize,
+        std::string mapName,
         WorldController& worldController,
         const CameraSettings& cameraSettings,
         const ViewSettings& viewSettings) const;

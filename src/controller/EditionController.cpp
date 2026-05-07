@@ -2,6 +2,7 @@
 // Created by fran on 17/03/2026.
 //
 
+#include <stdexcept>
 #include "EditionController.hpp"
 
 EditionController::EditionController(WorldModel &model, WorldView &view, const sf::Vector2f globalUIPosition)
@@ -84,7 +85,7 @@ void EditionController::selectEditionTool(const int toolId)
     if (toolId == m_currentEditionTool)
         return;
     if (toolId > m_editionTools.size() - 1 || toolId < 0)
-        std::cout << "Invalid ToolID" << std::endl;
+        throw std::out_of_range("Invalid tool id");
     if (m_currentEditionTool != -1) {
         m_editionView->unselectEditionTool(m_currentEditionTool);
         m_editionTools[m_currentEditionTool]->onToolUnSelected();

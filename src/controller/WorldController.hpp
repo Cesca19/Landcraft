@@ -7,6 +7,7 @@
 
 #include "../model/WorldModel.hpp"
 #include "../view/world/WorldView.hpp"
+#include "../view/menu/WorldMenu.hpp"
 #include "EditionController.hpp"
 #include "BrushController.hpp"
 #include "NavigationController.hpp"
@@ -38,11 +39,17 @@ public:
     void update(float deltaTime, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window) const;
     void onWindowResized(sf::Vector2u windowSize);
+    void setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const;
+    void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
+    void setCancelButtonOnClickCallback(const std::function<void()> &callback) const;
+    void setQuitMenuVisibility(bool isVisible) const;
+    void saveMapToFile();
 private:
     // add event for turn on/off wireframe, shaded mode,
 
     WorldView m_worldView;
     WorldModel m_worldModel;
+    std::unique_ptr<WorldMenu> m_worldMenu;
     std::unique_ptr<EditionController> m_editionController;
     std::unique_ptr<BrushController> m_brushController;
     std::unique_ptr<NavigationController> m_navigationController;
