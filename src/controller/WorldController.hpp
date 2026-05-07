@@ -46,7 +46,8 @@ public:
     void saveMapToFile();
 private:
     // add event for turn on/off wireframe, shaded mode,
-
+    bool m_isWireframeModeOn;
+    bool m_isShadedModeOn;
     WorldView m_worldView;
     WorldModel m_worldModel;
     std::unique_ptr<WorldMenu> m_worldMenu;

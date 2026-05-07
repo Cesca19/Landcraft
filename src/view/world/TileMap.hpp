@@ -21,6 +21,8 @@ public:
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &modifiedCorners, const Camera& camera);
     void paintTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<Tile *> & tilesToPaint, int textureId);
     void paintTile(const std::vector<std::vector<Tile>>& worldTiles, Tile *tileToPaint, int textureId);
+    void setIsWireframeVisible(bool enabled);
+    void setAreShadedTilesVisible(bool enabled);
 private:
     void addShadedTile(const Tile& tile, const Camera& camera);
     void addWireframeTile(const Tile& tile, const Camera& camera);
@@ -39,6 +41,9 @@ private:
 
     sf::Vector2u m_tilesSize;
     const sf::Texture* m_tilesetTexture;
+
+    bool m_isWireframeVisible;
+    bool m_areShadedTilesVisible;
 };
 
 

@@ -26,6 +26,9 @@ private:
     TextButton *m_saveMapButton;
     TextButton *m_dontSaveButton;
     TextButton *m_cancelButton;
+    Box *m_wireframeShadedModeBox;
+    TextButton *m_wireframeModeButton;
+    TextButton *m_shadedModeButton;
     std::vector<IWidget *> m_widgets;
 };
 

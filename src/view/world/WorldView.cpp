@@ -282,6 +282,16 @@ void WorldView::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile
     m_tileMap->paintTile(worldTiles, tileToPaint, textureId);
 }
 
+void WorldView::setIsWireframeVisible(bool enabled) const
+{
+    m_tileMap->setIsWireframeVisible(enabled);
+}
+
+void WorldView::setAreShadedTilesVisible(bool enabled) const
+{
+    m_tileMap->setAreShadedTilesVisible(enabled);
+}
+
 void WorldView::updateViewCenter(const sf::Vector2f center)
 {
     m_view.setCenter(center);

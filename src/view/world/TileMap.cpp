@@ -8,9 +8,10 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     : m_tilesSize(tilesSize)
     , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
-    , m_shadedTileColor(sf::Color(252, 252, 254/*205, 185, 220*/))
-    // , m_shadedTileColor(sf::Color(200, 180, 220))
+    , m_shadedTileColor(sf::Color(252, 252, 254))
     , m_wireframeTileColor(sf::Color(110, 110, 120, 25))
+    , m_isWireframeVisible(true)
+    , m_areShadedTilesVisible(true)
 {
     m_tilesetTexture = &ResourceManager::getInstance().getTexture(tilesetFilepath);
 }
@@ -120,6 +121,16 @@ void TileMap::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile *
         return;
     const int tileIndex = static_cast<int>(tilePosition.y * nbCols + tilePosition.x);
     paintTile(tileIndex * 6, textureId);
+}
+
+void TileMap::setIsWireframeVisible(bool enabled)
+{
+    m_isWireframeVisible = enabled;
+}
+
+void TileMap::setAreShadedTilesVisible(bool enabled)
+{
+    m_areShadedTilesVisible = enabled;
 }
 
 void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
@@ -237,8 +248,10 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
     states.texture = m_tilesetTexture;
 
     // draw the vertex array
-    target.draw(m_shadedTilesVertexArray, states);
+    if (m_areShadedTilesVisible)
+        target.draw(m_shadedTilesVertexArray, states);
 
     states.texture = nullptr;
-    target.draw(m_wireframeTilesVertexArray, states);
+    if (m_isWireframeVisible)
+        target.draw(m_wireframeTilesVertexArray, states);
 }

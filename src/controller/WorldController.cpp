@@ -5,6 +5,8 @@
 #include "WorldController.hpp"
 
 WorldController::WorldController()
+    : m_isWireframeModeOn(true)
+    , m_isShadedModeOn(true)
 {
 }
 
