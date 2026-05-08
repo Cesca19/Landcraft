@@ -127,6 +127,10 @@ void LandcraftEditor::initWorldController()
 
 void LandcraftEditor::onCloseEditorRequested()
 {
+    if (m_worldController->isQuitMenuVisible()) {
+        m_window.close();
+        return;
+    }
     m_worldController->setQuitMenuVisibility(true);
 }
 

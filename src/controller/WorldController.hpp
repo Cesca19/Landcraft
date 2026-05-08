@@ -43,11 +43,12 @@ public:
     void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
     void setCancelButtonOnClickCallback(const std::function<void()> &callback) const;
     void setQuitMenuVisibility(bool isVisible) const;
-    void saveMapToFile();
+    bool isQuitMenuVisible() const;
+    void saveMapToFile() const;
 private:
-    // add event for turn on/off wireframe, shaded mode,
-    bool m_isWireframeModeOn;
-    bool m_isShadedModeOn;
+    void onDrawModeButtonClicked(DrawMode mode);
+
+    DrawMode m_currentDrawMode;
     WorldView m_worldView;
     WorldModel m_worldModel;
     std::unique_ptr<WorldMenu> m_worldMenu;

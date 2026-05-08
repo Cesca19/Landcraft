@@ -9,7 +9,7 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
     , m_shadedTileColor(sf::Color(252, 252, 254))
-    , m_wireframeTileColor(sf::Color(110, 110, 120, 25))
+    , m_wireframeTileColor(sf::Color(110, 110, 120, 40))
     , m_isWireframeVisible(true)
     , m_areShadedTilesVisible(true)
 {

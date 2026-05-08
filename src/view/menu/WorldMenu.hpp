@@ -7,6 +7,12 @@
 
 #include "../../ui/UIFactory.hpp"
 
+enum class DrawMode {
+    WIREFRAME,
+    SHADED,
+    WIREFRAME_SHADED
+};
+
 class WorldMenu {
 public:
     WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition);
@@ -14,8 +20,12 @@ public:
     void setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const;
     void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
     void setCancelButtonOnClickCallback(const std::function<void()> &callback) const;
-    void setQuitMenuVisibility(bool isVisible) const;
+    void setQuitMenuVisibility(bool isVisible);
+    bool isQuitMenuVisible() const;
     void setQuitMenuPosition(const sf::Vector2f &position) const;
+    void setDrawModeButtonOnClickCallback(DrawMode mode, const std::function<void()> &callback);
+    void selectDrawModeButton(DrawMode mode);
+    void unselectDrawModeButton(DrawMode mode);
 private:
     void initWidgetsList();
 
@@ -27,9 +37,13 @@ private:
     TextButton *m_dontSaveButton;
     TextButton *m_cancelButton;
     Box *m_wireframeShadedModeBox;
-    TextButton *m_wireframeModeButton;
-    TextButton *m_shadedModeButton;
+    SpriteButton *m_shadedModeButton;
+    SpriteButton *m_wireframeModeButton;
+    SpriteButton *m_wireframeShadedModeButton;
+    Text *m_drawModeTitle;
+    bool m_isQuitMenuVisible;
     std::vector<IWidget *> m_widgets;
+    std::unordered_map<DrawMode, SpriteButton*> m_drawModeButtons;
 };
 
 

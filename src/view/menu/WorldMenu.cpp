@@ -4,7 +4,8 @@
 
 #include "WorldMenu.hpp"
 
-WorldMenu::WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition)
+WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition)
+    : m_isQuitMenuVisible(true)
 {
     m_globalMenuBox = UIFactory::createBox(globalUIPosition, {225, 90});
     UIFactory::applyDefaultBoxStyle(m_globalMenuBox);
@@ -22,6 +23,26 @@ WorldMenu::WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenu
     UIFactory::applyDefaultTextButtonStyle(m_dontSaveButton, UIFactory::TextVariant::Default);
     m_cancelButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(180, 150), "Cancel", 17);
     UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
+
+    const sf::Vector2f wireframeShadedModeBoxPosition = globalUIPosition + sf::Vector2f(770, 0);
+    m_wireframeShadedModeBox = UIFactory::createBox(wireframeShadedModeBoxPosition, {300, 90});
+    UIFactory::applyDefaultBoxStyle(m_wireframeShadedModeBox);
+    m_drawModeTitle = UIFactory::createText(wireframeShadedModeBoxPosition + sf::Vector2f(10, 25), " Draw   \nModes ", 15);
+    UIFactory::applyDefaultTextStyle(m_drawModeTitle, UIFactory::TextVariant::Label);
+    m_wireframeModeButton = UIFactory::createSpriteButton("assets/textures/ui/wireframe_512.png", 
+        wireframeShadedModeBoxPosition + sf::Vector2f(230, 20), {28, 28}, "Wireframe", 12);
+    m_shadedModeButton = UIFactory::createSpriteButton("assets/textures/ui/shaded_512.png", 
+        wireframeShadedModeBoxPosition + sf::Vector2f(155, 20), {28, 28}, "Shaded", 12);
+    m_wireframeShadedModeButton = UIFactory::createSpriteButton("assets/textures/ui/wireframe-shaded_512.png", 
+        wireframeShadedModeBoxPosition + sf::Vector2f(80, 20), {28, 28}, "Wireframe/Shaded", 12);
+
+    UIFactory::applyDefaultSpriteButtonStyle(m_wireframeModeButton, HighlightTextAlign::Down, false);
+    UIFactory::applyDefaultSpriteButtonStyle(m_shadedModeButton, HighlightTextAlign::Down, false);
+    UIFactory::applyDefaultSpriteButtonStyle(m_wireframeShadedModeButton, HighlightTextAlign::Down, false);
+
+    m_drawModeButtons.emplace(DrawMode::SHADED, m_shadedModeButton);
+    m_drawModeButtons.emplace(DrawMode::WIREFRAME, m_wireframeModeButton);
+    m_drawModeButtons.emplace(DrawMode::WIREFRAME_SHADED, m_wireframeShadedModeButton);
 }
 
 WorldMenu::~WorldMenu()
@@ -46,7 +67,7 @@ void WorldMenu::setCancelButtonOnClickCallback(const std::function<void()> &call
     m_cancelButton->initOnClickCallback(callback);
 }
 
-void WorldMenu::setQuitMenuVisibility(bool isVisible) const
+void WorldMenu::setQuitMenuVisibility(const bool isVisible)
 {
     m_quitMenuBox->setVisibility(isVisible);
     m_quitMenuTitle->setVisibility(isVisible);
@@ -54,6 +75,12 @@ void WorldMenu::setQuitMenuVisibility(bool isVisible) const
     m_saveMapButton->setVisibility(isVisible);
     m_dontSaveButton->setVisibility(isVisible);
     m_cancelButton->setVisibility(isVisible);
+    m_isQuitMenuVisible = isVisible;
+}
+
+bool WorldMenu::isQuitMenuVisible() const
+{
+    return m_isQuitMenuVisible;
 }
 
 void WorldMenu::setQuitMenuPosition(const sf::Vector2f &position) const
@@ -66,6 +93,21 @@ void WorldMenu::setQuitMenuPosition(const sf::Vector2f &position) const
     m_cancelButton->setPosition(position + sf::Vector2f(180, 150));
 }
 
+void WorldMenu::setDrawModeButtonOnClickCallback(const DrawMode mode, const std::function<void()> &callback)
+{
+    m_drawModeButtons[mode]->initOnClickCallback(callback);
+}
+
+void WorldMenu::selectDrawModeButton(const DrawMode mode)
+{
+    m_drawModeButtons[mode]->setSelected(true);
+}
+
+void WorldMenu::unselectDrawModeButton(const DrawMode mode)
+{
+    m_drawModeButtons[mode]->setSelected(false);
+}
+
 void WorldMenu::initWidgetsList()
 {
     m_widgets.push_back(m_globalMenuBox);
@@ -75,4 +117,9 @@ void WorldMenu::initWidgetsList()
     m_widgets.push_back(m_saveMapButton);
     m_widgets.push_back(m_dontSaveButton);
     m_widgets.push_back(m_cancelButton);
+    m_widgets.push_back(m_wireframeShadedModeBox);
+    m_widgets.push_back(m_wireframeModeButton);
+    m_widgets.push_back(m_shadedModeButton);
+    m_widgets.push_back(m_wireframeShadedModeButton);
+    m_widgets.push_back(m_drawModeTitle);
 }

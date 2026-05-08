@@ -5,23 +5,25 @@
 #include "WorldController.hpp"
 
 WorldController::WorldController()
-    : m_isWireframeModeOn(true)
-    , m_isShadedModeOn(true)
+    : m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
 {
 }
 
 void WorldController::init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings)
 {
-    float globalToolBoxOffset = 450;
+    const float globalToolBoxOffset = 550;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
-    sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 100);
+    sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 150);
     m_worldMenu = std::make_unique<WorldMenu>(globalUIPosition, quitMenuPosition);
     m_worldMenu->setQuitMenuVisibility(false);
+    m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::SHADED, [this] () { this->onDrawModeButtonClicked(DrawMode::SHADED); } );
+    m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::WIREFRAME, [this] () { this->onDrawModeButtonClicked(DrawMode::WIREFRAME); } );
+    m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::WIREFRAME_SHADED, [this] () { this->onDrawModeButtonClicked(DrawMode::WIREFRAME_SHADED); } );
+    m_worldMenu->selectDrawModeButton(DrawMode::WIREFRAME_SHADED);
 
     m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
-    float selectionMenuOffset = 185;
-    sf::Vector2f brushMenuPosition = sf::Vector2f{static_cast<float>(viewSettings.windowSize.x) / 2.f - selectionMenuOffset, 10};
+    sf::Vector2f brushMenuPosition = globalUIPosition + sf::Vector2f(245, 0); 
     m_brushController = std::make_unique<BrushController>(brushMenuPosition);
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
     m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0));
@@ -43,7 +45,7 @@ void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &win
     m_mapLoadSaveController->handleEvents(event, window);
 }
 
-void WorldController::handleContinuousEvents(float deltaTime, const sf::RenderWindow &window)
+void WorldController::handleContinuousEvents(const float deltaTime, const sf::RenderWindow &window)
 {
     m_navigationController->handleContinuousEvents(deltaTime, m_worldView);
     m_editionController->handleContinuousEvents(window, m_worldModel, m_worldView, *m_brushController);
@@ -84,12 +86,40 @@ void WorldController::setCancelButtonOnClickCallback(const std::function<void()>
     m_worldMenu->setCancelButtonOnClickCallback(callback);
 }
 
-void WorldController::setQuitMenuVisibility(bool isVisible) const
+void WorldController::setQuitMenuVisibility(const bool isVisible) const
 {
     m_worldMenu->setQuitMenuVisibility(isVisible);
 }
 
-void WorldController::saveMapToFile()
+bool WorldController::isQuitMenuVisible() const
+{
+    return m_worldMenu->isQuitMenuVisible();
+}
+
+void WorldController::saveMapToFile() const
 {
     m_mapLoadSaveController->saveMapToFile();
+}
+
+void WorldController::onDrawModeButtonClicked(const DrawMode mode)
+{
+    if (mode == m_currentDrawMode)
+        return;
+    m_worldMenu->unselectDrawModeButton(m_currentDrawMode);
+    switch (mode) {
+        case DrawMode::WIREFRAME_SHADED:
+            m_worldView.setAreShadedTilesVisible(true);
+            m_worldView.setIsWireframeVisible(true);
+            break;
+        case DrawMode::WIREFRAME:
+            m_worldView.setAreShadedTilesVisible(false);
+            m_worldView.setIsWireframeVisible(true);
+            break;
+        case DrawMode::SHADED:
+            m_worldView.setAreShadedTilesVisible(true);
+            m_worldView.setIsWireframeVisible(false);
+            break;
+    }
+    m_currentDrawMode = mode;
+    m_worldMenu->selectDrawModeButton(m_currentDrawMode);
 }
