@@ -4,8 +4,10 @@
 
 #include "WorldController.hpp"
 
-WorldController::WorldController()
-    : m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
+WorldController::WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWindowSize)
+    : m_minWindowSize(minWindowSize)
+    , m_maxWindowSize(maxWindowSize)
+    , m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
 {
 }
 
@@ -66,8 +68,13 @@ void WorldController::draw(sf::RenderWindow &window) const
         m_brushController->draw(window, m_worldView.getCamera());
 }
 
-void WorldController::onWindowResized(const sf::Vector2u windowSize)
+void WorldController::onWindowResized(const sf::Vector2u windowSize, sf::RenderWindow& window)
 {
+    unsigned int clampedWidth = std::clamp(windowSize.x, m_minWindowSize.x, m_maxWindowSize.x);
+    unsigned int clampedHeight = std::clamp(windowSize.y, m_minWindowSize.y, m_maxWindowSize.y);
+    
+    if (clampedWidth != windowSize.x || clampedHeight != windowSize.y)
+        window.setSize(sf::Vector2u(clampedWidth, clampedHeight));
     m_worldView.onWindowResized(windowSize);
 }
 
