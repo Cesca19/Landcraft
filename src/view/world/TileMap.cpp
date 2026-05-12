@@ -9,7 +9,7 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
     , m_shadedTileColor(sf::Color(252, 252, 254))
-    , m_wireframeTileColor(sf::Color(110, 110, 120, 40))
+    , m_wireframeTileColor(sf::Color(110, 110, 120, 255))
     , m_isWireframeVisible(true)
     , m_areShadedTilesVisible(true)
 {
@@ -224,13 +224,14 @@ void TileMap::paintTile(int shadedIndex, const int textureId)
     }
     const unsigned int x = textureId * m_tilesSize.x;
     const int y = 0;
+    float offset = 0.2f; // to avoid texture bleeding
     sf::Vector2f texCoords[6] = {
-        sf::Vector2f(x, y),
-        sf::Vector2f(x + m_tilesSize.x, y),
-        sf::Vector2f(x + m_tilesSize.x, y + m_tilesSize.y),
-        sf::Vector2f(x + m_tilesSize.x, y + m_tilesSize.y),
-        sf::Vector2f(x, y + m_tilesSize.y),
-        sf::Vector2f(x, y)
+        sf::Vector2f(x + offset, y + offset),
+        sf::Vector2f(x + m_tilesSize.x - offset, y + offset),
+        sf::Vector2f(x + m_tilesSize.x - offset, y + m_tilesSize.y - offset),
+        sf::Vector2f(x + m_tilesSize.x - offset, y + m_tilesSize.y - offset),
+        sf::Vector2f(x + offset, y + m_tilesSize.y - offset),
+        sf::Vector2f(x + offset, y + offset)
     };
     for (const auto texCoord : texCoords) {
         m_shadedTilesVertexArray[shadedIndex].texCoords = texCoord;

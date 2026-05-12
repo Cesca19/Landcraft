@@ -5,7 +5,7 @@
 #include "WorldView.hpp"
 
 WorldView::WorldView()
-    : m_minZoom(0.2f)
+    : m_minZoom(0.05f)
     , m_maxZoom(5.0f)
     , m_currentZoom(1.0f)
     , m_targetZoom(1.0f)
@@ -41,7 +41,7 @@ void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, 
 
 void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
 {
-    m_tileMap = std::make_unique<TileMap>("assets/textures/tileset.png", sf::Vector2u{256, 256});
+    m_tileMap = std::make_unique<TileMap>("assets/textures/tilemap-tileset-pastel.png", sf::Vector2u{32, 32});
     resetTileMap(tiles);
 }
 
@@ -106,7 +106,7 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
 void WorldView::draw(sf::RenderWindow &window) const
 {
     m_environmentView->drawSkyBox(window);
-    m_environmentView->drawWorldReference(window);
+    // m_environmentView->drawWorldReference(window);
     window.setView(m_view);
     window.draw(*m_tileMap);
     m_environmentView->drawWorldGizmo(window);
