@@ -19,6 +19,9 @@ public:
     void loadMapFromFile();
 private:
     void resetEditor();
+    std::string getFilePathWithoutExtension(const std::string& filePath);
+    std::string getFileName(const std::string& filePath);
+    bool TrySaveSplatmapImage(const std::string& filepath);
 
     WorldView *m_worldView;
     WorldModel *m_worldModel;

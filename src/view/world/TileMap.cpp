@@ -179,7 +179,7 @@ void TileMap::initSplatmap(const std::string &filepath, const sf::Vector2i &tile
             sf::RenderStates states;
             states.blendMode = sf::BlendNone;
             m_splatmap.draw(sprite, states);
-            std::cout << "Splatmap loaded successfully." << std::endl;
+            std::cout << "Splatmap loaded successfully: " << filepath << std::endl;
         }
     }
 

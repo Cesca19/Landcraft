@@ -42,7 +42,10 @@ void MapLoadSaveController::saveMapToFile()
     if (savePath.find(".legend") == std::string::npos)
         savePath += ".legend";
     try {
-        m_worldModel->saveMapToFile(savePath);
+        std::string splatmapFilePath = getFilePathWithoutExtension(savePath) + "-splatmap.png";
+        std::string splatmapFileName = getFileName(splatmapFilePath);
+        TrySaveSplatmapImage(splatmapFilePath);
+        m_worldModel->saveMapToFile(savePath, splatmapFileName);
         std::cout << "Map saved successfully." << std::endl;
     } catch (const std::exception& exception) {
         std::cerr << "Failed to save map: " << exception.what() << std::endl;
@@ -73,4 +76,34 @@ void MapLoadSaveController::resetEditor()
     m_worldView->clearTileMap();
     m_worldView->resetTileMap(m_worldModel->getTiles());
     m_worldView->initSplatmap(m_worldModel->getSplatmapFilepath(), m_worldModel->getTilesSize(), m_worldModel->getMapSize().x, m_worldModel->getMapSize().y);
+}
+
+std::string MapLoadSaveController::getFilePathWithoutExtension(const std::string &filePath)
+{
+    size_t lastDot = filePath.find_last_of('.');
+    if (lastDot != std::string::npos) {
+        return filePath.substr(0, lastDot);
+    }
+    return filePath;
+}
+
+std::string MapLoadSaveController::getFileName(const std::string &filePath)
+{
+    size_t lastSlash = filePath.find_last_of("/\\");
+    if (lastSlash != std::string::npos) {
+        return filePath.substr(lastSlash + 1);
+    }
+    return filePath;
+}
+
+bool MapLoadSaveController::TrySaveSplatmapImage(const std::string &filepath)
+{
+    const sf::Image& splatmapImage = m_worldView->getSplatmapImage();
+    if (splatmapImage.saveToFile(filepath)) {
+        std::cout << "Splatmap image saved successfully to " << filepath << std::endl;
+        return true;
+    } else {
+        std::cerr << "Failed to save splatmap image to " << filepath << std::endl;
+        return false;
+    }
 }
