@@ -1,3 +1,9 @@
+[TILES_SIZE]
+64 64
+
+[SPLATMAP_FILEPATH]
+assets/maps/landcraft-splatmap.png
+
 [MAP_SIZE] # nb-rows nb-cols
 60 60
 

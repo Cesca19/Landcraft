@@ -31,10 +31,13 @@ void WorldController::init(const std::string &mapName,
     m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0));
 
     m_worldModel.loadMap(mapName);
+    sf::Vector2i tilesSize = m_worldModel.getTilesSize();
     m_worldView.init(viewSettings.center, viewSettings.size, 10);
-    m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
+    m_worldView.initCamera(tilesSize.x, tilesSize.y, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles());
+    m_worldView.initBrushes(m_brushController->getBrushesImagePaths());
+    m_worldView.initSplatmap(m_worldModel.getSplatmapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
     m_worldView.initEnvironment(viewSettings.windowSize);
 }
 
@@ -65,7 +68,7 @@ void WorldController::draw(sf::RenderWindow &window) const
 {
     m_worldView.draw(window);
     if (!m_worldView.getCamera().isRotating()) // only draw selection when not rotating to avoid visual clutter
-        m_brushController->draw(window, m_worldView.getCamera());
+        m_brushController->draw(window, m_worldView.getCamera(), m_editionController->areEditableTilesVisible());
 }
 
 void WorldController::onWindowResized(const sf::Vector2u windowSize, sf::RenderWindow& window)

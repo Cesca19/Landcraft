@@ -23,6 +23,7 @@ public:
                                         BrushController& brushController, CommandHistory& history) = 0;
     virtual void onToolSelected() const = 0;
     virtual void onToolUnSelected() const = 0;
+    virtual bool areEditableTilesVisible() const = 0;
 };
 
 #endif //LANDCRAFT_IEDITIONTOOL_HPP

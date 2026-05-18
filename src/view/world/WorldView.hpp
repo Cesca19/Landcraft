@@ -18,8 +18,10 @@ public:
     void init(sf::Vector2f center, sf::Vector2f size, int defaultZoom);
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
     void initTileMap(const std::vector<std::vector<Tile>>& tiles);
+    void initBrushes(const std::vector<std::string> &brushesImagePaths);
     void clearTileMap();
     void resetTileMap(const std::vector<std::vector<Tile>>& tiles);
+    void initSplatmap(const std::string& filepath, const sf::Vector2i& tileSize, int nbCols, int nbRows);
     void initEnvironment(sf::Vector2u windowSize);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
@@ -58,6 +60,12 @@ public:
 
     void setIsWireframeVisible(bool enabled) const;
     void setAreShadedTilesVisible(bool enabled) const;
+
+    void drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i& tileSize, int nbCols, int nbRows);
+    sf::Image getSplatmapArea(const sf::IntRect& area) const;
+    void restoreSplatmapArea(const sf::IntRect& area, const sf::Image& pixels);
+    void updateSplatmapImage();
+    const sf::Image& getSplatmapImage() const;
 private:
     void updateViewCenter(sf::Vector2f center);
 

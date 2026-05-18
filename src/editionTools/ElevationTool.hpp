@@ -18,6 +18,7 @@ public:
     SelectionMode getRequiredSelectionMode() const override;
     void onToolSelected() const override;
     void onToolUnSelected() const override;
+    bool areEditableTilesVisible() const override;
     void handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
 private:

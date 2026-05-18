@@ -82,6 +82,11 @@ void ElevationTool::onToolUnSelected() const
     setUIVisibility(false);
 }
 
+bool ElevationTool::areEditableTilesVisible() const
+{
+    return true;
+}
+
 void ElevationTool::handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view,
                                  BrushController &brushController, CommandHistory &history)
 {

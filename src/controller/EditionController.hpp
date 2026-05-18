@@ -18,6 +18,7 @@ public:
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, BrushController& brushController);
     bool isEditing() const;
     bool isSelectionLocked() const;
+    bool areEditableTilesVisible() const;
     SelectionMode getSelectionMode() const;
     void clearCommandHistory();
 private:

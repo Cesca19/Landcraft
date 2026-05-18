@@ -72,4 +72,5 @@ void MapLoadSaveController::resetEditor()
     m_editionController->clearCommandHistory();
     m_worldView->clearTileMap();
     m_worldView->resetTileMap(m_worldModel->getTiles());
+    m_worldView->initSplatmap(m_worldModel->getSplatmapFilepath(), m_worldModel->getTilesSize(), m_worldModel->getMapSize().x, m_worldModel->getMapSize().y);
 }

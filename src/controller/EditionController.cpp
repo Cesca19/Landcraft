@@ -50,6 +50,11 @@ bool EditionController::isSelectionLocked() const
     return m_editionTools[m_currentEditionTool]->isSelectionLocked();
 }
 
+bool EditionController::areEditableTilesVisible() const
+{
+    return m_editionTools[m_currentEditionTool]->areEditableTilesVisible();
+}
+
 SelectionMode EditionController::getSelectionMode() const
 {
     return m_editionTools[m_currentEditionTool]->getRequiredSelectionMode();

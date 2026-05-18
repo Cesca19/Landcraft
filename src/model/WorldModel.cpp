@@ -7,6 +7,7 @@
 
 WorldModel::WorldModel()
     : m_highestTileCornerHeight(0)
+    , m_tilesSize({-1, -1})
 {
 }
 
@@ -21,10 +22,27 @@ void WorldModel::loadMap(std::string mapName)
     m_tileTextureIdMap.clear();
     m_tileCornersHeightmap = std::move(worldMap->TileCornersHeightMap);
     m_tileTextureIdMap = std::move(worldMap->TileTextureIdMap);
+    m_tilesSize = worldMap->TilesSize;
+    m_splatmapFilepath = worldMap->splatmapFilepath;
     worldMap = nullptr;
     createWorldTileCorners();
     createWorldTiles();
     onTileCornerHeightChanged();
+}
+
+sf::Vector2i WorldModel::getTilesSize() const
+{
+    return m_tilesSize;
+}
+
+std::string WorldModel::getSplatmapFilepath() const
+{
+    return m_splatmapFilepath;
+}
+
+sf::Vector2i WorldModel::getMapSize() const
+{
+    return sf::Vector2i(m_corners.empty() ? 0 : m_corners[0].size() - 1, m_corners.size() - 1);
 }
 
 void WorldModel::saveMapToFile(std::string mapName)
@@ -103,10 +121,17 @@ float WorldModel::getHighestTileCornerHeight() const
 std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName)
 {
     std::ifstream mapFile(mapName);
-    if (!mapFile.is_open()) {
+    if (!mapFile.is_open())
         throw std::runtime_error("Failed to open map file: " + mapName);
-    }
 
+    sf::Vector2i tilesSize = loadTilesSize(mapFile);
+    if (tilesSize.x <= 0 || tilesSize.y <= 0)
+        throw std::runtime_error("Invalid tiles size in file: " + mapName);
+
+    std::string splatmapFilepath = loadSplatmapFilepath(mapFile);
+    if (splatmapFilepath.empty())
+         throw std::runtime_error("Failed to load splatmap filepath from file: " + mapName);
+    
     sf::Vector2i mapSize = loadMapSize(mapFile);
     if (mapSize.x <= 0 || mapSize.y <= 0) {
         throw std::runtime_error("Invalid map size in file: " + mapName);
@@ -128,7 +153,47 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName)
     std::unique_ptr<WorldMap> worldMap = std::make_unique<WorldMap>();
     worldMap->TileCornersHeightMap = heightmap;
     worldMap->TileTextureIdMap = textureIdMap;
+    worldMap->TilesSize = tilesSize;
+    worldMap->splatmapFilepath = splatmapFilepath;
     return worldMap;
+}
+
+sf::Vector2i WorldModel::loadTilesSize(std::ifstream &mapFile) const
+{
+    std::string line;
+    sf::Vector2i defaultSize(-1, -1);
+    while (std::getline(mapFile, line)) {
+        if (line.empty())
+            continue;
+        if (line.find("[TILES_SIZE]") != std::string::npos) {
+            break;
+        } else
+            return defaultSize;
+    }
+    if (std::getline(mapFile, line)) {
+        std::istringstream iss(line);
+        int width, height;
+        if (iss >> width >> height) {
+            return sf::Vector2i(width, height);
+        }
+    }
+    return defaultSize;
+}
+
+std::string WorldModel::loadSplatmapFilepath(std::ifstream &mapFile) const
+{
+    std::string line;
+    while (std::getline(mapFile, line)) {
+        if (line.empty())
+            continue;
+        if (line.find("[SPLATMAP_FILEPATH]") != std::string::npos)
+            break;
+        else
+            return "";
+    }
+    if (std::getline(mapFile, line))
+        return line;
+    return "";
 }
 
 sf::Vector2i WorldModel::loadMapSize(std::ifstream &mapFile) const

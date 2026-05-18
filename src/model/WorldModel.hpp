@@ -13,6 +13,8 @@
 #include "Tile.hpp"
 
 struct WorldMap {
+    sf::Vector2i TilesSize;
+    std::string splatmapFilepath;
     std::vector<std::vector<float>> TileCornersHeightMap;
     std::vector<std::vector<int>> TileTextureIdMap;
 };
@@ -23,6 +25,9 @@ public:
     WorldModel();
     ~WorldModel();
     void loadMap(std::string mapName);
+    sf::Vector2i getTilesSize() const;
+    std::string getSplatmapFilepath() const;
+    sf::Vector2i getMapSize() const;
     void saveMapToFile(std::string mapName);
     std::vector<std::vector<Tile>>& getTiles();
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
@@ -30,8 +35,11 @@ public:
     void onTileCornerHeightChanged();
     void onTileCornerHeightChanged(float height);
     float getHighestTileCornerHeight() const;
+
 private:
     std::unique_ptr<WorldMap> loadMapFromFile(std::string mapName);
+    sf::Vector2i loadTilesSize(std::ifstream &mapFile) const;
+    std::string loadSplatmapFilepath(std::ifstream &mapFile) const;
     sf::Vector2i loadMapSize(std::ifstream &mapFile) const;
     std::vector<std::vector<float>> loadTileCornersHeightmap(std::ifstream &mapFile, int nb_rows, int nb_cols) const;
     std::vector<std::vector<int>> loadTileTextureIdMap(std::ifstream &mapFile, int nb_rows, int nb_cols) const;
@@ -45,6 +53,9 @@ private:
     std::vector<std::vector<std::unique_ptr<TileCorner>>> m_corners;
     std::vector<std::vector<Tile>> m_tiles;
     float m_highestTileCornerHeight;
+
+    sf::Vector2i m_tilesSize;
+    std::string m_splatmapFilepath;
 };
 
 

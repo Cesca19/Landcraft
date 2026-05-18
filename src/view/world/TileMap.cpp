@@ -5,7 +5,7 @@
 #include "TileMap.hpp"
 
 TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSize)
-    : m_tilesSize(tilesSize)
+    : m_texturesTilesSize(tilesSize)
     , m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
     , m_shadedTileColor(sf::Color(252, 252, 254))
@@ -14,6 +14,13 @@ TileMap::TileMap(const std::string &tilesetFilepath, const sf::Vector2u tilesSiz
     , m_areShadedTilesVisible(true)
 {
     m_tilesetTexture = &ResourceManager::getInstance().getTexture(tilesetFilepath);
+    m_tilesTextures.push_back(ResourceManager::getInstance().getTexture("assets/textures/grass_32.png"));
+    m_tilesTextures.push_back(ResourceManager::getInstance().getTexture("assets/textures/sand_32.png"));
+    m_tilesTextures.push_back(ResourceManager::getInstance().getTexture("assets/textures/rock_32.png"));
+    m_tilesTextures.push_back(ResourceManager::getInstance().getTexture("assets/textures/snow_32.png"));
+
+    for (auto& texture : m_tilesTextures)
+        texture.setRepeated(true);
 }
 
 void TileMap::clear()
@@ -36,6 +43,25 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
             addShadedTile(tile, camera);
             addWireframeTile(tile, camera);
         }
+    if (!m_terrainShader.loadFromFile("assets/shaders/terrain.vert", "assets/shaders/terrain.frag"))
+        throw std::runtime_error("Failed to load terrain shader");
+        m_terrainShader.setUniform("u_Splatmap", m_splatmap.getTexture());
+        m_terrainShader.setUniform("u_TexGrass", m_tilesTextures[0]);
+        m_terrainShader.setUniform("u_TexSand",  m_tilesTextures[1]);
+        m_terrainShader.setUniform("u_TexRock",  m_tilesTextures[2]);
+        m_terrainShader.setUniform("u_TexSnow",  m_tilesTextures[3]);
+
+}
+
+void TileMap::initBrushes(const std::vector<std::string> &brushesImagePaths)
+{
+    for (int i = 0; i < brushesImagePaths.size(); i++) {
+        sf::Sprite sprite;
+        sf::Texture& texture = ResourceManager::getInstance().getTexture(brushesImagePaths[i]);
+        sprite.setTexture(texture);
+        sprite.setOrigin(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f);
+        m_brushSprites.insert({i, sprite});  
+    }
 }
 
 void TileMap::updatePositions(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera)
@@ -133,6 +159,126 @@ void TileMap::setAreShadedTilesVisible(bool enabled)
     m_areShadedTilesVisible = enabled;
 }
 
+void TileMap::initSplatmap(const std::string &filepath, const sf::Vector2i &tileSize, int nbCols, int nbRows)
+{
+    m_tilesSize = tileSize;
+    m_nbCols = nbCols;
+    m_nbRows = nbRows;
+    unsigned int expectedWidth = tileSize.x * nbCols;
+    unsigned int expectedHeight = tileSize.y * nbRows;
+
+    m_splatmap.create(expectedWidth, expectedHeight);
+    m_splatmap.clear(sf::Color(0, 0, 0, 0));
+
+    sf::Image loadedImage;
+    if (!filepath.empty() && loadedImage.loadFromFile(filepath)) {
+        if (loadedImage.getSize().x == expectedWidth && loadedImage.getSize().y == expectedHeight) {
+            sf::Texture texture;
+            texture.loadFromImage(loadedImage);
+            sf::Sprite sprite(texture);
+            sf::RenderStates states;
+            states.blendMode = sf::BlendNone;
+            m_splatmap.draw(sprite, states);
+            std::cout << "Splatmap loaded successfully." << std::endl;
+        }
+    }
+
+    m_splatmap.display();
+    m_terrainShader.setUniform("u_Splatmap", m_splatmap.getTexture());
+    m_terrainShader.setUniform("u_MapSize", sf::Vector2f(static_cast<float>(nbCols), static_cast<float>(nbRows)));
+    updateSplatmapImage();
+}
+
+void TileMap::drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i& tileSize, int nbCols, int nbRows)
+{
+    sf::Sprite& brushSprite = m_brushSprites[stroke.brushTextureId];
+    sf::RenderStates states = sf::RenderStates::Default;
+    float diameterInTiles = (stroke.radius * 2.0f) + 1.0f;
+    float expectedPixelWidth = diameterInTiles * tileSize.x;
+    float expectedPixelHeight = diameterInTiles * tileSize.y;
+    
+    brushSprite.setScale(
+        expectedPixelWidth / brushSprite.getTexture()->getSize().x,
+        expectedPixelHeight / brushSprite.getTexture()->getSize().y
+    );
+    // In blending mode the source color is the color of the brush sprite, 
+    // and the destination color is the current color in the splatmap.
+    // where new_pixel = (dest * dest_factor) [equation] (source * source_factor)
+    if (stroke.textureId == 0) {
+        brushSprite.setColor(sf::Color(255, 255, 255, 255)); // Eraser
+        states.blendMode = sf::BlendMode(
+            // reverse_subtract does : dest - source, which means it will subtract the brush color from the splatmap color, effectively erasing it
+            // sf::BlendMode::One means we use 100% of the splatmap color
+            // sf::BlendMode::SrcAlpha means we use the brush color multiplied by its alpha
+            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract, // for RGB channels : grass, sand, rock
+            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract // for Alpha channel : snow
+        );
+    } else {
+        states.blendMode = sf::BlendMode(
+            // Here we use the brush color multiplied by its alpha, so only the non-transparent parts of the brush will affect the splatmap
+            // then we add it to the existing splatmap color,
+            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::Add,
+            // here we let the spla
+            sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add
+        );
+        // brushSprite.setColor(sf::Color(255, 0, 0, 255)) : multiplies the initial color of the brush texture by those RGB and alpha 
+        // whithout overriding them so a pixel a initial 0.7 alpha will remain 0.7 but will be colored in red 
+        if (stroke.textureId == 1) 
+            brushSprite.setColor(sf::Color(255, 0, 0, 255)); // Grass R 
+        else if (stroke.textureId == 2) 
+            brushSprite.setColor(sf::Color(0, 255, 0, 255)); // Sand G
+        else if (stroke.textureId == 3) 
+            brushSprite.setColor(sf::Color(0, 0, 255, 255)); // Rock B
+        else if (stroke.textureId == 4) 
+        {
+            brushSprite.setColor(sf::Color(0, 0, 0, 255));   // Snow A
+            states.blendMode = sf::BlendMode(
+                // we do the opposite for snow because it's stored in the alpha channel of the splatmap,
+                // we want to add it to the splatmap but not affect the RGB channels, so we use Zero for RGB and SrcAlpha for Alpha
+                sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add,
+                sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::Add
+            );
+        }
+    }
+    float percentX = stroke.worldPosition.x / static_cast<float>(nbCols);
+    float percentY = stroke.worldPosition.y / static_cast<float>(nbRows);
+    brushSprite.setPosition(percentX * m_splatmap.getSize().x, percentY * m_splatmap.getSize().y);
+    m_splatmap.draw(brushSprite, states);
+    m_splatmap.display();
+}
+
+sf::Image TileMap::getSplatmapArea(const sf::IntRect& area) const 
+{
+    sf::Image fullImage = m_splatmap.getTexture().copyToImage();
+    sf::Image subImage;
+    subImage.create(area.width, area.height);
+    subImage.copy(fullImage, 0, 0, area);
+    return subImage;
+}
+
+void TileMap::restoreSplatmapArea(const sf::IntRect& area, const sf::Image& pixels) 
+{
+    sf::Texture tempTex;
+    tempTex.loadFromImage(pixels);
+    sf::Sprite tempSprite(tempTex);
+    tempSprite.setPosition(area.left, area.top);
+    
+    sf::RenderStates states;
+    states.blendMode = sf::BlendNone;
+    m_splatmap.draw(tempSprite, states);
+    m_splatmap.display();
+}
+
+const sf::Image &TileMap::getSplatmapImage() const
+{
+    return m_splatmapImage;
+}
+
+void TileMap::updateSplatmapImage()
+{
+    m_splatmapImage = m_splatmap.getTexture().copyToImage();
+}
+
 void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
 {
     // -> shaded tiles
@@ -141,7 +287,9 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
     for (const TileCorner *corner : upRightCorners)
     {
         sf::Vector2f screenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-        m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
+        sf::Vertex vertex(screenPos, m_shadedTileColor);
+        vertex.texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
+        m_shadedTilesVertexArray.append(vertex);
     }
 
     // down left triangle
@@ -149,9 +297,10 @@ void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
     for (const TileCorner *corner : downLeftCorners)
     {
         sf::Vector2f screenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-        m_shadedTilesVertexArray.append(sf::Vertex(screenPos, m_shadedTileColor));
+        sf::Vertex vertex(screenPos, m_shadedTileColor);
+        vertex.texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
+        m_shadedTilesVertexArray.append(vertex);
     }
-    paintTile(m_shadedTilesVertexArray.getVertexCount() - 6, tile.getTextureId());
 }
 
 void TileMap::addWireframeTile(const Tile &tile, const Camera &camera)
@@ -222,15 +371,15 @@ void TileMap::paintTile(int shadedIndex, const int textureId)
         }
         return;
     }
-    const unsigned int x = textureId * m_tilesSize.x;
+    const unsigned int x = textureId * m_texturesTilesSize.x;
     const int y = 0;
     float offset = 0.2f; // to avoid texture bleeding
     sf::Vector2f texCoords[6] = {
         sf::Vector2f(x + offset, y + offset),
-        sf::Vector2f(x + m_tilesSize.x - offset, y + offset),
-        sf::Vector2f(x + m_tilesSize.x - offset, y + m_tilesSize.y - offset),
-        sf::Vector2f(x + m_tilesSize.x - offset, y + m_tilesSize.y - offset),
-        sf::Vector2f(x + offset, y + m_tilesSize.y - offset),
+        sf::Vector2f(x + m_texturesTilesSize.x - offset, y + offset),
+        sf::Vector2f(x + m_texturesTilesSize.x - offset, y + m_texturesTilesSize.y - offset),
+        sf::Vector2f(x + m_texturesTilesSize.x - offset, y + m_texturesTilesSize.y - offset),
+        sf::Vector2f(x + offset, y + m_texturesTilesSize.y - offset),
         sf::Vector2f(x + offset, y + offset)
     };
     for (const auto texCoord : texCoords) {
@@ -246,13 +395,15 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
     states.transform *= getTransform();
 
     // apply the tileset texture
-    states.texture = m_tilesetTexture;
+    // states.texture = m_tilesetTexture;
 
     // draw the vertex array
-    if (m_areShadedTilesVisible)
+    if (m_areShadedTilesVisible) {
+        states.shader = &m_terrainShader;
         target.draw(m_shadedTilesVertexArray, states);
+    }
 
-    states.texture = nullptr;
+    states.shader = nullptr;
     if (m_isWireframeVisible)
         target.draw(m_wireframeTilesVertexArray, states);
 }

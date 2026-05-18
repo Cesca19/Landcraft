@@ -13,7 +13,7 @@ BrushController::BrushController(const sf::Vector2f uiStartPosition)
     , m_brushSizeMax(20)
     , m_currentBrushImage(-1)
 {
-    std::vector<std::string> brushImagePaths = {
+    m_brushesImagePaths = {
         "assets/textures/brushes/Carre_Plein.png",
         "assets/textures/brushes/Hexagone.png",
         "assets/textures/brushes/Cercle_Dur.png",
@@ -24,13 +24,13 @@ BrushController::BrushController(const sf::Vector2f uiStartPosition)
         "assets/textures/brushes/Etoile_Trouee.png",
     };
 
-    m_brushMenu = std::make_unique<BrushMenu>(uiStartPosition, brushImagePaths);
+    m_brushMenu = std::make_unique<BrushMenu>(uiStartPosition, m_brushesImagePaths);
     m_brushMenu->setIncrementBrushSizeButtonCallback([this]() { incrementBrushSize(); });
     m_brushMenu->setDecrementBrushSizeButtonCallback([this]() { decrementBrushSize(); });
     m_brushMenu->setBrushSizeValueText(getBrushSizeValue());
 
-    for (int i = 0; i < brushImagePaths.size(); i++) {
-        m_brushesImages.push_back(ResourceManager::getInstance().getImage(brushImagePaths[i]));
+    for (int i = 0; i < m_brushesImagePaths.size(); i++) {
+        m_brushesImages.push_back(ResourceManager::getInstance().getImage(m_brushesImagePaths[i]));
         sanitizeBrushImage(m_brushesImages.back());
         m_brushMenu->setBrushTypeButtonCallback(i, [this, i] () { selectBrush(i); });
     }
@@ -66,13 +66,13 @@ void BrushController::update(const float deltaTime, const sf::RenderWindow &wind
     // should we hide the mouse cursor when something is hovered inside the map
 }
 
-void BrushController::draw(sf::RenderWindow &window, const Camera &camera) const
+void BrushController::draw(sf::RenderWindow &window, const Camera &camera, bool areEditableTilesVisible) const
 {
     if (!m_tilesToHilight.empty())
         m_brushView->drawBrushOverlay(window, m_tilesToHilight, camera, m_brushCenterWorldPosition, static_cast<float>(m_brushSize), m_brushesImages[m_currentBrushImage]);
     if (!m_brushSelectionTileCorners.empty())
         m_brushView->drawTileCorners(window, m_brushSelectionTileCorners, camera);
-    if (!m_brushSelectionTiles.empty()) {
+    if (!m_brushSelectionTiles.empty() && areEditableTilesVisible) {
         // m_brushView->drawTiles(window, m_brushSelectionTiles, camera);
         m_brushView->drawMaskedSelectedTiles(window, m_brushSelectionTiles, camera, m_brushCenterWorldPosition, static_cast<float>(m_brushSize), m_brushesImages[m_currentBrushImage]);
     }
@@ -83,12 +83,22 @@ sf::Vector2i BrushController::getMouseWorldPosition() const
     return m_mouseWorldPosition;
 }
 
+sf::Vector2f BrushController::getBrushCenterWorldPosition() const
+{
+    return m_brushCenterWorldPosition;
+}
+
 bool BrushController::isAnyTileCornerSelected() const
 {
     return !m_brushSelectionTileCorners.empty() || !m_brushSelectionTiles.empty();
 }
 
-const std::vector<BrushTileCornerHit>& BrushController::getBrushTileCornersSelection() const
+std::vector<std::string> BrushController::getBrushesImagePaths() const
+{
+    return m_brushesImagePaths;
+}
+
+const std::vector<BrushTileCornerHit> &BrushController::getBrushTileCornersSelection() const
 {
     return m_brushSelectionTileCorners;
 }
@@ -140,6 +150,15 @@ std::vector<BrushTileCornerHit> BrushController::getNeighborsTilesInBrushAsTileC
     return selection;
 }
 
+int BrushController::getCurrentBrushId() const
+{
+    return m_currentBrushImage;
+}
+
+int BrushController::getCurrentBrushRadius() const
+{
+    return m_brushSize;
+}
 
 void BrushController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
@@ -153,7 +172,6 @@ void BrushController::getSelectedCorners(const sf::RenderWindow &window, const C
     m_brushSelectionTiles.clear();
     m_brushSelectionTileCorners.clear();
     m_brushSelectionTilesAsTileCorners.clear();
-    m_mouseWorldPosition = sf::Vector2i(-1, -1);
     m_mouseWorldPosition = {static_cast<int>(std::round(tempPos.x)), static_cast<int>(std::round(tempPos.y))};
     if (selectionMode == SelectionMode::TILE_CORNER)
         getSelectedTilesCorners(camera, worldModel, m_mouseWorldPosition, sf::Vector2f(mouseScreenPosition));

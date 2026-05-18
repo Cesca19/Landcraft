@@ -45,6 +45,11 @@ void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
     resetTileMap(tiles);
 }
 
+void WorldView::initBrushes(const std::vector<std::string> &brushesImagePaths)
+{
+    m_tileMap->initBrushes(brushesImagePaths);
+}
+
 void WorldView::clearTileMap()
 {
     m_tileMap->clear();
@@ -53,6 +58,11 @@ void WorldView::clearTileMap()
 void WorldView::resetTileMap(const std::vector<std::vector<Tile>>& tiles)
 {
     m_tileMap->init(tiles, *m_camera);
+}
+
+void WorldView::initSplatmap(const std::string &filepath, const sf::Vector2i &tileSize, int nbCols, int nbRows)
+{
+    m_tileMap->initSplatmap(filepath, tileSize, nbCols, nbRows);
 }
 
 void WorldView::initEnvironment(const sf::Vector2u windowSize)
@@ -290,6 +300,31 @@ void WorldView::setIsWireframeVisible(bool enabled) const
 void WorldView::setAreShadedTilesVisible(bool enabled) const
 {
     m_tileMap->setAreShadedTilesVisible(enabled);
+}
+
+void WorldView::drawStrokeOnSplatmap(const PaintStroke &stroke, const sf::Vector2i &tileSize, int nbCols, int nbRows)
+{
+    m_tileMap->drawStrokeOnSplatmap(stroke, tileSize, nbCols, nbRows);
+}
+
+sf::Image WorldView::getSplatmapArea(const sf::IntRect &area) const
+{
+    return m_tileMap->getSplatmapArea(area);
+}
+
+void WorldView::restoreSplatmapArea(const sf::IntRect &area, const sf::Image &pixels)
+{
+    m_tileMap->restoreSplatmapArea(area, pixels);
+}
+
+void WorldView::updateSplatmapImage()
+{
+    m_tileMap->updateSplatmapImage();
+}
+
+const sf::Image &WorldView::getSplatmapImage() const
+{
+    return m_tileMap->getSplatmapImage();
 }
 
 void WorldView::updateViewCenter(const sf::Vector2f center)
