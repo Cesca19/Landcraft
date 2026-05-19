@@ -276,7 +276,12 @@ void WorldView::updateContinuousRotation(const sf::RenderWindow &window) const
     m_camera->updateContinuousRotation(sf::Mouse::getPosition(window));
 }
 
-void WorldView::updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const
+void WorldView::updatePositions(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera) const
+{
+    m_tileMap->updatePositions(worldTiles, camera);
+}
+
+void WorldView::updateTileCorners(const std::vector<std::vector<Tile>> &worldTiles, const std::vector<TileCorner *> &selectedCorners) const
 {
     m_tileMap->updatePositions(worldTiles, selectedCorners, *m_camera);
 }
