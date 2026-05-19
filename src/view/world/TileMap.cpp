@@ -66,39 +66,32 @@ void TileMap::initBrushes(const std::vector<std::string> &brushesImagePaths)
 
 void TileMap::updatePositions(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera)
 {
-    if (worldTiles.empty() || worldTiles[0].empty())
-        return; // TO DO: Handle empty tile map case
+    if (worldTiles.empty() || worldTiles[0].empty()) return;
+    int nbRows = static_cast<int>(worldTiles.size());
+    int nbCols = static_cast<int>(worldTiles[0].size());
 
-    int shadedIndex = 0;
-    int wireframeIndex = 0;
+    // Detection of the map orientation to determine the correct drawing order
+    sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
+    sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
+    sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
+    bool colForward = (p10.y - p00.y) > 0;
+    bool rowForward = (p01.y - p00.y) > 0;
+    int rStart = rowForward ? 0 : nbRows - 1;
+    int rEnd = rowForward ? nbRows : -1;
+    int rStep = rowForward ? 1 : -1;
+    int cStart = colForward ? 0 : nbCols - 1;
+    int cEnd = colForward ? nbCols : -1;
+    int cStep = colForward ? 1 : -1;
 
-    for (int row = 0; row < worldTiles.size(); ++row)
-    {
-        for (int col = 0; col < worldTiles[0].size(); ++col)
-        {
-            const Tile& tile = worldTiles[row][col];
-
-            // shaded triangles update
-            for (const TileCorner* corner : tile.getUpRightTriangleCorners()) {
-                m_shadedTilesVertexArray[shadedIndex++].position =
-                    camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-            }
-            for (const TileCorner* corner : tile.getDownLeftTriangleCorners()) {
-                m_shadedTilesVertexArray[shadedIndex++].position =
-                    camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-            }
-
-            // wireframe update
-            std::vector<TileCorner*> corners = tile.getCorners();
-            for (size_t i = 0; i < corners.size(); ++i) {
-                const TileCorner* corner1 = corners[i];
-                const TileCorner* corner2 = corners[(i + 1) % corners.size()];
-
-                m_wireframeTilesVertexArray[wireframeIndex++].position =
-                    camera.world_to_screen(corner1->getColumn(), corner1->getRow(), corner1->getHeight());
-                m_wireframeTilesVertexArray[wireframeIndex++].position =
-                    camera.world_to_screen(corner2->getColumn(), corner2->getRow(), corner2->getHeight());
-            }
+    int drawOrder = 0;
+    for (int row = rStart; row != rEnd; row += rStep) {
+        for (int col = cStart; col != cEnd; col += cStep) {
+            const Tile &tile = worldTiles[row][col];
+            int shadedIndex = drawOrder * 6; // 6 vertices per tile
+            int wireframeIndex = drawOrder * 8; // 8 vertices per tile (4 lines)
+            updateShadedTile(tile, camera, shadedIndex);
+            updateWireframeTile(tile, camera, wireframeIndex);
+            drawOrder++;
         }
     }
 }
@@ -320,15 +313,23 @@ void TileMap::addWireframeTile(const Tile &tile, const Camera &camera)
 
 void TileMap::updateTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::set<std::pair<int, int>>& tilesToUpdate, const Camera &camera)
 {
-    const int nbCols = static_cast<int>(worldTiles[0].size());
+    if (worldTiles.empty() || worldTiles[0].empty()) 
+        return;
+    int nbRows = static_cast<int>(worldTiles.size());
+    int nbCols = static_cast<int>(worldTiles[0].size());
+    sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
+    sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
+    sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
+    bool colForward = (p10.y - p00.y) > 0;
+    bool rowForward = (p01.y - p00.y) > 0;
+
     for (const auto&[row, col] : tilesToUpdate) {
         const Tile& tile = worldTiles[row][col];
-        // tile index the worldModel tilemap
-        const int tileIndex = (row * nbCols) + col;
-        // tile index in the shaded tilemap : made of triangles each tile has 6 vertices
-        const int shadedIndex = tileIndex * 6;
-        // tile index in the wireframe tilemap : made of lines each tile has 8 vertices
-        const int wireframeIndex = tileIndex * 8;
+        int rIndex = rowForward ? row : (nbRows - 1 - row);
+        int cIndex = colForward ? col : (nbCols - 1 - col);
+        int drawOrder = (rIndex * nbCols) + cIndex;
+        int shadedIndex = drawOrder * 6;
+        int wireframeIndex = drawOrder * 8;
 
         // --- UPDATE TRIANGLES ---
         updateShadedTile(tile, camera, shadedIndex);
@@ -339,12 +340,18 @@ void TileMap::updateTiles(const std::vector<std::vector<Tile>>& worldTiles, cons
 
 void TileMap::updateShadedTile(const Tile &tile, const Camera &camera, int shadedIndex)
 {
-    for (const TileCorner* corner : tile.getUpRightTriangleCorners())
-        m_shadedTilesVertexArray[shadedIndex++].position =
+    for (const TileCorner* corner : tile.getUpRightTriangleCorners()) {
+        m_shadedTilesVertexArray[shadedIndex].position =
             camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-    for (const TileCorner* corner : tile.getDownLeftTriangleCorners())
-        m_shadedTilesVertexArray[shadedIndex++].position =
+        m_shadedTilesVertexArray[shadedIndex].texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
+        shadedIndex++;
+    }
+    for (const TileCorner* corner : tile.getDownLeftTriangleCorners()) {
+        m_shadedTilesVertexArray[shadedIndex].position =
             camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
+        m_shadedTilesVertexArray[shadedIndex].texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
+        shadedIndex++;
+    }
 }
 
 void TileMap::updateWireframeTile(const Tile &tile, const Camera &camera, int wireframeIndex)

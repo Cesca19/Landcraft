@@ -5,8 +5,9 @@ void main() {
     
     // Pass texture coordinates (the UVs we clapped to the grid)
     // gl_MultiTexCoord0 represent the texture_coords set in the tilemap
-    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
     
     // Pass color to the fragment shader
     gl_FrontColor = gl_Color;
+    gl_BackColor  = gl_Color;
 }

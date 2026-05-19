@@ -1,3 +1,9 @@
+[TILES_SIZE]
+64 64
+
+[SPLATMAP_FILEPATH]
+landcraft-splatmap.png
+
 [MAP_SIZE]
 60 60
 
