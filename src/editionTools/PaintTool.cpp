@@ -97,7 +97,7 @@ void PaintTool::handleEvents(const sf::RenderWindow& window, const sf::Event &ev
         && m_ongoingPaintCommand == nullptr) {
         // m_ongoingPaintCommand = std::make_unique<PaintTilesCommand>(m_currentTextureId);
         // m_ongoingPaintCommand->AddTiles(brushController.getBrushTilesSelection(), model, view);
-        m_ongoingPaintCommand = std::make_unique<PaintSplatmapCommand>();
+        m_ongoingPaintCommand = std::make_unique<PaintSplatMapCommand>();
         m_previousMousePosition = brushController.getMouseWorldPosition();
         paintStroke(brushController.getBrushCenterWorldPosition(), model, view, 
             brushController.getCurrentBrushId(), brushController.getCurrentBrushRadius());

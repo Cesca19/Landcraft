@@ -15,9 +15,9 @@
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-class PaintSplatmapCommand : public ICommand {
+class PaintSplatMapCommand : public ICommand {
 public:
-    PaintSplatmapCommand();
+    PaintSplatMapCommand();
     void addStroke(const PaintStroke& stroke);
     bool isEmpty() const;
     void drawRealTime(WorldModel& model, WorldView& view);

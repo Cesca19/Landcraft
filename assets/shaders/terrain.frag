@@ -4,9 +4,27 @@ uniform sampler2D u_TexSand;
 uniform sampler2D u_TexRock;
 uniform sampler2D u_TexSnow;
 
+uniform float u_MinElevation;
+uniform float u_ElevationRange;
+uniform float u_WaterHeight;
+
 uniform vec2 u_MapSize; 
 
+uniform float u_IsWireframe;
+
 void main() {
+    // Decode altitude : Minimum + (Percentage * Range)
+    float terrainZ = u_MinElevation + (gl_Color.a * u_ElevationRange);
+    // Clip the terrain if it is underwater
+    if (terrainZ <= u_WaterHeight) {
+        discard;
+    }
+
+    if (u_IsWireframe > 0.5) {
+        gl_FragColor = vec4(gl_Color.rgb, 1.0);
+        return;
+    }
+
     // get the tile UV coordinates from the vertex shader
     vec2 tileUV = gl_TexCoord[0].xy; 
     
@@ -35,4 +53,5 @@ void main() {
     
     // we multiply the final color by the vertex color (which is white in our case) to get the final output color
     gl_FragColor = finalColor * gl_Color;
+    gl_FragColor.a = 1.0; // Set alpha to 1 for opaque terrain
 }

@@ -2,24 +2,24 @@
 // Created by fran on 15/05/2026.
 //
 
-#include "PaintSplatmapCommand.hpp"
+#include "PaintSplatMapCommand.hpp"
 
-PaintSplatmapCommand::PaintSplatmapCommand() 
+PaintSplatMapCommand::PaintSplatMapCommand()
     : m_isFirstExecution(true) 
 {
 }
 
-void PaintSplatmapCommand::addStroke(const PaintStroke& stroke) 
+void PaintSplatMapCommand::addStroke(const PaintStroke& stroke)
 {
     m_strokes.push_back(stroke);
 }
 
-bool PaintSplatmapCommand::isEmpty() const 
+bool PaintSplatMapCommand::isEmpty() const
 {
     return m_strokes.empty();
 }
 
-void PaintSplatmapCommand::drawRealTime(WorldModel& model, WorldView& view) 
+void PaintSplatMapCommand::drawRealTime(WorldModel& model, WorldView& view)
 {
     if (m_strokes.empty())
         return;
@@ -30,7 +30,7 @@ void PaintSplatmapCommand::drawRealTime(WorldModel& model, WorldView& view)
     view.drawStrokeOnSplatmap(m_strokes.back(), model.getTilesSize(), nbCols, nbRows);
 }
 
-void PaintSplatmapCommand::execute(WorldModel& model, WorldView& view) 
+void PaintSplatMapCommand::execute(WorldModel& model, WorldView& view)
 {
     int nbCols = model.getTiles()[0].size();
     int nbRows = model.getTiles().size();
@@ -72,7 +72,7 @@ void PaintSplatmapCommand::execute(WorldModel& model, WorldView& view)
     view.updateSplatmapImage();
 }
 
-void PaintSplatmapCommand::undo(WorldModel& model, WorldView& view) 
+void PaintSplatMapCommand::undo(WorldModel& model, WorldView& view)
 {
     if (m_modifiedArea.width > 0 && m_modifiedArea.height > 0) {
         view.restoreSplatmapArea(m_modifiedArea, m_oldPixels);
@@ -80,7 +80,7 @@ void PaintSplatmapCommand::undo(WorldModel& model, WorldView& view)
     }
 }
 
-std::string PaintSplatmapCommand::getName()
+std::string PaintSplatMapCommand::getName()
 {
     return "Painted " + std::to_string(m_strokes.size()) + " stroke(s)";
 }

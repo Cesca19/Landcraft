@@ -15,6 +15,8 @@ WorldView::WorldView()
     , m_dragStartWorldPos({0, 0})
     , m_isDragging(false)
     , m_isMoving(false)
+    , m_waterView(std::make_unique<WaterView>())
+    , m_tileMap(nullptr)
 {
 }
 
@@ -39,9 +41,11 @@ void WorldView::initCamera(float tileSizeX, float tileSizeY, float heightScale, 
     m_camera->setWorldPivotWithWorldPosition(worldPivot);
 }
 
-void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles)
+void WorldView::initTileMap(const std::vector<std::vector<Tile>> &tiles
+    , float minElevation, float maxElevation, float waterHeight)
 {
-    m_tileMap = std::make_unique<TileMap>("assets/textures/tilemap-tileset-pastel.png", sf::Vector2u{32, 32});
+    m_tileMap = std::make_unique<TileMap>(minElevation, maxElevation, waterHeight);
+    m_waterHeight = waterHeight;
     resetTileMap(tiles);
 }
 
@@ -60,9 +64,14 @@ void WorldView::resetTileMap(const std::vector<std::vector<Tile>>& tiles)
     m_tileMap->init(tiles, *m_camera);
 }
 
-void WorldView::initSplatmap(const std::string &filepath, const sf::Vector2i &tileSize, int nbCols, int nbRows)
+void WorldView::initSplatMap(const std::string &filepath, const sf::Vector2i &tileSize, int nbCols, int nbRows)
 {
-    m_tileMap->initSplatmap(filepath, tileSize, nbCols, nbRows);
+    m_tileMap->initSplatMap(filepath, tileSize, nbCols, nbRows);
+}
+
+void WorldView::initWaterView(int nbCols, int nbRows, const sf::Vector2i &tileSize)
+{
+    m_waterView->init(nbCols, nbRows, tileSize, m_waterHeight, *m_camera);
 }
 
 void WorldView::initEnvironment(const sf::Vector2u windowSize)
@@ -107,8 +116,10 @@ void WorldView::update(const float deltaTime, const std::vector<std::vector<Tile
         }
 
     m_camera->update(deltaTime);
+    m_waterView->update(deltaTime);
     if (m_camera->isRotating() || m_camera->isContinuousRotationActive())
-        m_tileMap->updatePositions(tiles, *m_camera);
+        updatePositions(tiles, *m_camera);
+        // m_tileMap->updatePositions(tiles, *m_camera);
     m_environmentView->update(*m_camera, m_view.getCenter(), m_view.getSize(),
         {window.getSize().x - 50.0f, 100.0f}, 40, isMoving() || isRotating());
 }
@@ -117,8 +128,11 @@ void WorldView::draw(sf::RenderWindow &window) const
 {
     m_environmentView->drawSkyBox(window);
     // m_environmentView->drawWorldReference(window);
+
     window.setView(m_view);
+    m_waterView->draw(window);
     window.draw(*m_tileMap);
+
     m_environmentView->drawWorldGizmo(window);
 }
 
@@ -279,22 +293,13 @@ void WorldView::updateContinuousRotation(const sf::RenderWindow &window) const
 void WorldView::updatePositions(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera) const
 {
     m_tileMap->updatePositions(worldTiles, camera);
+    m_waterView->updatePositions(camera);
 }
 
 void WorldView::updateTileCorners(const std::vector<std::vector<Tile>> &worldTiles, const std::vector<TileCorner *> &selectedCorners) const
 {
     m_tileMap->updatePositions(worldTiles, selectedCorners, *m_camera);
-}
-
-void WorldView::paintTiles(const std::vector<std::vector<Tile>> &worldTiles, const std::vector<Tile *> &tilesToPaint,
-    const int textureId) const
-{
-    m_tileMap->paintTiles(worldTiles, tilesToPaint, textureId);
-}
-
-void WorldView::paintTile(const std::vector<std::vector<Tile>> &worldTiles, Tile *tileToPaint, int textureId) const
-{
-    m_tileMap->paintTile(worldTiles, tileToPaint, textureId);
+    m_waterView->updatePositions(*m_camera);
 }
 
 void WorldView::setIsWireframeVisible(bool enabled) const

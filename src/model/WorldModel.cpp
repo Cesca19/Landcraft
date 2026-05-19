@@ -8,6 +8,9 @@
 WorldModel::WorldModel()
     : m_highestTileCornerHeight(0)
     , m_tilesSize({-1, -1})
+    , m_minElevation(-20.0f)
+    , m_maxElevation(30.0f)
+    , m_waterHeight(-5.0f)
 {
 }
 
@@ -113,6 +116,21 @@ void WorldModel::onTileCornerHeightChanged(const float height)
 float WorldModel::getHighestTileCornerHeight() const
 {
     return m_highestTileCornerHeight;
+}
+
+float WorldModel::getMinElevation() const
+{
+    return m_minElevation;
+}
+
+float WorldModel::getMaxElevation() const
+{
+    return m_maxElevation;
+}
+
+float WorldModel::getWaterHeight() const
+{
+    return m_waterHeight;
 }
 
 std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName)
@@ -270,7 +288,7 @@ void WorldModel::createWorldTileCorners()
         std::vector<std::unique_ptr<TileCorner>> rowCorners;
         for (int col = 0; col < m_tileCornersHeightmap[row].size(); col++) {
             std::unique_ptr<TileCorner> tileCorner = std::make_unique<TileCorner>(
-                row, col, m_tileCornersHeightmap[row][col]
+                row, col, m_tileCornersHeightmap[row][col], m_minElevation, m_maxElevation
             );
             rowCorners.push_back(std::move(tileCorner));
         }

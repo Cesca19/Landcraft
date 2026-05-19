@@ -75,7 +75,8 @@ void MapLoadSaveController::resetEditor()
     m_editionController->clearCommandHistory();
     m_worldView->clearTileMap();
     m_worldView->resetTileMap(m_worldModel->getTiles());
-    m_worldView->initSplatmap(m_worldModel->getSplatmapFilepath(), m_worldModel->getTilesSize(), m_worldModel->getMapSize().x, m_worldModel->getMapSize().y);
+    m_worldView->initSplatMap(m_worldModel->getSplatmapFilepath(), m_worldModel->getTilesSize(), m_worldModel->getMapSize().x, m_worldModel->getMapSize().y);
+    m_worldView->initWaterView(m_worldModel->getMapSize().x, m_worldModel->getMapSize().y, m_worldModel->getTilesSize());
     m_worldView->updatePositions(m_worldModel->getTiles(), m_worldView->getCamera());
 }
 

@@ -33,7 +33,7 @@ void PaintTilesCommand::AddTile(Tile *tile, WorldModel &model, const WorldView &
 
 void PaintTilesCommand::execute(WorldModel &model, WorldView &view)
 {
-    view.paintTiles(model.getTiles(), m_tiles, m_textureId);
+    // view.paintTiles(model.getTiles(), m_tiles, m_textureId);
 }
 
 void PaintTilesCommand::undo(WorldModel &model, WorldView &view)

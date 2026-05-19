@@ -35,6 +35,9 @@ public:
     void onTileCornerHeightChanged(float height);
     float getHighestTileCornerHeight() const;
 
+    float getMinElevation() const;
+    float getMaxElevation() const;
+    float getWaterHeight() const;
 private:
     std::unique_ptr<WorldMap> loadMapFromFile(std::string mapName);
     sf::Vector2i loadTilesSize(std::ifstream &mapFile) const;
@@ -54,6 +57,10 @@ private:
 
     sf::Vector2i m_tilesSize;
     std::string m_splatmapFilepath;
+
+    float m_minElevation;
+    float m_maxElevation;
+    float m_waterHeight;
 };
 
 

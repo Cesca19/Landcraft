@@ -9,6 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include "Camera.hpp"
 #include "TileMap.hpp"
+#include "WaterView.hpp"
 #include "EnvironmentView.hpp"
 
 class WorldView 
@@ -17,11 +18,12 @@ public:
     WorldView();
     void init(sf::Vector2f center, sf::Vector2f size, int defaultZoom);
     void initCamera(float tileSizeX, float tileSizeY, float heightScale, float projectionAngleX, float projectionAngleY, sf::Vector2f worldPivot);
-    void initTileMap(const std::vector<std::vector<Tile>>& tiles);
+    void initTileMap(const std::vector<std::vector<Tile>>& tiles, float minElevation, float maxElevation, float waterHeight);
     void initBrushes(const std::vector<std::string> &brushesImagePaths);
     void clearTileMap();
     void resetTileMap(const std::vector<std::vector<Tile>>& tiles);
-    void initSplatmap(const std::string& filepath, const sf::Vector2i& tileSize, int nbCols, int nbRows);
+    void initSplatMap(const std::string& filepath, const sf::Vector2i& tileSize, int nbCols, int nbRows);
+    void initWaterView(int nbCols, int nbRows, const sf::Vector2i& tileSize);
     void initEnvironment(sf::Vector2u windowSize);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;
@@ -56,8 +58,6 @@ public:
 
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const Camera& camera) const;
     void updateTileCorners(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &selectedCorners) const;
-    void paintTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<Tile *> & tilesToPaint, int textureId) const;
-    void paintTile(const std::vector<std::vector<Tile>>& worldTiles, Tile *tileToPaint, int textureId) const;
 
     void setIsWireframeVisible(bool enabled) const;
     void setAreShadedTilesVisible(bool enabled) const;
@@ -72,6 +72,7 @@ private:
 
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<TileMap> m_tileMap;
+    std::unique_ptr<WaterView> m_waterView;
     std::unique_ptr<EnvironmentView> m_environmentView;
     sf::View m_view;
 
@@ -100,6 +101,8 @@ private:
     sf::Vector2f m_defaultCenter;
     int m_defaultZoom;
     float m_defaultTargetZoom;
+
+    float m_waterHeight;
 };
 
 #endif //LANDCRAFT_WORLDVIEW_HPP

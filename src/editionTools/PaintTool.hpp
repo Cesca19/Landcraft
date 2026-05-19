@@ -6,7 +6,7 @@
 #define LANDCRAFT_PAINTTOOL_HPP
 
 #include "IEditionTool.hpp"
-#include "../commands/PaintSplatmapCommand.hpp"
+#include "../commands/PaintSplatMapCommand.hpp"
 #include "../ui/UIFactory.hpp"
 
 class PaintTool : public IEditionTool {
@@ -31,7 +31,7 @@ private:
     bool m_isEditing;
     int m_currentTextureId;
     sf::Vector2i m_previousMousePosition;
-    std::unique_ptr<PaintSplatmapCommand> m_ongoingPaintCommand;
+    std::unique_ptr<PaintSplatMapCommand> m_ongoingPaintCommand;
     const sf::Mouse::Button m_paintMouseButton = sf::Mouse::Left;
     std::vector<SpriteButton *> m_paintTextureButtons;
     Box *m_paintToolBox;

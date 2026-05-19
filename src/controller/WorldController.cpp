@@ -35,9 +35,10 @@ void WorldController::init(const std::string &mapName,
     m_worldView.init(viewSettings.center, viewSettings.size, 10);
     m_worldView.initCamera(tilesSize.x, tilesSize.y, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
-    m_worldView.initTileMap(m_worldModel.getTiles());
+    m_worldView.initTileMap(m_worldModel.getTiles(), m_worldModel.getMinElevation(), m_worldModel.getMaxElevation(), m_worldModel.getWaterHeight());
     m_worldView.initBrushes(m_brushController->getBrushesImagePaths());
-    m_worldView.initSplatmap(m_worldModel.getSplatmapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
+    m_worldView.initSplatMap(m_worldModel.getSplatmapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
+    m_worldView.initWaterView(m_worldModel.getMapSize().x, m_worldModel.getMapSize().y, m_worldModel.getTilesSize());
     m_worldView.initEnvironment(viewSettings.windowSize);
 }
 
