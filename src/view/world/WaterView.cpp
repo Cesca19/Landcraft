@@ -42,7 +42,6 @@ void WaterView::init(int nbCols, int nbRows, const sf::Vector2i& tilesSize, floa
         tex.setRepeated(true);
         m_waterShader.setUniform("u_WaterTexture", tex);
         m_waterShader.setUniform("u_Time", m_totalTime);
-        m_waterShader.setUniform("u_DebugMode", 1);
     }
     updatePositions(camera);
 }
@@ -79,7 +78,7 @@ void WaterView::updatePositions(const Camera &camera)
             sf::Vector2f left   = camera.world_to_screen(col,     row + 1, m_waterHeight);
 
             // Triangle 1: Top -> Right -> Left
-            m_waterVertexArray[vertexIndex + 0].position = top;
+            m_waterVertexArray[vertexIndex].position = top;
             m_waterVertexArray[vertexIndex + 1].position = right;
             m_waterVertexArray[vertexIndex + 2].position = left;
 
@@ -89,7 +88,7 @@ void WaterView::updatePositions(const Camera &camera)
             m_waterVertexArray[vertexIndex + 5].position = left;
 
             // Send local grid coordinates as UVs to feed the shader wave equation
-            m_waterVertexArray[vertexIndex + 0].texCoords = sf::Vector2f(col, row);
+            m_waterVertexArray[vertexIndex].texCoords = sf::Vector2f(col, row);
             m_waterVertexArray[vertexIndex + 1].texCoords = sf::Vector2f(col + 1, row);
             m_waterVertexArray[vertexIndex + 2].texCoords = sf::Vector2f(col, row + 1);
             m_waterVertexArray[vertexIndex + 3].texCoords = sf::Vector2f(col + 1, row);
@@ -115,6 +114,7 @@ void WaterView::draw(sf::RenderWindow &window) const
         return;
     sf::RenderStates states = sf::RenderStates::Default;
     states.shader = &m_waterShader;
+    states.texture = &ResourceManager::getInstance().getTexture("assets/textures/water_32.png");
     window.draw(m_waterVertexArray, states);
 }
 
