@@ -54,17 +54,6 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
     updatePositions(tiles, camera);
     updateGround(tiles, camera);
 
-    // for (int row = 0; row < tiles.size(); ++row)
-    //     for (int col = 0; col < tiles[0].size(); ++col)
-    //     {
-    //         const Tile &tile = tiles[row][col];
-    //         updateShadedTile(tile, camera, (row * tiles[0].size() + col) * 6);
-    //         updateWireframeTile(tile, camera, (row * tiles[0].size() + col) * 8);
-    //         // addShadedTile(tile, camera);
-    //         // addWireframeTile(tile, camera);
-    //     }
-    
-    
     if (!m_terrainShader.loadFromFile("assets/shaders/terrain.vert", "assets/shaders/terrain.frag"))
         throw std::runtime_error("Failed to load terrain shader");
     m_terrainShader.setUniform("u_Splatmap", m_splatmap.getTexture());
@@ -75,6 +64,10 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
     m_terrainShader.setUniform("u_MinElevation", m_minElevation);
     m_terrainShader.setUniform("u_ElevationRange", m_maxElevation - m_minElevation);
     m_terrainShader.setUniform("u_WaterHeight", m_waterHeight);
+    m_terrainShader.setUniform("u_WireframeColor", 
+        sf::Glsl::Vec4(m_wireframeTileColor.r / 255.0f, m_wireframeTileColor.g / 255.0f, 
+        m_wireframeTileColor.b / 255.0f, m_wireframeTileColor.a / 255.0f));
+    m_terrainShader.setUniform("u_ShowGrid", m_isWireframeVisible ? 1.0f : 0.0f);
 }
 
 void TileMap::initBrushes(const std::vector<std::string> &brushesImagePaths)
@@ -441,13 +434,15 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
 
         states.shader = nonConstShader;
         if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 0.0f);
+        nonConstShader->setUniform("u_ShowGrid", m_isWireframeVisible ? 1.0f : 0.0f);
         target.draw(m_shadedTilesVertexArray, states);
     }
 
     // Draw Wireframe Grid with Shader filtering
-    if (m_isWireframeVisible) {
+    if (m_isWireframeVisible && !m_areShadedTilesVisible) {
         states.shader = nonConstShader;
         if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 1.0f);
+        nonConstShader->setUniform("u_ShowGrid", 0.0f);
         target.draw(m_wireframeTilesVertexArray, states);
     }
 }

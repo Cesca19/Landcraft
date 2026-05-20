@@ -61,6 +61,7 @@ public:
 
     void setIsWireframeVisible(bool enabled) const;
     void setAreShadedTilesVisible(bool enabled) const;
+    void setIsWaterVisible(bool enabled) const;
 
     void drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i& tileSize, int nbCols, int nbRows);
     sf::Image getSplatmapArea(const sf::IntRect& area) const;

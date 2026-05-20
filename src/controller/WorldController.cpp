@@ -121,14 +121,17 @@ void WorldController::onDrawModeButtonClicked(const DrawMode mode)
         case DrawMode::WIREFRAME_SHADED:
             m_worldView.setAreShadedTilesVisible(true);
             m_worldView.setIsWireframeVisible(true);
+            m_worldView.setIsWaterVisible(true);
             break;
         case DrawMode::WIREFRAME:
             m_worldView.setAreShadedTilesVisible(false);
             m_worldView.setIsWireframeVisible(true);
+            m_worldView.setIsWaterVisible(false);
             break;
         case DrawMode::SHADED:
             m_worldView.setAreShadedTilesVisible(true);
             m_worldView.setIsWireframeVisible(false);
+            m_worldView.setIsWaterVisible(true);
             break;
     }
     m_currentDrawMode = mode;

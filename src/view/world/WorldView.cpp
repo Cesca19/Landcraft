@@ -312,6 +312,11 @@ void WorldView::setAreShadedTilesVisible(bool enabled) const
     m_tileMap->setAreShadedTilesVisible(enabled);
 }
 
+void WorldView::setIsWaterVisible(bool enabled) const
+{
+    m_waterView->setIsVisible(enabled);
+}
+
 void WorldView::drawStrokeOnSplatmap(const PaintStroke &stroke, const sf::Vector2i &tileSize, int nbCols, int nbRows)
 {
     m_tileMap->drawStrokeOnSplatmap(stroke, tileSize, nbCols, nbRows);
