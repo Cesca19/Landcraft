@@ -38,9 +38,12 @@ void WaterView::init(int nbCols, int nbRows, const sf::Vector2i& tilesSize, floa
     if (!m_waterShader.loadFromFile("assets/shaders/water.vert", "assets/shaders/water.frag"))
         std::cerr << "Failed to load water shaders!" << std::endl;
     else {
-        sf::Texture &tex = ResourceManager::getInstance().getTexture("assets/textures/water_32.png");
-        tex.setRepeated(true);
-        m_waterShader.setUniform("u_WaterTexture", tex);
+        sf::Texture &waterTexture = ResourceManager::getInstance().getTexture("assets/textures/water.png");
+        sf::Texture &normalTexture = ResourceManager::getInstance().getTexture("assets/textures/water-normal-map.png");
+        waterTexture.setRepeated(true);
+        normalTexture.setRepeated(true);
+        m_waterShader.setUniform("u_WaterTexture", waterTexture);
+        m_waterShader.setUniform("u_NormalMap", normalTexture);
         m_waterShader.setUniform("u_Time", m_totalTime);
     }
     updatePositions(camera);
@@ -114,7 +117,6 @@ void WaterView::draw(sf::RenderWindow &window) const
         return;
     sf::RenderStates states = sf::RenderStates::Default;
     states.shader = &m_waterShader;
-    states.texture = &ResourceManager::getInstance().getTexture("assets/textures/water_32.png");
     window.draw(m_waterVertexArray, states);
 }
 
