@@ -4,7 +4,7 @@
 
 #include "TileMap.hpp"
 
-TileMap::TileMap(float minElevation, float maxElevation, float waterHeight)
+TileMap::TileMap(const float minElevation, const float maxElevation, const float waterHeight)
     : m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
     , m_groundVertexArray(sf::Triangles)
@@ -12,6 +12,8 @@ TileMap::TileMap(float minElevation, float maxElevation, float waterHeight)
     , m_wireframeTileColor(sf::Color(110, 110, 120, 255))
     , m_isWireframeVisible(true)
     , m_areShadedTilesVisible(true)
+    , m_nbCols(0)
+    , m_nbRows(0)
     , m_minElevation(minElevation)
     , m_maxElevation(maxElevation)
     , m_waterHeight(waterHeight)
@@ -21,7 +23,7 @@ TileMap::TileMap(float minElevation, float maxElevation, float waterHeight)
     m_tilesTextures.push_back(ResourceManager::getInstance().getTexture("assets/textures/rock_32.png"));
     m_tilesTextures.push_back(ResourceManager::getInstance().getTexture("assets/textures/snow_32.png"));
 
-    for (auto& texture : m_tilesTextures)
+    for (auto &texture: m_tilesTextures)
         texture.setRepeated(true);
 }
 
@@ -42,13 +44,13 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
     m_wireframeTilesVertexArray.clear();
     m_groundVertexArray.clear();
 
-    int nbTiles = (tiles.size()) * (tiles[0].size());
+    const int nbTiles = static_cast<int>(tiles.size() * (tiles[0].size()));
     // shaded
     m_shadedTilesVertexArray.resize(nbTiles * 6);
     // wireframe
     m_wireframeTilesVertexArray.resize(nbTiles * 8);
     // ground
-    int nbWall = (tiles.size())* 2 + (tiles[0].size() * 2);
+    const int nbWall = static_cast<int>((tiles.size())* 2 + (tiles[0].size() * 2));
     m_groundVertexArray.resize(nbWall * 6);
 
     updatePositions(tiles, camera);
@@ -56,7 +58,7 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
 
     if (!m_terrainShader.loadFromFile("assets/shaders/terrain.vert", "assets/shaders/terrain.frag"))
         throw std::runtime_error("Failed to load terrain shader");
-    m_terrainShader.setUniform("u_Splatmap", m_splatmap.getTexture());
+    m_terrainShader.setUniform("u_SplatMap", m_splatmap.getTexture());
     m_terrainShader.setUniform("u_TexGrass", m_tilesTextures[0]);
     m_terrainShader.setUniform("u_TexSand",  m_tilesTextures[1]);
     m_terrainShader.setUniform("u_TexRock",  m_tilesTextures[2]);
@@ -84,28 +86,28 @@ void TileMap::initBrushes(const std::vector<std::string> &brushesImagePaths)
 void TileMap::updatePositions(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera)
 {
     if (worldTiles.empty() || worldTiles[0].empty()) return;
-    int nbRows = static_cast<int>(worldTiles.size());
-    int nbCols = static_cast<int>(worldTiles[0].size());
+    const int nbRows = static_cast<int>(worldTiles.size());
+    const int nbCols = static_cast<int>(worldTiles[0].size());
 
     // Detection of the map orientation to determine the correct drawing order
-    sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
-    sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
-    sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
-    bool colForward = (p10.y - p00.y) > 0;
-    bool rowForward = (p01.y - p00.y) > 0;
-    int rStart = rowForward ? 0 : nbRows - 1;
-    int rEnd = rowForward ? nbRows : -1;
-    int rStep = rowForward ? 1 : -1;
-    int cStart = colForward ? 0 : nbCols - 1;
-    int cEnd = colForward ? nbCols : -1;
-    int cStep = colForward ? 1 : -1;
+    const sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
+    const sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
+    const sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
+    const bool colForward = (p10.y - p00.y) > 0;
+    const bool rowForward = (p01.y - p00.y) > 0;
+    const int rStart = rowForward ? 0 : nbRows - 1;
+    const int rEnd = rowForward ? nbRows : -1;
+    const int rStep = rowForward ? 1 : -1;
+    const int cStart = colForward ? 0 : nbCols - 1;
+    const int cEnd = colForward ? nbCols : -1;
+    const int cStep = colForward ? 1 : -1;
 
     int drawOrder = 0;
     for (int row = rStart; row != rEnd; row += rStep) {
         for (int col = cStart; col != cEnd; col += cStep) {
             const Tile &tile = worldTiles[row][col];
-            int shadedIndex = drawOrder * 6; // 6 vertices per tile
-            int wireframeIndex = drawOrder * 8; // 8 vertices per tile (4 lines)
+            const int shadedIndex = drawOrder * 6; // 6 vertices per tile
+            const int wireframeIndex = drawOrder * 8; // 8 vertices per tile (4 lines)
             updateShadedTile(tile, camera, shadedIndex);
             updateWireframeTile(tile, camera, wireframeIndex);
             drawOrder++;
@@ -135,23 +137,23 @@ void TileMap::updatePositions(const std::vector<std::vector<Tile>>& worldTiles, 
     updateTiles(worldTiles, tilesToUpdate, camera);
 }
 
-void TileMap::setIsWireframeVisible(bool enabled)
+void TileMap::setIsWireframeVisible(const bool enabled)
 {
     m_isWireframeVisible = enabled;
 }
 
-void TileMap::setAreShadedTilesVisible(bool enabled)
+void TileMap::setAreShadedTilesVisible(const bool enabled)
 {
     m_areShadedTilesVisible = enabled;
 }
 
-void TileMap::initSplatMap(const std::string &filepath, const sf::Vector2i &tileSize, int nbCols, int nbRows)
+void TileMap::initSplatMap(const std::string &filepath, const sf::Vector2i &tileSize, const int nbCols, const int nbRows)
 {
     m_tilesSize = tileSize;
     m_nbCols = nbCols;
     m_nbRows = nbRows;
-    unsigned int expectedWidth = tileSize.x * nbCols;
-    unsigned int expectedHeight = tileSize.y * nbRows;
+    const unsigned int expectedWidth = tileSize.x * nbCols;
+    const unsigned int expectedHeight = tileSize.y * nbRows;
 
     m_splatmap.create(expectedWidth, expectedHeight);
     m_splatmap.setSmooth(true);
@@ -166,40 +168,40 @@ void TileMap::initSplatMap(const std::string &filepath, const sf::Vector2i &tile
             sf::RenderStates states;
             states.blendMode = sf::BlendNone;
             m_splatmap.draw(sprite, states);
-            std::cout << "Splatmap loaded successfully: " << filepath << std::endl;
+            std::cout << "SplatMap loaded successfully: " << filepath << std::endl;
         }
     }
 
     m_splatmap.display();
-    m_terrainShader.setUniform("u_Splatmap", m_splatmap.getTexture());
+    m_terrainShader.setUniform("u_SplatMap", m_splatmap.getTexture());
     m_terrainShader.setUniform("u_MapSize", sf::Vector2f(static_cast<float>(nbCols), static_cast<float>(nbRows)));
-    updateSplatmapImage();
+    updateSplatMapImage();
 }
 
-void TileMap::drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i& tileSize, int nbCols, int nbRows)
+void TileMap::drawStrokeOnSplatMap(const PaintStroke& stroke, const sf::Vector2i& tileSize, const int nbCols, const int nbRows)
 {
     sf::Sprite& brushSprite = m_brushSprites[stroke.brushTextureId];
     sf::RenderStates states = sf::RenderStates::Default;
-    float diameterInTiles = (stroke.radius * 2.0f) + 1.0f;
-    float expectedPixelWidth = diameterInTiles * tileSize.x;
-    float expectedPixelHeight = diameterInTiles * tileSize.y;
+    const float diameterInTiles = (stroke.radius * 2.0f) + 1.0f;
+    const float expectedPixelWidth = diameterInTiles * tileSize.x;
+    const float expectedPixelHeight = diameterInTiles * tileSize.y;
     
     brushSprite.setScale(
         expectedPixelWidth / brushSprite.getTexture()->getSize().x,
         expectedPixelHeight / brushSprite.getTexture()->getSize().y
     );
-    float percentX = stroke.worldPosition.x / static_cast<float>(nbCols);
-    float percentY = stroke.worldPosition.y / static_cast<float>(nbRows);
+    const float percentX = stroke.worldPosition.x / static_cast<float>(nbCols);
+    const float percentY = stroke.worldPosition.y / static_cast<float>(nbRows);
     brushSprite.setPosition(percentX * m_splatmap.getSize().x, percentY * m_splatmap.getSize().y);
 
     // In blending mode the source color is the color of the brush sprite, 
-    // and the destination color is the current color in the splatmap.
+    // and the destination color is the current color in the splat-map.
     // where new_pixel = (dest * dest_factor) [equation] (source * source_factor)
     if (stroke.textureId == 0) {
         brushSprite.setColor(sf::Color(255, 255, 255, 255)); // Eraser
         states.blendMode = sf::BlendMode(
-            // reverse_subtract does : dest - source, which means it will subtract the brush color from the splatmap color, effectively erasing it
-            // sf::BlendMode::One means we use 100% of the splatmap color
+            // reverse_subtract does : dest - source, which means it will subtract the brush color from the splat-map color, effectively erasing it
+            // sf::BlendMode::One means we use 100% of the splat-map color
             // sf::BlendMode::SrcAlpha means we use the brush color multiplied by its alpha
             sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract, // for RGB channels : grass, sand, rock
             sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract // for Alpha channel : snow
@@ -207,8 +209,8 @@ void TileMap::drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i
         m_splatmap.draw(brushSprite, states);
     } else if (stroke.textureId == 4) {
         brushSprite.setColor(sf::Color(0, 0, 0, 255)); // Snow
-        // we do the opposite of rgb for snow because it's stored in the alpha channel of the splatmap,
-        // we want to add it to the splatmap but not affect the RGB channels, 
+        // we do the opposite of rgb for snow because it's stored in the alpha channel of the splat-map,
+        // we want to add it to the splat-map but not affect the RGB channels, 
         // so we use Zero for RGB and SrcAlpha for Alpha
         states.blendMode = sf::BlendMode(
             sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add,
@@ -216,10 +218,10 @@ void TileMap::drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i
         );
         m_splatmap.draw(brushSprite, states);
     } else {
-        // First we dig a hole in the splatmap existing colors
+        // First we dig a hole in the splat-map existing colors
         brushSprite.setColor(sf::Color(255, 255, 255, 255)); // Subtraction mask
         states.blendMode = sf::BlendMode(
-            // Here we want to subtract the brush color (multiplied by its alpha) from the splatmap color, 
+            // Here we want to subtract the brush color (multiplied by its alpha) from the splat-map color, 
             // but only for the RGB channels, so we use ReverseSubtract for RGB and Add zero to Alpha to keep it intact
             sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract, // Subtract existing RGB
             sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add                  // Keep Alpha (Snow) intact
@@ -235,8 +237,8 @@ void TileMap::drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i
             brushSprite.setColor(sf::Color(0, 0, 255, 255)); // Rock B
         states.blendMode = sf::BlendMode(
             // Here we use the brush color multiplied by its alpha, so only 
-            // the non-transparent parts of the brush will affect the splatmap
-            // then we add it to the existing splatmap color,
+            // the non-transparent parts of the brush will affect the splat-map
+            // then we add it to the existing splat-map color,
             sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::Add,
             // here we let the alpha intact
             sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add
@@ -246,16 +248,16 @@ void TileMap::drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i
     m_splatmap.display();
 }
 
-sf::Image TileMap::getSplatmapArea(const sf::IntRect& area) const 
+sf::Image TileMap::getSplatMapArea(const sf::IntRect& area) const
 {
-    sf::Image fullImage = m_splatmap.getTexture().copyToImage();
+    const sf::Image fullImage = m_splatmap.getTexture().copyToImage();
     sf::Image subImage;
     subImage.create(area.width, area.height);
     subImage.copy(fullImage, 0, 0, area);
     return subImage;
 }
 
-void TileMap::restoreSplatmapArea(const sf::IntRect& area, const sf::Image& pixels) 
+void TileMap::restoreSplatMapArea(const sf::IntRect& area, const sf::Image& pixels)
 {
     sf::Texture tempTex;
     tempTex.loadFromImage(pixels);
@@ -268,12 +270,12 @@ void TileMap::restoreSplatmapArea(const sf::IntRect& area, const sf::Image& pixe
     m_splatmap.display();
 }
 
-const sf::Image &TileMap::getSplatmapImage() const
+const sf::Image &TileMap::getSplatMapImage() const
 {
     return m_splatmapImage;
 }
 
-void TileMap::updateSplatmapImage()
+void TileMap::updateSplatMapImage()
 {
     m_splatmapImage = m_splatmap.getTexture().copyToImage();
 }
@@ -282,21 +284,21 @@ void TileMap::updateTiles(const std::vector<std::vector<Tile>>& worldTiles, cons
 {
     if (worldTiles.empty() || worldTiles[0].empty()) 
         return;
-    int nbRows = static_cast<int>(worldTiles.size());
-    int nbCols = static_cast<int>(worldTiles[0].size());
-    sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
-    sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
-    sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
-    bool colForward = (p10.y - p00.y) > 0;
-    bool rowForward = (p01.y - p00.y) > 0;
+    const int nbRows = static_cast<int>(worldTiles.size());
+    const int nbCols = static_cast<int>(worldTiles[0].size());
+    const sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
+    const sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
+    const sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
+    const bool colForward = (p10.y - p00.y) > 0;
+    const bool rowForward = (p01.y - p00.y) > 0;
 
     for (const auto&[row, col] : tilesToUpdate) {
         const Tile& tile = worldTiles[row][col];
-        int rIndex = rowForward ? row : (nbRows - 1 - row);
-        int cIndex = colForward ? col : (nbCols - 1 - col);
-        int drawOrder = (rIndex * nbCols) + cIndex;
-        int shadedIndex = drawOrder * 6;
-        int wireframeIndex = drawOrder * 8;
+        const int rIndex = rowForward ? row : (nbRows - 1 - row);
+        const int cIndex = colForward ? col : (nbCols - 1 - col);
+        const int drawOrder = (rIndex * nbCols) + cIndex;
+        const int shadedIndex = drawOrder * 6;
+        const int wireframeIndex = drawOrder * 8;
 
         // --- UPDATE TRIANGLES ---
         updateShadedTile(tile, camera, shadedIndex);
@@ -311,9 +313,9 @@ void TileMap::updateShadedTile(const Tile &tile, const Camera &camera, int shade
     for (const TileCorner* corner : tile.getUpRightTriangleCorners()) {
         // we encode the altitude Z in the alpha channel of the vertex color for ex,
         // we remap it from [-20, 30] to [0, 255]
-        float z = corner->getHeight();
-        float normalizedZ = (z - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ * 255.0f)));
+        const float z = corner->getHeight();
+        const float normalizedZ = (z - m_minElevation) / (m_maxElevation - m_minElevation);
+        const sf::Uint8 alphaZ = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ * 255.0f)));
 
         m_shadedTilesVertexArray[shadedIndex].position =
             camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
@@ -323,9 +325,9 @@ void TileMap::updateShadedTile(const Tile &tile, const Camera &camera, int shade
         shadedIndex++;
     }
     for (const TileCorner* corner : tile.getDownLeftTriangleCorners()) {
-        float z = corner->getHeight();
-        float normalizedZ = (z - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ * 255.0f)));
+        const float z = corner->getHeight();
+        const float normalizedZ = (z - m_minElevation) / (m_maxElevation - m_minElevation);
+        const sf::Uint8 alphaZ = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ * 255.0f)));
 
         m_shadedTilesVertexArray[shadedIndex].position =
             camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
@@ -344,14 +346,14 @@ void TileMap::updateWireframeTile(const Tile &tile, const Camera &camera, int wi
         const TileCorner* corner2 = corners[(i + 1) % corners.size()];
 
         // encode height for vertex1
-        float z1 = corner1->getHeight();
-        float normalizedZ1 = (z1 - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ1 = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ1 * 255.0f)));
+        const float z1 = corner1->getHeight();
+        const float normalizedZ1 = (z1 - m_minElevation) / (m_maxElevation - m_minElevation);
+        const sf::Uint8 alphaZ1 = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ1 * 255.0f)));
 
         // encode height for vertex2
-        float z2 = corner2->getHeight();
-        float normalizedZ2 = (z2 - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ2 = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ2 * 255.0f)));
+        const float z2 = corner2->getHeight();
+        const float normalizedZ2 = (z2 - m_minElevation) / (m_maxElevation - m_minElevation);
+        const sf::Uint8 alphaZ2 = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ2 * 255.0f)));
 
         m_wireframeTilesVertexArray[wireframeIndex].position =
             camera.world_to_screen(corner1->getColumn(), corner1->getRow(), corner1->getHeight());
@@ -369,35 +371,55 @@ void TileMap::updateWireframeTile(const Tile &tile, const Camera &camera, int wi
 
 void TileMap::updateGround(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera)
 {
-    if (worldTiles.empty() || worldTiles[0].empty()) return;
-
-    int nbRows = static_cast<int>(worldTiles.size());
-    int nbCols = static_cast<int>(worldTiles[0].size());
+    if (worldTiles.empty() || worldTiles[0].empty())
+        return;
+    const int nbRows = static_cast<int>(worldTiles.size());
+    const int nbCols = static_cast<int>(worldTiles[0].size());
     int groundIndex = 0;
 
-    for (int col = 0; col < nbCols; ++col) {
-        updateGroundWall(worldTiles[0][col].getCorners()[0], worldTiles[0][col].getCorners()[1], camera, groundIndex);
-        updateGroundWall(worldTiles[nbRows - 1][col].getCorners()[3], worldTiles[nbRows - 1][col].getCorners()[2], camera, groundIndex);
-    }
-    for (int row = 0; row < nbRows; ++row) {
-        updateGroundWall(worldTiles[row][0].getCorners()[0], worldTiles[row][0].getCorners()[3], camera, groundIndex);
-        updateGroundWall(worldTiles[row][nbCols - 1].getCorners()[1], worldTiles[row][nbCols - 1].getCorners()[2], camera, groundIndex);
+    const sf::Vector2f p00 = camera.world_to_screen(0, 0, 0);
+    const sf::Vector2f p10 = camera.world_to_screen(1, 0, 0);
+    const sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
+    const bool colForward = (p10.y - p00.y) > 0;
+    const bool rowForward = (p01.y - p00.y) > 0;
+
+    if (colForward)
+        for (int row = 0; row < nbRows; row++)
+            updateGroundWall(worldTiles[row][nbCols - 1].getCorners()[1], worldTiles[row][nbCols - 1].getCorners()[2], camera, groundIndex);
+    else
+        for (int row = 0; row < nbRows; row++)
+            updateGroundWall(worldTiles[row][0].getCorners()[0], worldTiles[row][0].getCorners()[3], camera, groundIndex);
+
+    if (rowForward)
+        for (int col = 0; col < nbCols; col++)
+            updateGroundWall(worldTiles[nbRows - 1][col].getCorners()[3], worldTiles[nbRows - 1][col].getCorners()[2], camera, groundIndex);
+    else
+        for (int col = 0; col < nbCols; col++)
+            updateGroundWall(worldTiles[0][col].getCorners()[0], worldTiles[0][col].getCorners()[1], camera, groundIndex);
+
+    // 3. Hide unused vertices
+    // Since m_groundVertexArray was resized in init() to hold 4 walls, but we only draw 2,
+    // we collapse the remaining vertices to the center of the screen to make them invisible.
+    while (groundIndex < m_groundVertexArray.getVertexCount()) {
+        m_groundVertexArray[groundIndex++].position = sf::Vector2f(0.f, 0.f);
     }
 }
 
 void TileMap::updateGroundWall(const TileCorner *c1, const TileCorner *c2, const Camera &camera, int &groundIndex)
 {
-    float groundBottomZ = m_minElevation - 5.0f;
-    float z1 = c1->getHeight();
-    float z2 = c2->getHeight();
+    const float groundBottomZ = m_minElevation - 5.0f;
+    // const float z1 = c1->getHeight();
+    // const float z2 = c2->getHeight();
+    const float z1 = std::max(c1->getHeight(), m_waterHeight);
+    const float z2 = std::max(c2->getHeight(), m_waterHeight);
 
-    sf::Vector2f top1 = camera.world_to_screen(c1->getColumn(), c1->getRow(), z1);
-    sf::Vector2f top2 = camera.world_to_screen(c2->getColumn(), c2->getRow(), z2);
-    sf::Vector2f bottom1 = camera.world_to_screen(c1->getColumn(), c1->getRow(), groundBottomZ);
-    sf::Vector2f bottom2 = camera.world_to_screen(c2->getColumn(), c2->getRow(), groundBottomZ);
+    const sf::Vector2f top1 = camera.world_to_screen(c1->getColumn(), c1->getRow(), z1);
+    const sf::Vector2f top2 = camera.world_to_screen(c2->getColumn(), c2->getRow(), z2);
+    const sf::Vector2f bottom1 = camera.world_to_screen(c1->getColumn(), c1->getRow(), groundBottomZ);
+    const sf::Vector2f bottom2 = camera.world_to_screen(c2->getColumn(), c2->getRow(), groundBottomZ);
 
     // with 255 alpha the water shader won't pass the wall
-    sf::Color groundColor(130, 130, 130, 255); 
+    const auto groundColor = sf::Color(203, 203, 205);
 
     // Triangle 1
     m_groundVertexArray[groundIndex].position = top1;
@@ -430,7 +452,7 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
     if (m_areShadedTilesVisible) {
         states.shader = nullptr;
         states.texture = nullptr;
-        target.draw(m_groundVertexArray, states); 
+        target.draw(m_groundVertexArray, states);
 
         states.shader = nonConstShader;
         if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 0.0f);
@@ -442,7 +464,7 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
     if (m_isWireframeVisible && !m_areShadedTilesVisible) {
         states.shader = nonConstShader;
         if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 1.0f);
-        nonConstShader->setUniform("u_ShowGrid", 0.0f);
+        nonConstShader->setUniform("u_IsWireframe", 1.0f);
         target.draw(m_wireframeTilesVertexArray, states);
     }
 }

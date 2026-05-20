@@ -319,27 +319,27 @@ void WorldView::setIsWaterVisible(bool enabled) const
 
 void WorldView::drawStrokeOnSplatmap(const PaintStroke &stroke, const sf::Vector2i &tileSize, int nbCols, int nbRows)
 {
-    m_tileMap->drawStrokeOnSplatmap(stroke, tileSize, nbCols, nbRows);
+    m_tileMap->drawStrokeOnSplatMap(stroke, tileSize, nbCols, nbRows);
 }
 
 sf::Image WorldView::getSplatmapArea(const sf::IntRect &area) const
 {
-    return m_tileMap->getSplatmapArea(area);
+    return m_tileMap->getSplatMapArea(area);
 }
 
 void WorldView::restoreSplatmapArea(const sf::IntRect &area, const sf::Image &pixels)
 {
-    m_tileMap->restoreSplatmapArea(area, pixels);
+    m_tileMap->restoreSplatMapArea(area, pixels);
 }
 
 void WorldView::updateSplatmapImage()
 {
-    m_tileMap->updateSplatmapImage();
+    m_tileMap->updateSplatMapImage();
 }
 
 const sf::Image &WorldView::getSplatmapImage() const
 {
-    return m_tileMap->getSplatmapImage();
+    return m_tileMap->getSplatMapImage();
 }
 
 void WorldView::updateViewCenter(const sf::Vector2f center)

@@ -16,7 +16,8 @@ WaterView::~WaterView()
 {
 }
 
-void WaterView::init(int nbCols, int nbRows, const sf::Vector2i& tilesSize, float waterHeight, const Camera &camera)
+void WaterView::init(const int nbCols, const int nbRows, const sf::Vector2i& tilesSize,
+    const float waterHeight, const Camera &camera)
 {
     m_nbCols = nbCols;
     m_nbRows = nbRows;
@@ -60,11 +61,11 @@ void WaterView::updatePositions(const Camera &camera)
     sf::Vector2f p01 = camera.world_to_screen(0, 1, 0);
     bool colForward = (p10.y - p00.y) > 0;
     bool rowForward = (p01.y - p00.y) > 0;
-    
-    int rStart = rowForward ? 0 : m_nbRows - 1;
+
+    const int rStart = rowForward ? 0 : m_nbRows - 1;
     int rEnd   = rowForward ? m_nbRows : -1;
     int rStep  = rowForward ? 1 : -1;
-    int cStart = colForward ? 0 : m_nbCols - 1;
+    const int cStart = colForward ? 0 : m_nbCols - 1;
     int cEnd   = colForward ? m_nbCols : -1;
     int cStep  = colForward ? 1 : -1;
 
@@ -103,7 +104,7 @@ void WaterView::updatePositions(const Camera &camera)
     }
 }
 
-void WaterView::update(float deltaTime)
+void WaterView::update(const float deltaTime)
 {
     m_totalTime += deltaTime;
     if (!m_isVisible) 
@@ -120,8 +121,8 @@ void WaterView::draw(sf::RenderWindow &window) const
     window.draw(m_waterVertexArray, states);
 }
 
-void WaterView::setWaterHeight(float height) 
-{ 
+void WaterView::setWaterHeight(const float height)
+{
     m_waterHeight = height; 
 }
 
@@ -130,7 +131,7 @@ float WaterView::getWaterHeight() const
     return m_waterHeight; 
 }
 
-void WaterView::setIsVisible(bool visible) 
+void WaterView::setIsVisible(const bool visible)
 {
     m_isVisible = visible; 
 }

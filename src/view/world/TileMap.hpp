@@ -17,7 +17,7 @@ class TileMap : public sf::Drawable, public sf::Transformable
 public:
     TileMap(float minElevation, float maxElevation, float waterHeight);
     void clear();
-    void init(const std::vector<std::vector<Tile>>& tiles, const Camera& Camera);
+    void init(const std::vector<std::vector<Tile>>& tiles, const Camera& camera);
     void initBrushes(const std::vector<std::string> &brushesImagePaths);
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const Camera& camera);
     void updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &modifiedCorners, const Camera& camera);
@@ -25,11 +25,11 @@ public:
     void setAreShadedTilesVisible(bool enabled);
 
     void initSplatMap(const std::string& filepath, const sf::Vector2i& tileSize, int nbCols, int nbRows);
-    void drawStrokeOnSplatmap(const PaintStroke& stroke, const sf::Vector2i& tileSize, int nbCols, int nbRows);
-    sf::Image getSplatmapArea(const sf::IntRect& area) const;
-    void restoreSplatmapArea(const sf::IntRect& area, const sf::Image& pixels);
-    const sf::Image& getSplatmapImage() const;
-    void updateSplatmapImage();
+    void drawStrokeOnSplatMap(const PaintStroke& stroke, const sf::Vector2i& tileSize, int nbCols, int nbRows);
+    sf::Image getSplatMapArea(const sf::IntRect& area) const;
+    void restoreSplatMapArea(const sf::IntRect& area, const sf::Image& pixels);
+    const sf::Image& getSplatMapImage() const;
+    void updateSplatMapImage();
 
 private:
     void updateTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::set<std::pair<int, int>>& tilesToUpdate, const Camera& camera);
