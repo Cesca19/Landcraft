@@ -32,15 +32,16 @@ public:
     void updateSplatmapImage();
 
 private:
-    void addShadedTile(const Tile& tile, const Camera& camera);
-    void addWireframeTile(const Tile& tile, const Camera& camera);
     void updateTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::set<std::pair<int, int>>& tilesToUpdate, const Camera& camera);
     void updateShadedTile(const Tile& tile, const Camera& camera, int shadedIndex);
     void updateWireframeTile(const Tile& tile, const Camera& camera, int wireframeIndex);
+    void updateGround(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera);
+    void updateGroundWall(const TileCorner* c1, const TileCorner* c2, const Camera& camera, int &groundIndex);
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
     
     sf::VertexArray m_shadedTilesVertexArray;
     sf::VertexArray m_wireframeTilesVertexArray;
+    sf::VertexArray m_groundVertexArray;
 
     sf::Color m_shadedTileColor;
     sf::Color m_wireframeTileColor;

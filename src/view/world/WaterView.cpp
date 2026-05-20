@@ -18,8 +18,8 @@ WaterView::~WaterView()
 
 void WaterView::init(int nbCols, int nbRows, const sf::Vector2i& tilesSize, float waterHeight, const Camera &camera)
 {
-    m_nbCols = nbCols -1;
-    m_nbRows = nbRows -1;
+    m_nbCols = nbCols;
+    m_nbRows = nbRows;
     m_tileSize = tilesSize;
     m_waterHeight = waterHeight;
 

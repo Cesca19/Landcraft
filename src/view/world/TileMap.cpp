@@ -7,6 +7,7 @@
 TileMap::TileMap(float minElevation, float maxElevation, float waterHeight)
     : m_shadedTilesVertexArray(sf::Triangles)
     , m_wireframeTilesVertexArray(sf::Lines)
+    , m_groundVertexArray(sf::Triangles)
     , m_shadedTileColor(sf::Color(252, 252, 254))
     , m_wireframeTileColor(sf::Color(110, 110, 120, 255))
     , m_isWireframeVisible(true)
@@ -28,6 +29,7 @@ void TileMap::clear()
 {
     m_shadedTilesVertexArray.clear();
     m_wireframeTilesVertexArray.clear();
+    m_groundVertexArray.clear();
 }
 
 void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &camera)
@@ -38,13 +40,31 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
 
     m_shadedTilesVertexArray.clear();
     m_wireframeTilesVertexArray.clear();
-    for (int row = 0; row < tiles.size(); ++row)
-        for (int col = 0; col < tiles[0].size(); ++col)
-        {
-            const Tile &tile = tiles[row][col];
-            addShadedTile(tile, camera);
-            addWireframeTile(tile, camera);
-        }
+    m_groundVertexArray.clear();
+
+    int nbTiles = (tiles.size()) * (tiles[0].size());
+    // shaded
+    m_shadedTilesVertexArray.resize(nbTiles * 6);
+    // wireframe
+    m_wireframeTilesVertexArray.resize(nbTiles * 8);
+    // ground
+    int nbWall = (tiles.size())* 2 + (tiles[0].size() * 2);
+    m_groundVertexArray.resize(nbWall * 6);
+
+    updatePositions(tiles, camera);
+    updateGround(tiles, camera);
+
+    // for (int row = 0; row < tiles.size(); ++row)
+    //     for (int col = 0; col < tiles[0].size(); ++col)
+    //     {
+    //         const Tile &tile = tiles[row][col];
+    //         updateShadedTile(tile, camera, (row * tiles[0].size() + col) * 6);
+    //         updateWireframeTile(tile, camera, (row * tiles[0].size() + col) * 8);
+    //         // addShadedTile(tile, camera);
+    //         // addWireframeTile(tile, camera);
+    //     }
+    
+    
     if (!m_terrainShader.loadFromFile("assets/shaders/terrain.vert", "assets/shaders/terrain.frag"))
         throw std::runtime_error("Failed to load terrain shader");
     m_terrainShader.setUniform("u_Splatmap", m_splatmap.getTexture());
@@ -98,6 +118,7 @@ void TileMap::updatePositions(const std::vector<std::vector<Tile>> &worldTiles, 
             drawOrder++;
         }
     }
+    updateGround(worldTiles, camera);
 }
 
 void TileMap::updatePositions(const std::vector<std::vector<Tile>>& worldTiles, const std::vector<TileCorner *> &modifiedCorners, const Camera &camera)
@@ -264,68 +285,6 @@ void TileMap::updateSplatmapImage()
     m_splatmapImage = m_splatmap.getTexture().copyToImage();
 }
 
-void TileMap::addShadedTile(const Tile &tile, const Camera &camera)
-{
-    // -> shaded tiles
-    // up right triangle
-    const std::vector<TileCorner *> upRightCorners = tile.getUpRightTriangleCorners();
-    for (const TileCorner *corner : upRightCorners)
-    {
-        // we encode the altitude Z in the alpha channel of the vertex color for ex,
-        // we remap it from [-20, 30] to [0, 255]
-        float z = corner->getHeight();
-        float normalizedZ = (z - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ * 255.0f)));
-
-        sf::Vector2f screenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-        sf::Vertex vertex(screenPos, m_shadedTileColor);
-        vertex.texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
-        vertex.color.a = alphaZ;
-        m_shadedTilesVertexArray.append(vertex);
-    }
-
-    // down left triangle
-    const std::vector<TileCorner *> downLeftCorners = tile.getDownLeftTriangleCorners();
-    for (const TileCorner *corner : downLeftCorners)
-    {
-        // we encode the altitude Z in the alpha channel of the vertex color for ex,
-        // we remap it from [-20, 30] to [0, 255]
-        float z = corner->getHeight();
-        float normalizedZ = (z - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ * 255.0f)));
-        
-        sf::Vector2f screenPos = camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
-        sf::Vertex vertex(screenPos, m_shadedTileColor);
-        vertex.texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
-        vertex.color.a = alphaZ;
-        m_shadedTilesVertexArray.append(vertex);
-    }
-}
-
-void TileMap::addWireframeTile(const Tile &tile, const Camera &camera)
-{
-    // -> wireframe tiles
-    const std::vector<TileCorner *> corners = tile.getCorners();
-    for (size_t i = 0; i < corners.size(); ++i)
-    {
-        const TileCorner *corner1 = corners[i];
-        const TileCorner *corner2 = corners[(i + 1) % corners.size()];
-        
-        float z1 = corner1->getHeight();
-        float normalizedZ1 = (z1 - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ1 = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ1 * 255.0f)));
-
-        float z2 = corner2->getHeight();
-        float normalizedZ2 = (z2 - m_minElevation) / (m_maxElevation - m_minElevation);
-        sf::Uint8 alphaZ2 = static_cast<sf::Uint8>(std::max(0.0f, std::min(255.0f, normalizedZ2 * 255.0f)));
-
-        sf::Vector2f screenPos1 = camera.world_to_screen(corner1->getColumn(), corner1->getRow(), corner1->getHeight());
-        sf::Vector2f screenPos2 = camera.world_to_screen(corner2->getColumn(), corner2->getRow(), corner2->getHeight());
-        m_wireframeTilesVertexArray.append(sf::Vertex(screenPos1, sf::Color(m_wireframeTileColor.r, m_wireframeTileColor.g, m_wireframeTileColor.b, alphaZ1)));
-        m_wireframeTilesVertexArray.append(sf::Vertex(screenPos2, sf::Color(m_wireframeTileColor.r, m_wireframeTileColor.g, m_wireframeTileColor.b, alphaZ2)));
-    }
-}
-
 void TileMap::updateTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::set<std::pair<int, int>>& tilesToUpdate, const Camera &camera)
 {
     if (worldTiles.empty() || worldTiles[0].empty()) 
@@ -351,6 +310,7 @@ void TileMap::updateTiles(const std::vector<std::vector<Tile>>& worldTiles, cons
         // --- UPDATE WIREFRAME ---
         updateWireframeTile(tile, camera, wireframeIndex);
     }
+    updateGround(worldTiles, camera);
 }
 
 void TileMap::updateShadedTile(const Tile &tile, const Camera &camera, int shadedIndex)
@@ -365,6 +325,7 @@ void TileMap::updateShadedTile(const Tile &tile, const Camera &camera, int shade
         m_shadedTilesVertexArray[shadedIndex].position =
             camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
         m_shadedTilesVertexArray[shadedIndex].texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
+        m_shadedTilesVertexArray[shadedIndex].color = m_shadedTileColor;
         m_shadedTilesVertexArray[shadedIndex].color.a = alphaZ;
         shadedIndex++;
     }
@@ -376,6 +337,7 @@ void TileMap::updateShadedTile(const Tile &tile, const Camera &camera, int shade
         m_shadedTilesVertexArray[shadedIndex].position =
             camera.world_to_screen(corner->getColumn(), corner->getRow(), corner->getHeight());
         m_shadedTilesVertexArray[shadedIndex].texCoords = sf::Vector2f(corner->getColumn(), corner->getRow());
+        m_shadedTilesVertexArray[shadedIndex].color = m_shadedTileColor;
         m_shadedTilesVertexArray[shadedIndex].color.a = alphaZ;
         shadedIndex++;
     }
@@ -400,14 +362,70 @@ void TileMap::updateWireframeTile(const Tile &tile, const Camera &camera, int wi
 
         m_wireframeTilesVertexArray[wireframeIndex].position =
             camera.world_to_screen(corner1->getColumn(), corner1->getRow(), corner1->getHeight());
+        m_wireframeTilesVertexArray[wireframeIndex].color = m_wireframeTileColor;
         m_wireframeTilesVertexArray[wireframeIndex].color.a = alphaZ1;
         wireframeIndex++;
 
         m_wireframeTilesVertexArray[wireframeIndex].position =
             camera.world_to_screen(corner2->getColumn(), corner2->getRow(), corner2->getHeight());
+        m_wireframeTilesVertexArray[wireframeIndex].color = m_wireframeTileColor;
         m_wireframeTilesVertexArray[wireframeIndex].color.a = alphaZ2;
         wireframeIndex++;
     }
+}
+
+void TileMap::updateGround(const std::vector<std::vector<Tile>> &worldTiles, const Camera &camera)
+{
+    if (worldTiles.empty() || worldTiles[0].empty()) return;
+
+    int nbRows = static_cast<int>(worldTiles.size());
+    int nbCols = static_cast<int>(worldTiles[0].size());
+    int groundIndex = 0;
+
+    for (int col = 0; col < nbCols; ++col) {
+        updateGroundWall(worldTiles[0][col].getCorners()[0], worldTiles[0][col].getCorners()[1], camera, groundIndex);
+        updateGroundWall(worldTiles[nbRows - 1][col].getCorners()[3], worldTiles[nbRows - 1][col].getCorners()[2], camera, groundIndex);
+    }
+    for (int row = 0; row < nbRows; ++row) {
+        updateGroundWall(worldTiles[row][0].getCorners()[0], worldTiles[row][0].getCorners()[3], camera, groundIndex);
+        updateGroundWall(worldTiles[row][nbCols - 1].getCorners()[1], worldTiles[row][nbCols - 1].getCorners()[2], camera, groundIndex);
+    }
+}
+
+void TileMap::updateGroundWall(const TileCorner *c1, const TileCorner *c2, const Camera &camera, int &groundIndex)
+{
+    float groundBottomZ = m_minElevation - 5.0f;
+    float z1 = c1->getHeight();
+    float z2 = c2->getHeight();
+
+    sf::Vector2f top1 = camera.world_to_screen(c1->getColumn(), c1->getRow(), z1);
+    sf::Vector2f top2 = camera.world_to_screen(c2->getColumn(), c2->getRow(), z2);
+    sf::Vector2f bottom1 = camera.world_to_screen(c1->getColumn(), c1->getRow(), groundBottomZ);
+    sf::Vector2f bottom2 = camera.world_to_screen(c2->getColumn(), c2->getRow(), groundBottomZ);
+
+    // with 255 alpha the water shader won't pass the wall
+    sf::Color groundColor(130, 130, 130, 255); 
+
+    // Triangle 1
+    m_groundVertexArray[groundIndex].position = top1;
+    m_groundVertexArray[groundIndex].color = groundColor;
+    m_groundVertexArray[groundIndex++].texCoords = sf::Vector2f(c1->getColumn(), c1->getRow());
+    m_groundVertexArray[groundIndex].position = top2;
+    m_groundVertexArray[groundIndex].color = groundColor;
+    m_groundVertexArray[groundIndex++].texCoords = sf::Vector2f(c2->getColumn(), c2->getRow());
+    m_groundVertexArray[groundIndex].position = bottom1;
+    m_groundVertexArray[groundIndex].color = groundColor;
+    m_groundVertexArray[groundIndex++].texCoords = sf::Vector2f(c1->getColumn(), c1->getRow());
+    // Triangle 2
+    m_groundVertexArray[groundIndex].position = top2;
+    m_groundVertexArray[groundIndex].color = groundColor;
+    m_groundVertexArray[groundIndex++].texCoords = sf::Vector2f(c2->getColumn(), c2->getRow());
+    m_groundVertexArray[groundIndex].position = bottom2;
+    m_groundVertexArray[groundIndex].color = groundColor;
+    m_groundVertexArray[groundIndex++].texCoords = sf::Vector2f(c2->getColumn(), c2->getRow());
+    m_groundVertexArray[groundIndex].position = bottom1;
+    m_groundVertexArray[groundIndex].color = groundColor;
+    m_groundVertexArray[groundIndex++].texCoords = sf::Vector2f(c1->getColumn(), c1->getRow());
 }
 
 void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
@@ -417,6 +435,10 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
 
     // Draw Shaded Terrain
     if (m_areShadedTilesVisible) {
+        states.shader = nullptr;
+        states.texture = nullptr;
+        target.draw(m_groundVertexArray, states); 
+
         states.shader = nonConstShader;
         if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 0.0f);
         target.draw(m_shadedTilesVertexArray, states);
@@ -429,19 +451,3 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
         target.draw(m_wireframeTilesVertexArray, states);
     }
 }
-
-// void TileMap::drawShadedTerrain(sf::RenderTarget &target, sf::RenderStates states) const
-// {
-//     // apply the transform
-//     states.transform *= getTransform();
-
-//     // // draw the vertex array
-//     // if (m_areShadedTilesVisible) {
-//     //     states.shader = &m_terrainShader;
-//     //     target.draw(m_shadedTilesVertexArray, states);
-//     // }
-
-//     states.shader = nullptr;
-//     if (m_isWireframeVisible)
-//         target.draw(m_wireframeTilesVertexArray, states);
-// }
