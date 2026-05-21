@@ -75,10 +75,14 @@ void TileMap::init(const std::vector<std::vector<Tile>> &tiles, const Camera &ca
 void TileMap::initBrushes(const std::vector<std::string> &brushesImagePaths)
 {
     for (int i = 0; i < brushesImagePaths.size(); i++) {
+        sf::Image img = ResourceManager::getInstance().getTexture(brushesImagePaths[i]).copyToImage();
+        BrushUtils::sanitizeBrushImage(img);
+        m_processedBrushTextures[i].loadFromImage(img);
+        m_processedBrushTextures[i].setSmooth(true);
+
         sf::Sprite sprite;
-        sf::Texture& texture = ResourceManager::getInstance().getTexture(brushesImagePaths[i]);
-        sprite.setTexture(texture);
-        sprite.setOrigin(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f);
+        sprite.setTexture(m_processedBrushTextures[i]);
+        sprite.setOrigin(m_processedBrushTextures[i].getSize().x / 2.0f, m_processedBrushTextures[i].getSize().y / 2.0f);
         m_brushSprites.insert({i, sprite});  
     }
 }
@@ -182,6 +186,7 @@ void TileMap::drawStrokeOnSplatMap(const PaintStroke& stroke, const sf::Vector2i
 {
     sf::Sprite& brushSprite = m_brushSprites[stroke.brushTextureId];
     sf::RenderStates states = sf::RenderStates::Default;
+
     const float diameterInTiles = (stroke.radius * 2.0f) + 1.0f;
     const float expectedPixelWidth = diameterInTiles * tileSize.x;
     const float expectedPixelHeight = diameterInTiles * tileSize.y;
@@ -194,53 +199,40 @@ void TileMap::drawStrokeOnSplatMap(const PaintStroke& stroke, const sf::Vector2i
     const float percentY = stroke.worldPosition.y / static_cast<float>(nbRows);
     brushSprite.setPosition(percentX * m_splatmap.getSize().x, percentY * m_splatmap.getSize().y);
 
-    // In blending mode the source color is the color of the brush sprite, 
-    // and the destination color is the current color in the splat-map.
-    // where new_pixel = (dest * dest_factor) [equation] (source * source_factor)
     if (stroke.textureId == 0) {
-        brushSprite.setColor(sf::Color(255, 255, 255, 255)); // Eraser
+        // --- ERASER (Multiplication by the inverse of the brush) ---
+        brushSprite.setColor(sf::Color(255, 255, 255, 255));
         states.blendMode = sf::BlendMode(
-            // reverse_subtract does : dest - source, which means it will subtract the brush color from the splat-map color, effectively erasing it
-            // sf::BlendMode::One means we use 100% of the splat-map color
-            // sf::BlendMode::SrcAlpha means we use the brush color multiplied by its alpha
-            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract, // for RGB channels : grass, sand, rock
-            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract // for Alpha channel : snow
+            sf::BlendMode::Zero, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add, // Removes RGB
+            sf::BlendMode::Zero, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add  // Removes snow
         );
         m_splatmap.draw(brushSprite, states);
-    } else if (stroke.textureId == 4) {
-        brushSprite.setColor(sf::Color(0, 0, 0, 255)); // Snow
-        // we do the opposite of rgb for snow because it's stored in the alpha channel of the splat-map,
-        // we want to add it to the splat-map but not affect the RGB channels, 
-        // so we use Zero for RGB and SrcAlpha for Alpha
+    } 
+    else if (stroke.textureId == 4) {
+        // --- SNOW ---
+        brushSprite.setColor(sf::Color(255, 255, 255, 255));
         states.blendMode = sf::BlendMode(
-            sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add,
-            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::Add
+            sf::BlendMode::Zero, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add, // Removes RGB underneath
+            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::Add           // Adds snow
         );
         m_splatmap.draw(brushSprite, states);
-    } else {
-        // First we dig a hole in the splat-map existing colors
-        brushSprite.setColor(sf::Color(255, 255, 255, 255)); // Subtraction mask
+    } 
+    else {
+        // --- GRASS, SAND, ROCK ---
+        // Carve out a hole (removes existing RGB and snow)
+        brushSprite.setColor(sf::Color(255, 255, 255, 255));
         states.blendMode = sf::BlendMode(
-            // Here we want to subtract the brush color (multiplied by its alpha) from the splat-map color, 
-            // but only for the RGB channels, so we use ReverseSubtract for RGB and Add zero to Alpha to keep it intact
-            sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::ReverseSubtract, // Subtract existing RGB
-            sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add                  // Keep Alpha (Snow) intact
+            sf::BlendMode::Zero, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add,
+            sf::BlendMode::Zero, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add
         );
-        m_splatmap.draw(brushSprite, states); 
-
-        // Then we fill the hole with the new texture color
-        if (stroke.textureId == 1)
-            brushSprite.setColor(sf::Color(255, 0, 0, 255)); // Grass R 
-        else if (stroke.textureId == 2)
-            brushSprite.setColor(sf::Color(0, 255, 0, 255)); // Sand G
-        else if (stroke.textureId == 3)
-            brushSprite.setColor(sf::Color(0, 0, 255, 255)); // Rock B
+        m_splatmap.draw(brushSprite, states);
+        // Fill the hole with the pure color
+        if (stroke.textureId == 1)      brushSprite.setColor(sf::Color(255, 0, 0, 255));
+        else if (stroke.textureId == 2) brushSprite.setColor(sf::Color(0, 255, 0, 255));
+        else if (stroke.textureId == 3) brushSprite.setColor(sf::Color(0, 0, 255, 255));
+        
         states.blendMode = sf::BlendMode(
-            // Here we use the brush color multiplied by its alpha, so only 
-            // the non-transparent parts of the brush will affect the splat-map
-            // then we add it to the existing splat-map color,
             sf::BlendMode::SrcAlpha, sf::BlendMode::One, sf::BlendMode::Add,
-            // here we let the alpha intact
             sf::BlendMode::Zero, sf::BlendMode::One, sf::BlendMode::Add
         );
         m_splatmap.draw(brushSprite, states);

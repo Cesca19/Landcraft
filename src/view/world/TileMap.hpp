@@ -11,6 +11,7 @@
 #include "../../model/Tile.hpp"
 #include "../../model/PaintStroke.hpp"
 #include "../../utils/ResourceManager.hpp"
+#include "../../utils/BrushUtils.hpp"
 
 class TileMap : public sf::Drawable, public sf::Transformable
 {
@@ -52,6 +53,7 @@ private:
     sf::RenderTexture m_splatmap;
     sf::Image m_splatmapImage;
     sf::Shader m_terrainShader;
+    std::unordered_map<int, sf::Texture> m_processedBrushTextures;
     std::unordered_map<int, sf::Sprite> m_brushSprites;
     std::vector<sf::Texture> m_tilesTextures;
 

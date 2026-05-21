@@ -22,7 +22,7 @@ void main() {
         return;
     }
 
-    // Water clipping
+    // Water clipping and height computing
     float terrainZ = u_MinElevation + (gl_Color.a * u_ElevationRange);
     if (terrainZ <= u_WaterHeight) {
         discard;
@@ -30,26 +30,18 @@ void main() {
 
     vec2 tileUV = gl_TexCoord[0].xy;
 
-    // THE SUN (3D SHADOW CALCULATION)
-    // Calculate 3D slope vectors using terrain coordinates (tileUV)
-    // This makes the shadow completely insensitive to zoom or camera movements!
+    // 3D sun and shadow calculation
     vec3 dPdx = vec3(dFdx(tileUV.x), dFdx(tileUV.y), dFdx(terrainZ));
     vec3 dPdy = vec3(dFdy(tileUV.x), dFdy(tileUV.y), dFdy(terrainZ));
-    // Cross product gives the true 3D normal of the face
     vec3 normal = normalize(cross(dPdx, dPdy));
-    // Ensure the normal always points toward the sky (positive Z)
+    
     if (normal.z < 0.0) {
         normal = -normal;
     }
-    // A 3D sun (X, Y, Z).
-    // Z (here 2.5) defines the sun height. The larger it is, the higher the sun,
-    // which flattens shadows from small sand imperfections.
-    vec3 soleil = normalize(vec3(-1.0, -1.0, 2.5));
-    // Light is the dot product between the slope and the sun
-    float lumiere = dot(normal, soleil);
-    // Heavily clamp contrast to mask micro-rounding defects (8-bit Alpha)
-    lumiere = clamp(0.8 + (lumiere * 0.3), 0.95, 1.05);
-
+    
+    vec3 sunDirection = normalize(vec3(-1.0, -1.0, 2.5));
+    float lightFactor = dot(normal, sunDirection);
+    lightFactor = clamp(0.8 + (lightFactor * 0.3), 0.95, 1.05);
 
     // Texture blending
     vec2 splatUV = tileUV / u_MapSize;
@@ -61,15 +53,20 @@ void main() {
     vec4 colRock  = texture2D(u_TexRock, tileUV);
     vec4 colSnow  = texture2D(u_TexSnow, tileUV);
 
-    vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);
-    finalColor = mix(finalColor, colGrass, weights.r);
-    finalColor = mix(finalColor, colSand,  weights.g);
-    finalColor = mix(finalColor, colRock,  weights.b);
-    finalColor = mix(finalColor, colSnow,  weights.a);
+    // Clean, direct blending (guaranteed by the C++ cleanup)
+    float wSum = weights.r + weights.g + weights.b + weights.a;
 
-    finalColor.rgb *= lumiere;
+    // Sum the textures
+    vec4 texturesColor = colGrass * weights.r + colSand * weights.g + colRock * weights.b + colSnow * weights.a;
 
-    // Grid overlay (must be applied AFTER lighting to remain visible)
+    // Fill the remaining area (if wSum < 1.0) with a white background
+    float emptySpace = max(0.0, 1.0 - wSum);
+    vec4 finalColor = texturesColor + vec4(1.0, 1.0, 1.0, 1.0) * emptySpace;
+
+    // Apply lighting
+    finalColor.rgb *= lightFactor;
+
+    // Grid overlay
     if (u_ShowGrid > 0.5) {
         vec2 edgeDist = abs(fract(tileUV - 0.5) - 0.5);
         vec2 fw = fwidth(tileUV);

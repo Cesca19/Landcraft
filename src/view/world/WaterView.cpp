@@ -133,7 +133,7 @@ float WaterView::getWaterHeight() const
 
 void WaterView::setIsVisible(const bool visible)
 {
-    m_isVisible = visible; 
+    m_isVisible = visible;
 }
 
 bool WaterView::isVisible() const 
