@@ -96,6 +96,7 @@ add_executable(${MY_TARGET}
         src/view/menu/WorldMenu.cpp
         src/commands/PaintSplatMapCommand.cpp
         src/view/world/WaterView.cpp
+        src/utils/BrushUtils.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

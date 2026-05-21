@@ -5,11 +5,13 @@
 #include <exception>
 #include "MapLoadSaveController.hpp"
 
-MapLoadSaveController::MapLoadSaveController(WorldModel *m_worldModel, WorldView *m_worldView, EditionController *m_editionController, sf::Vector2f globalUIPosition)
+MapLoadSaveController::MapLoadSaveController(WorldModel *m_worldModel, WorldView *m_worldView, 
+    EditionController *m_editionController, sf::Vector2f globalUIPosition, std::function<void()> onMapLoadedCallback)
     : m_worldModel(m_worldModel)
     , m_worldView(m_worldView)
     , m_editionController(m_editionController)
     , m_mapSaveLoadMenu(std::make_unique<MapSaveLoadMenu>(globalUIPosition))
+    , m_onMapLoadedCallback(onMapLoadedCallback)
 {
     m_mapSaveLoadMenu->setSaveFileButtonOnClickCallback([this] () {
         this->saveMapToFile();
@@ -64,6 +66,7 @@ void MapLoadSaveController::loadMapFromFile()
     try {
         m_worldModel->loadMap(openPath);
         resetEditor();
+        m_onMapLoadedCallback();
         std::cout << "Map loaded successfully." << std::endl;
     } catch (const std::exception& exception) {
         std::cerr << "Failed to load map: " << exception.what() << std::endl;

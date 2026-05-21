@@ -79,6 +79,11 @@ void Box::setPosition(const sf::Vector2f &position)
     m_rectangle.setPosition(position);
 }
 
+void Box::setSize(const sf::Vector2f &size)
+{
+    m_rectangle.setSize(size);
+}
+
 void Box::onBase()
 {
 }

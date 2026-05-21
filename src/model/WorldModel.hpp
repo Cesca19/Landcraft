@@ -15,6 +15,7 @@
 struct WorldMap {
     sf::Vector2i TilesSize;
     std::string splatmapFilepath;
+    std::string mapName;
     std::vector<std::vector<float>> TileCornersHeightMap;
 };
 
@@ -23,11 +24,12 @@ class WorldModel
 public:
     WorldModel();
     ~WorldModel();
-    void loadMap(std::string mapName);
+    void loadMap(std::string mapFilePath);
     sf::Vector2i getTilesSize() const;
     std::string getSplatmapFilepath() const;
     sf::Vector2i getMapSize() const;
-    void saveMapToFile(std::string mapName, std::string splatmapFileName);
+    std::string getMapName() const;
+    void saveMapToFile(std::string mapFilePath, std::string splatmapFileName);
     std::vector<std::vector<Tile>>& getTiles();
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
     sf::Vector2f getCenter() const;
@@ -39,7 +41,7 @@ public:
     float getMaxElevation() const;
     float getWaterHeight() const;
 private:
-    std::unique_ptr<WorldMap> loadMapFromFile(std::string mapName);
+    std::unique_ptr<WorldMap> loadMapFromFile(std::string mapFilePath);
     sf::Vector2i loadTilesSize(std::ifstream &mapFile) const;
     std::string loadSplatmapFilepath(std::ifstream &mapFile) const;
     sf::Vector2i loadMapSize(std::ifstream &mapFile) const;
@@ -56,6 +58,7 @@ private:
     float m_highestTileCornerHeight;
 
     sf::Vector2i m_tilesSize;
+    std::string m_mapName;
     std::string m_splatmapFilepath;
 
     float m_minElevation;

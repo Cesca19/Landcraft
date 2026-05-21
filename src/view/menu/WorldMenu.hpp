@@ -15,7 +15,8 @@ enum class DrawMode {
 
 class WorldMenu {
 public:
-    WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition);
+    WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition,
+        const sf::Vector2f &mapNamePosition);
     ~WorldMenu();
     void setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const;
     void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
@@ -26,9 +27,12 @@ public:
     void setDrawModeButtonOnClickCallback(DrawMode mode, const std::function<void()> &callback);
     void selectDrawModeButton(DrawMode mode);
     void unselectDrawModeButton(DrawMode mode);
+    void setMapName(const std::string &mapName);
 private:
+    void updateMapNameMenu();
     void initWidgetsList();
 
+    sf::Vector2f m_mapNameMenuPosition;
     Box *m_globalMenuBox;
     Box *m_quitMenuBox;
     Text *m_quitMenuTitle;
@@ -41,6 +45,7 @@ private:
     SpriteButton *m_wireframeModeButton;
     SpriteButton *m_wireframeShadedModeButton;
     Text *m_drawModeTitle;
+    TextButton *m_mapNameBtn;
     bool m_isQuitMenuVisible;
     std::vector<IWidget *> m_widgets;
     std::unordered_map<DrawMode, SpriteButton*> m_drawModeButtons;

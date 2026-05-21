@@ -14,6 +14,7 @@
 #include "../view/menu/BrushMenu.hpp"
 #include "../view/world/Camera.hpp"
 #include "../model/BrushInfos.hpp"
+#include "../utils/BrushUtils.hpp"
 
 
 class BrushController {
@@ -53,7 +54,7 @@ public:
     static sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner);
 
     float getPointWeightInBrush(const sf::Vector2f& pointWorldPosition, const sf::Vector2f& brushCenterWorldPosition) const;
-    static void sanitizeBrushImage(sf::Image& img);
+    // static void sanitizeBrushImage(sf::Image& img);
     void selectBrush(int index);
     void incrementBrushSize();
     void decrementBrushSize();

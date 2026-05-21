@@ -18,13 +18,14 @@ WorldModel::~WorldModel()
 {
 }
 
-void WorldModel::loadMap(std::string mapName)
+void WorldModel::loadMap(std::string mapFilePath)
 {
-    std::unique_ptr<WorldMap> worldMap = loadMapFromFile(mapName);
+    std::unique_ptr<WorldMap> worldMap = loadMapFromFile(mapFilePath);
     m_tileCornersHeightmap.clear();
     m_tileCornersHeightmap = std::move(worldMap->TileCornersHeightMap);
     m_tilesSize = worldMap->TilesSize;
     m_splatmapFilepath = worldMap->splatmapFilepath;
+    m_mapName = worldMap->mapName;
     worldMap = nullptr;
     createWorldTileCorners();
     createWorldTiles();
@@ -46,11 +47,16 @@ sf::Vector2i WorldModel::getMapSize() const
     return sf::Vector2i(m_corners.empty() ? 0 : m_corners[0].size() - 1, m_corners.size() - 1);
 }
 
-void WorldModel::saveMapToFile(std::string mapName, std::string splatmapFileName)
+std::string WorldModel::getMapName() const
 {
-        std::ofstream mapFile(mapName);
+    return m_mapName;
+}
+
+void WorldModel::saveMapToFile(std::string mapFilePath, std::string splatmapFileName)
+{
+        std::ofstream mapFile(mapFilePath);
         if (!mapFile.is_open()) {
-            throw std::runtime_error("Failed to open map file for writing: " + mapName);
+            throw std::runtime_error("Failed to open map file for writing: " + mapFilePath);
         }
         // Write tile size
         mapFile << "[TILES_SIZE]\n";
@@ -133,38 +139,39 @@ float WorldModel::getWaterHeight() const
     return m_waterHeight;
 }
 
-std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapName)
+std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapFilePath)
 {
-    std::ifstream mapFile(mapName);
+    std::ifstream mapFile(mapFilePath);
     if (!mapFile.is_open())
-        throw std::runtime_error("Failed to open map file: " + mapName);
+        throw std::runtime_error("Failed to open map file: " + mapFilePath);
 
     sf::Vector2i tilesSize = loadTilesSize(mapFile);
     if (tilesSize.x <= 0 || tilesSize.y <= 0)
-        throw std::runtime_error("Invalid tiles size in file: " + mapName);
+        throw std::runtime_error("Invalid tiles size in file: " + mapFilePath);
 
     std::string splatmapFileName = loadSplatmapFilepath(mapFile);
     if (splatmapFileName.empty())
-         throw std::runtime_error("Failed to load splatmap filename from file: " + mapName);
-    std::string splatmapFilePath = mapName.substr(0, mapName.find_last_of("/\\") + 1) + splatmapFileName;
+         throw std::runtime_error("Failed to load splatmap filename from file: " + mapFilePath);
+    std::string splatmapFilePath = mapFilePath.substr(0, mapFilePath.find_last_of("/\\") + 1) + splatmapFileName;
     
     sf::Vector2i mapSize = loadMapSize(mapFile);
     if (mapSize.x <= 0 || mapSize.y <= 0) {
-        throw std::runtime_error("Invalid map size in file: " + mapName);
+        throw std::runtime_error("Invalid map size in file: " + mapFilePath);
     }
     int nbCols = mapSize.x;
     int nbRows = mapSize.y;
 
     std::vector<std::vector<float>> heightmap = loadTileCornersHeightmap(mapFile, nbRows, nbCols);
     if (heightmap.empty()) {
-        throw std::runtime_error("Failed to load tile corners heightmap from file: " + mapName);
+        throw std::runtime_error("Failed to load tile corners heightmap from file: " + mapFilePath);
     }
 
-    std::cout << "Map file loaded successfully: " << mapName << std::endl;
+    std::cout << "Map file loaded successfully: " << mapFilePath << std::endl;
     std::unique_ptr<WorldMap> worldMap = std::make_unique<WorldMap>();
     worldMap->TileCornersHeightMap = heightmap;
     worldMap->TilesSize = tilesSize;
     worldMap->splatmapFilepath = splatmapFilePath;
+    worldMap->mapName = mapFilePath.substr(mapFilePath.find_last_of("/\\") + 1);
     return worldMap;
 }
 

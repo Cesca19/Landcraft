@@ -17,7 +17,9 @@ void WorldController::init(const std::string &mapName,
     const float globalToolBoxOffset = 550;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
     sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 150);
-    m_worldMenu = std::make_unique<WorldMenu>(globalUIPosition, quitMenuPosition);
+    sf::Vector2f mapNamePosition = sf::Vector2f(static_cast<float>(viewSettings.windowSize.x) / 2.f, 
+        static_cast<float>(viewSettings.windowSize.y) - 150);
+    m_worldMenu = std::make_unique<WorldMenu>(globalUIPosition, quitMenuPosition, mapNamePosition);
     m_worldMenu->setQuitMenuVisibility(false);
     m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::SHADED, [this] () { this->onDrawModeButtonClicked(DrawMode::SHADED); } );
     m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::WIREFRAME, [this] () { this->onDrawModeButtonClicked(DrawMode::WIREFRAME); } );
@@ -28,9 +30,11 @@ void WorldController::init(const std::string &mapName,
     sf::Vector2f brushMenuPosition = globalUIPosition + sf::Vector2f(245, 0); 
     m_brushController = std::make_unique<BrushController>(brushMenuPosition);
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
-    m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0));
+    m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, 
+        m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0), [this] () { this->onMapLoaded(); });
 
     m_worldModel.loadMap(mapName);
+    onMapLoaded();
     sf::Vector2i tilesSize = m_worldModel.getTilesSize();
     m_worldView.init(viewSettings.center, viewSettings.size, 10);
     m_worldView.initCamera(tilesSize.x, tilesSize.y, cameraSettings.heightScale,
@@ -110,6 +114,11 @@ bool WorldController::isQuitMenuVisible() const
 void WorldController::saveMapToFile() const
 {
     m_mapLoadSaveController->saveMapToFile();
+}
+
+void WorldController::onMapLoaded()
+{
+    m_worldMenu->setMapName(m_worldModel.getMapName());
 }
 
 void WorldController::onDrawModeButtonClicked(const DrawMode mode)

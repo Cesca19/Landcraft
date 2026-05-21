@@ -45,6 +45,7 @@ public:
     void setQuitMenuVisibility(bool isVisible) const;
     bool isQuitMenuVisible() const;
     void saveMapToFile() const;
+    void onMapLoaded();
 private:
     void onDrawModeButtonClicked(DrawMode mode);
 

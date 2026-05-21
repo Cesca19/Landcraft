@@ -4,9 +4,19 @@
 
 #include "WorldMenu.hpp"
 
-WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition)
+WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition, const sf::Vector2f &mapNamePosition)
     : m_isQuitMenuVisible(true)
+    , m_mapNameMenuPosition(mapNamePosition)
 {
+    m_mapNameBtn = UIFactory::createTextButton(mapNamePosition, "Map Name", 18);
+    UIFactory::applyDefaultTextButtonStyle(m_mapNameBtn, UIFactory::TextVariant::Label);
+    m_mapNameBtn->initBackgroundStatesColor(sf::Color::White, sf::Color::White, 
+        sf::Color::White, sf::Color::White, sf::Color::White);
+    m_mapNameBtn->initOutlineStatesColors(sf::Color(220, 210, 240), sf::Color(220, 210, 240), 
+        sf::Color(220, 210, 240), sf::Color(220, 210, 240), sf::Color(220, 210, 240));
+    m_mapNameBtn->initTextColor(sf::Color(110, 95, 150), sf::Color(110, 95, 150),
+        sf::Color(110, 95, 150), sf::Color(110, 95, 150), sf::Color(110, 95, 150));
+
     m_globalMenuBox = UIFactory::createBox(globalUIPosition, {225, 90});
     UIFactory::applyDefaultBoxStyle(m_globalMenuBox);
 
@@ -108,6 +118,20 @@ void WorldMenu::unselectDrawModeButton(const DrawMode mode)
     m_drawModeButtons[mode]->setSelected(false);
 }
 
+void WorldMenu::setMapName(const std::string &mapName)
+{
+    m_mapNameBtn->setContent(mapName);
+    updateMapNameMenu();
+}
+
+void WorldMenu::updateMapNameMenu()
+{
+    sf::FloatRect textBounds = m_mapNameBtn->getBounds();
+    const sf::Vector2f boxPosition = m_mapNameMenuPosition - 
+        sf::Vector2f(textBounds.width / 2.f, 0) + sf::Vector2f(-10, 0);
+    m_mapNameBtn->setPosition(boxPosition);
+}
+
 void WorldMenu::initWidgetsList()
 {
     m_widgets.push_back(m_globalMenuBox);
@@ -122,4 +146,5 @@ void WorldMenu::initWidgetsList()
     m_widgets.push_back(m_shadedModeButton);
     m_widgets.push_back(m_wireframeShadedModeButton);
     m_widgets.push_back(m_drawModeTitle);
+    m_widgets.push_back(m_mapNameBtn);
 }
