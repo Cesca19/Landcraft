@@ -4,31 +4,45 @@
 
 #include "WorldController.hpp"
 
-WorldController::WorldController()
+WorldController::WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWindowSize)
+    : m_minWindowSize(minWindowSize)
+    , m_maxWindowSize(maxWindowSize)
+    , m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
 {
 }
 
 void WorldController::init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings)
 {
-    float globalToolBoxOffset = 450;
+    const float globalToolBoxOffset = 550;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
-    sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 100);
-    m_worldMenu = std::make_unique<WorldMenu>(globalUIPosition, quitMenuPosition);
+    sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 150);
+    sf::Vector2f mapNamePosition = sf::Vector2f(static_cast<float>(viewSettings.windowSize.x) / 2.f, 
+        static_cast<float>(viewSettings.windowSize.y) - 150);
+    m_worldMenu = std::make_unique<WorldMenu>(globalUIPosition, quitMenuPosition, mapNamePosition);
     m_worldMenu->setQuitMenuVisibility(false);
+    m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::SHADED, [this] () { this->onDrawModeButtonClicked(DrawMode::SHADED); } );
+    m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::WIREFRAME, [this] () { this->onDrawModeButtonClicked(DrawMode::WIREFRAME); } );
+    m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::WIREFRAME_SHADED, [this] () { this->onDrawModeButtonClicked(DrawMode::WIREFRAME_SHADED); } );
+    m_worldMenu->selectDrawModeButton(DrawMode::WIREFRAME_SHADED);
 
     m_editionController = std::make_unique<EditionController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
-    float selectionMenuOffset = 185;
-    sf::Vector2f brushMenuPosition = sf::Vector2f{static_cast<float>(viewSettings.windowSize.x) / 2.f - selectionMenuOffset, 10};
+    sf::Vector2f brushMenuPosition = globalUIPosition + sf::Vector2f(245, 0); 
     m_brushController = std::make_unique<BrushController>(brushMenuPosition);
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
-    m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0));
+    m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, 
+        m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0), [this] () { this->onMapLoaded(); });
 
     m_worldModel.loadMap(mapName);
+    onMapLoaded();
+    sf::Vector2i tilesSize = m_worldModel.getTilesSize();
     m_worldView.init(viewSettings.center, viewSettings.size, 10);
-    m_worldView.initCamera(cameraSettings.tileSizeX, cameraSettings.tileSizeY, cameraSettings.heightScale,
+    m_worldView.initCamera(tilesSize.x, tilesSize.y, cameraSettings.heightScale,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
-    m_worldView.initTileMap(m_worldModel.getTiles());
+    m_worldView.initTileMap(m_worldModel.getTiles(), m_worldModel.getMinElevation(), m_worldModel.getMaxElevation(), m_worldModel.getWaterHeight());
+    m_worldView.initBrushes(m_brushController->getBrushesImagePaths());
+    m_worldView.initSplatMap(m_worldModel.getSplatmapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
+    m_worldView.initWaterView(m_worldModel.getMapSize().x, m_worldModel.getMapSize().y, m_worldModel.getTilesSize());
     m_worldView.initEnvironment(viewSettings.windowSize);
 }
 
@@ -41,7 +55,7 @@ void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &win
     m_mapLoadSaveController->handleEvents(event, window);
 }
 
-void WorldController::handleContinuousEvents(float deltaTime, const sf::RenderWindow &window)
+void WorldController::handleContinuousEvents(const float deltaTime, const sf::RenderWindow &window)
 {
     m_navigationController->handleContinuousEvents(deltaTime, m_worldView);
     m_editionController->handleContinuousEvents(window, m_worldModel, m_worldView, *m_brushController);
@@ -59,11 +73,16 @@ void WorldController::draw(sf::RenderWindow &window) const
 {
     m_worldView.draw(window);
     if (!m_worldView.getCamera().isRotating()) // only draw selection when not rotating to avoid visual clutter
-        m_brushController->draw(window, m_worldView.getCamera());
+        m_brushController->draw(window, m_worldView.getCamera(), m_editionController->areEditableTilesVisible());
 }
 
-void WorldController::onWindowResized(const sf::Vector2u windowSize)
+void WorldController::onWindowResized(const sf::Vector2u windowSize, sf::RenderWindow& window)
 {
+    unsigned int clampedWidth = std::clamp(windowSize.x, m_minWindowSize.x, m_maxWindowSize.x);
+    unsigned int clampedHeight = std::clamp(windowSize.y, m_minWindowSize.y, m_maxWindowSize.y);
+    
+    if (clampedWidth != windowSize.x || clampedHeight != windowSize.y)
+        window.setSize(sf::Vector2u(clampedWidth, clampedHeight));
     m_worldView.onWindowResized(windowSize);
 }
 
@@ -82,12 +101,48 @@ void WorldController::setCancelButtonOnClickCallback(const std::function<void()>
     m_worldMenu->setCancelButtonOnClickCallback(callback);
 }
 
-void WorldController::setQuitMenuVisibility(bool isVisible) const
+void WorldController::setQuitMenuVisibility(const bool isVisible) const
 {
     m_worldMenu->setQuitMenuVisibility(isVisible);
 }
 
-void WorldController::saveMapToFile()
+bool WorldController::isQuitMenuVisible() const
+{
+    return m_worldMenu->isQuitMenuVisible();
+}
+
+void WorldController::saveMapToFile() const
 {
     m_mapLoadSaveController->saveMapToFile();
+}
+
+void WorldController::onMapLoaded()
+{
+    m_worldMenu->setMapName(m_worldModel.getMapName());
+}
+
+void WorldController::onDrawModeButtonClicked(const DrawMode mode)
+{
+    if (mode == m_currentDrawMode)
+        return;
+    m_worldMenu->unselectDrawModeButton(m_currentDrawMode);
+    switch (mode) {
+        case DrawMode::WIREFRAME_SHADED:
+            m_worldView.setAreShadedTilesVisible(true);
+            m_worldView.setIsWireframeVisible(true);
+            m_worldView.setIsWaterVisible(true);
+            break;
+        case DrawMode::WIREFRAME:
+            m_worldView.setAreShadedTilesVisible(false);
+            m_worldView.setIsWireframeVisible(true);
+            m_worldView.setIsWaterVisible(false);
+            break;
+        case DrawMode::SHADED:
+            m_worldView.setAreShadedTilesVisible(true);
+            m_worldView.setIsWireframeVisible(false);
+            m_worldView.setIsWaterVisible(true);
+            break;
+    }
+    m_currentDrawMode = mode;
+    m_worldMenu->selectDrawModeButton(m_currentDrawMode);
 }

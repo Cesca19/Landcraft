@@ -10,9 +10,8 @@ Tile::Tile()
     m_corners.clear();
 }
 
-Tile::Tile(const std::vector<TileCorner*> &corners, const int textureId)
+Tile::Tile(const std::vector<TileCorner*> &corners)
     : m_corners(corners)
-    , m_textureId(textureId)
 {
     if (corners.size() != 4)
         throw std::invalid_argument("A tile must have exactly 4 corners.");
@@ -62,15 +61,6 @@ sf::Vector2i Tile::getGridPosition() const
 sf::Vector2f Tile::getCenterGridPosition() const
 {
     return getPosition() + sf::Vector2f(0.5f, 0.5f);
-}
-
-int Tile::getTextureId() const
-{
-    return m_textureId;
-}
-
-void Tile::setTextureId(const int textureId) {
-    m_textureId = textureId;
 }
 
 void Tile::updateTriangleCorners()

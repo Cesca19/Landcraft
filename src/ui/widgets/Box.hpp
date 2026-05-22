@@ -29,6 +29,7 @@ public:
     void setState(WidgetState state) override;
     
     void setPosition(const sf::Vector2f& position) override;
+    void setSize(const sf::Vector2f& size);
 protected:
     void onBase() override;
     void onHover() override;

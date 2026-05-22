@@ -13,16 +13,22 @@
 
 class MapLoadSaveController {
 public:
-    MapLoadSaveController(WorldModel *m_worldModel, WorldView *m_worldView, EditionController *m_editionController, sf::Vector2f globalUIPosition);
+    MapLoadSaveController(WorldModel *m_worldModel, WorldView *m_worldView, 
+        EditionController *m_editionController, sf::Vector2f globalUIPosition,
+        std::function<void()> onMapLoadedCallback);
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
     void saveMapToFile();
     void loadMapFromFile();
 private:
     void resetEditor();
+    std::string getFilePathWithoutExtension(const std::string& filePath);
+    std::string getFileName(const std::string& filePath);
+    bool TrySaveSplatmapImage(const std::string& filepath);
 
     WorldView *m_worldView;
     WorldModel *m_worldModel;
     EditionController *m_editionController;
+    std::function<void()> m_onMapLoadedCallback;
     std::unique_ptr<MapSaveLoadMenu> m_mapSaveLoadMenu;
     const std::vector<std::string> m_mapFileFilters = {
         "Legend Files", "*.legend"

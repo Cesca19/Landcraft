@@ -4,10 +4,12 @@
 
 #include "TileCorner.hpp"
 
-TileCorner::TileCorner(const int row, const int col, const float height)
+TileCorner::TileCorner(const int row, const int col, const float height, const float minElevation, const float maxElevation)
     : m_row(row)
     , m_col(col)
     , m_height(height)
+    , m_minElevation(minElevation)
+    , m_maxElevation(maxElevation)
 {
 }
 
@@ -34,4 +36,5 @@ sf::Vector2f TileCorner::getPosition() const
 void TileCorner::addHeight(const float heightStep)
 {
     m_height += heightStep;
+    m_height = std::clamp(m_height, m_minElevation, m_maxElevation);
 }

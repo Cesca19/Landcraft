@@ -25,6 +25,7 @@ TextButton::TextButton(const sf::Vector2f position, const std::string &text, con
     , m_selectedTextColor(sf::Color::White)
     , m_padding(20, 20)
     , m_onClickCallback(nullptr)
+    , m_position(position)
 {
     m_text.setFillColor(m_baseTextColor);
     m_text.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
@@ -123,6 +124,11 @@ sf::Vector2f TextButton::getCenter() const
     return m_background.getGlobalBounds().getPosition() + m_background.getGlobalBounds().getSize() / 2.0f;
 }
 
+sf::Vector2f TextButton::getPosition() const
+{
+    return m_background.getGlobalBounds().getPosition();
+}
+
 void TextButton::update(float deltaTime)
 {
 }
@@ -166,6 +172,7 @@ void TextButton::setVisibility(const bool isVisible)
 
 void TextButton::setPosition(const sf::Vector2f &position)
 {
+    m_position = position;
     m_text.setPosition(position);
 
     sf::FloatRect textLocal = m_text.getLocalBounds();
@@ -182,6 +189,12 @@ void TextButton::setPosition(const sf::Vector2f &position)
     float centerX = position.x + (bgWidth / 2.0f);
     float centerY = position.y + (bgHeight / 2.0f);
     m_text.setPosition(centerX, centerY);
+}
+
+void TextButton::setContent(const std::string &text)
+{
+    m_text.setString(text);
+    setPosition(m_position);
 }
 
 void TextButton::onBase()

@@ -14,6 +14,7 @@
 #include "../view/menu/BrushMenu.hpp"
 #include "../view/world/Camera.hpp"
 #include "../model/BrushInfos.hpp"
+#include "../utils/BrushUtils.hpp"
 
 
 class BrushController {
@@ -22,17 +23,22 @@ public:
     void handleEvents(const sf::RenderWindow &window, const sf::Event &event);
     void update(float deltaTime, const sf::RenderWindow &window, SelectionMode selectionMode,
                  WorldModel &worldModel, const Camera &camera);
-    void draw(sf::RenderWindow &window, const Camera &camera) const;
+    void draw(sf::RenderWindow &window, const Camera &camera, bool areEditableTilesVisible) const;
     sf::Vector2i getMouseWorldPosition() const;
+    sf::Vector2f getBrushCenterWorldPosition() const;
     bool isAnyTileCornerSelected() const;
 
+    std::vector<std::string> getBrushesImagePaths() const;
     const std::vector<BrushTileCornerHit>& getBrushTileCornersSelection() const;
     const std::vector<BrushTileHit>& getBrushTilesSelection() const;
     const std::vector<BrushTileCornerHit>& getBrushTilesSelectionAsTileCorners() const;
     std::vector<BrushTileHit> getNeighborsTilesInBrush(WorldModel &worldModel, int x, int y) const;
     std::vector<BrushTileCornerHit> getNeighborsTileCornersInBrush(WorldModel &worldModel, int x, int y) const;
     std::vector<BrushTileCornerHit> getNeighborsTilesInBrushAsTileCorners(WorldModel &worldModel, int x, int y) const;
-private:
+    
+    int getCurrentBrushId() const;
+    int getCurrentBrushRadius() const;
+    private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void getSelectedTiles(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
@@ -48,7 +54,7 @@ private:
     static sf::Vector2f getTileCornerScreenCoordinates(const Camera &camera, const TileCorner* corner);
 
     float getPointWeightInBrush(const sf::Vector2f& pointWorldPosition, const sf::Vector2f& brushCenterWorldPosition) const;
-    static void sanitizeBrushImage(sf::Image& img);
+    // static void sanitizeBrushImage(sf::Image& img);
     void selectBrush(int index);
     void incrementBrushSize();
     void decrementBrushSize();
@@ -70,9 +76,9 @@ private:
     int m_brushSize;
     int m_brushSizeMin;
     int m_brushSizeMax;
-
-    std::vector<sf::Image> m_brushesImages;
     int m_currentBrushImage;
+    std::vector<std::string> m_brushesImagePaths;
+    std::vector<sf::Image> m_brushesImages;
 };
 
 #endif //LANDCRAFT_BRUSHCONTROLLER_HPP

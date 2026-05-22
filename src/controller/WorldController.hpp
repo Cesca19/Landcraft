@@ -31,22 +31,27 @@ struct ViewSettings {
 class WorldController 
 {
 public:
-    WorldController();
+    WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWindowSize);
     void init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings);
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
     void handleContinuousEvents(float deltaTime, const sf::RenderWindow& window);
     void update(float deltaTime, const sf::RenderWindow& window);
     void draw(sf::RenderWindow& window) const;
-    void onWindowResized(sf::Vector2u windowSize);
+    void onWindowResized(sf::Vector2u windowSize, sf::RenderWindow& window);
     void setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const;
     void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
     void setCancelButtonOnClickCallback(const std::function<void()> &callback) const;
     void setQuitMenuVisibility(bool isVisible) const;
-    void saveMapToFile();
+    bool isQuitMenuVisible() const;
+    void saveMapToFile() const;
+    void onMapLoaded();
 private:
-    // add event for turn on/off wireframe, shaded mode,
+    void onDrawModeButtonClicked(DrawMode mode);
 
+    sf::Vector2u m_minWindowSize;
+    sf::Vector2u m_maxWindowSize;
+    DrawMode m_currentDrawMode;
     WorldView m_worldView;
     WorldModel m_worldModel;
     std::unique_ptr<WorldMenu> m_worldMenu;

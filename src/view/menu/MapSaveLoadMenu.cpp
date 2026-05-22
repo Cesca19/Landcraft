@@ -9,7 +9,7 @@ MapSaveLoadMenu::MapSaveLoadMenu(sf::Vector2f globalUIPosition)
 {
     m_menuBox = UIFactory::createBox(globalUIPosition, {205, 90});
     UIFactory::applyDefaultBoxStyle(m_menuBox);
-    m_menuTitle = UIFactory::createText(globalUIPosition + sf::Vector2f(10, 35), "Map:", 15);
+    m_menuTitle = UIFactory::createText(globalUIPosition + sf::Vector2f(10, 35), "Map", 15);
     UIFactory::applyDefaultTextStyle(m_menuTitle, UIFactory::TextVariant::Label);
 
     sf::Vector2f buttonPosition = globalUIPosition + sf::Vector2f(50, 0);

@@ -94,6 +94,9 @@ add_executable(${MY_TARGET}
         src/controller/MapLoadSaveController.cpp
         src/view/menu/MapSaveLoadMenu.cpp
         src/view/menu/WorldMenu.cpp
+        src/commands/PaintSplatMapCommand.cpp
+        src/view/world/WaterView.cpp
+        src/utils/BrushUtils.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

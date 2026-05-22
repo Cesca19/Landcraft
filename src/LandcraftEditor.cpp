@@ -18,13 +18,12 @@ LandcraftEditor::LandcraftEditor(std::string mapName)
     , m_uiController(nullptr)
     , m_worldController(nullptr)
 {
-    // m_window.setPosition(sf::Vector2i(00, 600));
     m_uiController = std::make_unique<UIController>();
     m_uiController->setOnDestroy([] {
         UIFactory::init(nullptr);
     });
     UIFactory::init(m_uiController.get());
-    m_worldController = std::make_unique<WorldController>();
+    m_worldController = std::make_unique<WorldController>(sf::Vector2u(800, 600), sf::Vector2u(1920, 1080));
 
     m_window.setVerticalSyncEnabled(true);
     applyWindowIcon();
@@ -76,7 +75,7 @@ void LandcraftEditor::handleEvents()
                 applyWindowIcon();
                 break;
             case sf::Event::Resized:
-                m_worldController->onWindowResized(sf::Vector2u(event.size.width, event.size.height));
+                m_worldController->onWindowResized(sf::Vector2u(event.size.width, event.size.height), m_window);
                 applyWindowIcon();
                 break;
             default:
@@ -127,6 +126,10 @@ void LandcraftEditor::initWorldController()
 
 void LandcraftEditor::onCloseEditorRequested()
 {
+    if (m_worldController->isQuitMenuVisible()) {
+        m_window.close();
+        return;
+    }
     m_worldController->setQuitMenuVisibility(true);
 }
 

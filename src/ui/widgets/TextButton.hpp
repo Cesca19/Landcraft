@@ -26,6 +26,7 @@ public:
 
     sf::FloatRect getBounds() const override;
     sf::Vector2f getCenter() const override;
+    sf::Vector2f getPosition() const;
 
     void update(float deltaTime) override;
     void draw(sf::RenderWindow& window) const override;
@@ -35,6 +36,8 @@ public:
     void setVisibility(bool isVisible) override;
     
     void setPosition(const sf::Vector2f& position) override;
+
+    void setContent(const std::string& text);
 protected:
     void onBase() override;
     void onHover() override;
@@ -64,6 +67,7 @@ protected:
     sf::Color m_pressTextColor;
     sf::Color m_selectedTextColor;
     sf::Vector2f m_padding;
+    sf::Vector2f m_position;
     std::function<void()> m_onClickCallback;
 };
 
