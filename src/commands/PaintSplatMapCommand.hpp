@@ -12,6 +12,7 @@
 #include "../model/WorldModel.hpp"
 #include "../model/PaintStroke.hpp"
 #include "../view/world/WorldView.hpp"
+#include "../utils/MathUtils.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
 

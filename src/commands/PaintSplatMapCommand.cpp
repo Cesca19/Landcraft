@@ -11,6 +11,14 @@ PaintSplatMapCommand::PaintSplatMapCommand()
 
 void PaintSplatMapCommand::addStroke(const PaintStroke& stroke)
 {
+    if (!m_strokes.empty()) {
+        const PaintStroke& lastStroke = m_strokes.back();
+        float distance = MathUtils::distanceBetweenPoints(lastStroke.worldPosition,
+             stroke.worldPosition);
+        float minDistanceThreshold = stroke.radius * 0.1f;
+        if (distance < minDistanceThreshold)
+            return;
+    }
     m_strokes.push_back(stroke);
 }
 
