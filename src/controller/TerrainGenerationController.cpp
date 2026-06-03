@@ -86,8 +86,16 @@ std::vector<std::vector<float>> TerrainGenerationController::generateTerrainHeig
 void TerrainGenerationController::generateTerrain(WorldModel &model, WorldView &view, CommandHistory &commandHistory)
 {
     std::vector<std::vector<float>> heightmap = generateTerrainHeightmap(model, view);
-    std::unique_ptr<GenerateTerrainCommand> command = std::make_unique<GenerateTerrainCommand>(heightmap);
-    commandHistory.addCommand(std::move(command), model, view, true);
+    sf::Image blankImage;
+    sf::Image splatmapImage = view.getSplatmapImage();
+    blankImage.create(splatmapImage.getSize().x, splatmapImage.getSize().y, sf::Color(255, 0, 0, 0));
+    std::unique_ptr<SetTerrainHeightMapCommand> heightmapCommand = std::make_unique<SetTerrainHeightMapCommand>(heightmap);
+    std::unique_ptr<SetSplatMapCommand> splatmapCommand = std::make_unique<SetSplatMapCommand>(view.getSplatmapImage(), blankImage);
+    std::unique_ptr<CommandGroup> commandGroup = std::make_unique<CommandGroup>("Generate Terrain");
+    commandGroup->addCommand(std::move(heightmapCommand));
+    commandGroup->addCommand(std::move(splatmapCommand));
+    
+    commandHistory.addCommand(std::move(commandGroup), model, view, true);
 }
 
 void TerrainGenerationController::handleEvents(const sf::Event &event, sf::RenderWindow &window, 

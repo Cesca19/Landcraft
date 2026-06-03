@@ -99,7 +99,9 @@ add_executable(${MY_TARGET}
         src/utils/BrushUtils.cpp
         src/controller/TerrainGenerationController.cpp
         src/view/menu/TerrainGenerationMenu.cpp
-        src/commands/GenerateTerrainCommand.cpp
+        src/commands/SetTerrainHeightMapCommand.cpp
+        src/commands/SetSplatMapCommand.cpp
+        src/commands/CommandGroup.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

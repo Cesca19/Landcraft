@@ -8,11 +8,13 @@
 #include <vector>
 #include <iostream>
 #include "../../lib/FastNoiseLite.h"
-
+#include <SFML/Graphics/Image.hpp>
 #include "../model/WorldModel.hpp"
 #include "../view/world/WorldView.hpp"
 #include "../commands/CommandHistory.hpp"
-#include "../commands/GenerateTerrainCommand.hpp"
+#include "../commands/SetSplatMapCommand.hpp"
+#include "../commands/CommandGroup.hpp"
+#include "../commands/SetTerrainHeightMapCommand.hpp"
 
 class TerrainGenerationController {
 public:

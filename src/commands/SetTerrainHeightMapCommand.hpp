@@ -8,9 +8,9 @@
 #include <vector>
 #include "ICommand.hpp"
 
-class GenerateTerrainCommand : public ICommand {
+class SetTerrainHeightMapCommand : public ICommand {
 public:
-    GenerateTerrainCommand(const std::vector<std::vector<float>>& heightmap);
+    SetTerrainHeightMapCommand(const std::vector<std::vector<float>>& heightmap);
     void execute(WorldModel& model, WorldView& view) override;
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;

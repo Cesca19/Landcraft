@@ -2,14 +2,14 @@
 // Created by fran on 03/06/2026.
 //
 
-#include "GenerateTerrainCommand.hpp"
+#include "SetTerrainHeightMapCommand.hpp"
 
-GenerateTerrainCommand::GenerateTerrainCommand(const std::vector<std::vector<float>> &heightmap)
+SetTerrainHeightMapCommand::SetTerrainHeightMapCommand(const std::vector<std::vector<float>> &heightmap)
     : m_heightmap(heightmap)
 {
 }
 
-void GenerateTerrainCommand::execute(WorldModel &model, WorldView &view)
+void SetTerrainHeightMapCommand::execute(WorldModel &model, WorldView &view)
 {
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
     
@@ -23,17 +23,17 @@ void GenerateTerrainCommand::execute(WorldModel &model, WorldView &view)
     applyHeightmapToModel(model, view, m_heightmap);
 }
 
-void GenerateTerrainCommand::undo(WorldModel &model, WorldView &view)
+void SetTerrainHeightMapCommand::undo(WorldModel &model, WorldView &view)
 {
     applyHeightmapToModel(model, view, m_previousHeightmap);
 }
 
-std::string GenerateTerrainCommand::getName()
+std::string SetTerrainHeightMapCommand::getName()
 {
     return "Generate Terrain";
 }
 
-void GenerateTerrainCommand::applyHeightmapToModel(WorldModel &model, WorldView &view, const std::vector<std::vector<float>> &heightmap)
+void SetTerrainHeightMapCommand::applyHeightmapToModel(WorldModel &model, WorldView &view, const std::vector<std::vector<float>> &heightmap)
 {
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
     for (size_t row = 0; row < corners.size(); row++) {
