@@ -32,6 +32,7 @@ void WorldController::init(const std::string &mapName,
     m_navigationController = std::make_unique<NavigationController>(m_worldModel, m_worldView, globalUIPosition + sf::Vector2f(5, 5));
     m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, 
         m_editionController.get(), brushMenuPosition + sf::Vector2f(300, 0), [this] () { this->onMapLoaded(); });
+    m_terrainGenerationController = std::make_unique<TerrainGenerationController>();
 
     m_worldModel.loadMap(mapName);
     onMapLoaded();
@@ -52,6 +53,7 @@ void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &win
     m_navigationController->handleEvents(window, event, m_worldModel, m_worldView, m_editionController->isEditing());
     m_brushController->handleEvents(window, event);
     m_editionController->handleEvents(window, event, m_worldModel, m_worldView, *m_brushController);
+    m_terrainGenerationController->handleEvents(event, window, m_worldModel, m_worldView);
     m_mapLoadSaveController->handleEvents(event, window);
 }
 

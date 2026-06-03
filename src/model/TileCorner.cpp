@@ -38,3 +38,8 @@ void TileCorner::addHeight(const float heightStep)
     m_height += heightStep;
     m_height = std::clamp(m_height, m_minElevation, m_maxElevation);
 }
+
+void TileCorner::setHeight(float height)
+{
+    m_height = std::clamp(height, m_minElevation, m_maxElevation);
+}

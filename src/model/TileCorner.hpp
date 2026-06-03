@@ -17,6 +17,7 @@ public:
     float getHeight() const;
     sf::Vector2f getPosition() const;
     void addHeight(float heightStep);
+    void setHeight(float height);
 private:    
     int m_row;
     int m_col;

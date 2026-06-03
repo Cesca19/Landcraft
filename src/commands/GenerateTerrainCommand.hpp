@@ -1,0 +1,13 @@
+﻿//
+// Created by fran on 03/06/2026.
+//
+
+#ifndef LANDCRAFT_GENERATETERRAINCOMMAND_HPP
+#define LANDCRAFT_GENERATETERRAINCOMMAND_HPP
+
+
+class GenerateTerrainCommand {
+};
+
+
+#endif //LANDCRAFT_GENERATETERRAINCOMMAND_HPP

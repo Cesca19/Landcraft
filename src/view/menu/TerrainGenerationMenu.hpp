@@ -1,0 +1,13 @@
+﻿//
+// Created by fran on 02/06/2026.
+//
+
+#ifndef LANDCRAFT_TERRAINGENERATIONMENU_HPP
+#define LANDCRAFT_TERRAINGENERATIONMENU_HPP
+
+
+class TerrainGenerationMenu {
+};
+
+
+#endif //LANDCRAFT_TERRAINGENERATIONMENU_HPP

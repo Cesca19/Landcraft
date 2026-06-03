@@ -97,6 +97,9 @@ add_executable(${MY_TARGET}
         src/commands/PaintSplatMapCommand.cpp
         src/view/world/WaterView.cpp
         src/utils/BrushUtils.cpp
+        src/controller/TerrainGenerationController.cpp
+        src/view/menu/TerrainGenerationMenu.cpp
+        src/commands/GenerateTerrainCommand.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---
