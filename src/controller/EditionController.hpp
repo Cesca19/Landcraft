@@ -10,6 +10,7 @@
 #include "../commands/CommandHistory.hpp"
 #include "../editionTools/EditionTools.hpp"
 #include "../view/menu/EditionMenu.hpp"
+#include "TerrainGenerationController.hpp"
 
 class EditionController {
 public:
@@ -32,6 +33,7 @@ private:
     std::unique_ptr<EditionMenu> m_editionView;
     sf::Vector2f m_editionToolsBoxPosition;
     sf::Vector2f m_toolsMenuStartPosition;
+    TerrainGenerationController m_terrainGenerationController;
 };
 
 #endif //LANDCRAFT_EDITIONCONTROLLER_HPP

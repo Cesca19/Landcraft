@@ -5,7 +5,7 @@
 #ifndef LANDCRAFT_SETTILESCORNERSHEIGHTCOMMAND_HPP
 #define LANDCRAFT_SETTILESCORNERSHEIGHTCOMMAND_HPP
 #include "ICommand.hpp"
-#include <map>
+#include <unordered_map>
 
 class EditTilesCornersHeightCommand : public ICommand
 {
@@ -17,7 +17,8 @@ public:
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;
 private:
-    std::map<TileCorner *, float> m_cornersHeightStep;
+    std::unordered_map<TileCorner *, float> m_previousCornersHeight;
+    std::unordered_map<TileCorner *, float> m_cornersHeightStep;
 };
 
 

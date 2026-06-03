@@ -198,6 +198,8 @@ void BrushController::getSelectedTilesCorners(const Camera &camera, WorldModel &
 
     if (closestCorner == nullptr)
         return;
+    m_mouseWorldPosition = sf::Vector2i(static_cast<int>(closestCorner->getColumn()),
+         static_cast<int>(closestCorner->getRow()));
     m_brushCenterWorldPosition = closestCorner->getPosition();
     const std::vector<TileCorner*> neighbors = getPointNeighborsInRadius(worldModel, static_cast<int>(closestCorner->getColumn()), static_cast<int>(closestCorner->getRow()), m_brushSize);
     for (TileCorner* neighbor : neighbors)
@@ -211,6 +213,8 @@ void BrushController::getSelectedTiles(const Camera &camera, WorldModel &worldMo
 
     if (hoveredTile == nullptr)
         return;
+    m_mouseWorldPosition = hoveredTile->getGridPosition();
+    
     m_brushCenterWorldPosition = hoveredTile->getCenterGridPosition();
     const std::vector<Tile *> neighbors = getClosestTilesInRadius(worldModel, hoveredTile->getGridPosition().x, hoveredTile->getGridPosition().y, m_brushSize, true);
     for (Tile* neighbor : neighbors)

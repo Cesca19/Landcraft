@@ -56,7 +56,7 @@ std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(i
     return heightmap;
 }
 
-void TerrainGenerationController::generateTerrain(WorldModel &model, WorldView &view)
+std::vector<std::vector<float>> TerrainGenerationController::generateTerrainHeightmap(WorldModel &model, WorldView &view)
 {
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
     int width = corners[0].size();
@@ -66,6 +66,7 @@ void TerrainGenerationController::generateTerrain(WorldModel &model, WorldView &
     float noiseMin = -1.0f;
     float noiseMax = 1.0f;
     std::vector<std::vector<float>> heightmap = generateHeightmap(width, height);
+    std::vector<std::vector<float>> finalHeightmap(height, std::vector<float>(width));
 
     // TO DO: turn that into a custom command that we can undo/redo 
     for (int y = 0; y < height; y++) {
@@ -75,19 +76,26 @@ void TerrainGenerationController::generateTerrain(WorldModel &model, WorldView &
             float normalizedHeight = (heightValue - noiseMin) / (noiseMax - noiseMin);
             // we want to scale the height value to the range [minElevation, maxElevation]
             float scaledHeight = normalizedHeight * (maxElevation - minElevation) + minElevation; // scale to [minElevation, maxElevation]
-            corners[y][x]->setHeight(scaledHeight);
+            // corners[y][x]->setHeight(scaledHeight);
+            finalHeightmap[y][x] = scaledHeight;
         }
     }
-
-    model.onTileCornerHeightChanged();
-    view.updatePositions(model.getTiles(), view.getCamera());
+    return finalHeightmap;
 }
 
-void TerrainGenerationController::handleEvents(const sf::Event &event, sf::RenderWindow &window, WorldModel &model, WorldView &view)
+void TerrainGenerationController::generateTerrain(WorldModel &model, WorldView &view, CommandHistory &commandHistory)
+{
+    std::vector<std::vector<float>> heightmap = generateTerrainHeightmap(model, view);
+    std::unique_ptr<GenerateTerrainCommand> command = std::make_unique<GenerateTerrainCommand>(heightmap);
+    commandHistory.addCommand(std::move(command), model, view, true);
+}
+
+void TerrainGenerationController::handleEvents(const sf::Event &event, sf::RenderWindow &window, 
+    WorldModel &model, WorldView &view, CommandHistory &commandHistory)
 {
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::G) {
         std::cout << "Generating terrain..." << std::endl;
-        generateTerrain(model, view);
+        generateTerrain(model, view, commandHistory);
     }
 
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N) {

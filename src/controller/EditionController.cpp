@@ -33,6 +33,8 @@ void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &
     handleEditionToolSwitchEvents(event);
     m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, brushController, m_commandHistory);
     handleUndoRedoEvents(window, event, model, view);
+    m_terrainGenerationController.handleEvents(event, window, model, view, m_commandHistory);
+
 }
 
 void EditionController::handleContinuousEvents(const sf::RenderWindow &window, WorldModel &model, WorldView &view, BrushController &brushController)

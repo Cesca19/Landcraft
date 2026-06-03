@@ -12,8 +12,6 @@
 #include "BrushController.hpp"
 #include "NavigationController.hpp"
 #include "MapLoadSaveController.hpp"
-#include "TerrainGenerationController.hpp"
-
 
 struct CameraSettings {
     float tileSizeX;
@@ -60,7 +58,6 @@ private:
     std::unique_ptr<BrushController> m_brushController;
     std::unique_ptr<NavigationController> m_navigationController;
     std::unique_ptr<MapLoadSaveController> m_mapLoadSaveController;
-    std::unique_ptr<TerrainGenerationController> m_terrainGenerationController;
 };
 
 

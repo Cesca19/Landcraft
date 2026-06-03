@@ -9,7 +9,7 @@ WorldModel::WorldModel()
     : m_highestTileCornerHeight(0)
     , m_tilesSize({-1, -1})
     , m_minElevation(-20.0f)
-    , m_maxElevation(30.0f)
+    , m_maxElevation(60.0f)
     , m_waterHeight(-5.0f)
 {
 }
