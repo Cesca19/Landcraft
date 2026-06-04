@@ -160,6 +160,15 @@ void TextButton::setState(const WidgetState state)
     m_currentState = state;
 }
 
+void TextButton::handleKeyBoardEvents(const sf::Event &event)
+{
+}
+
+bool TextButton::shouldFocusOnClick() const
+{
+    return false;
+}
+
 bool TextButton::isVisible() const
 {
     return m_isVisible;

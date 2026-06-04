@@ -102,6 +102,7 @@ add_executable(${MY_TARGET}
         src/commands/SetTerrainHeightMapCommand.cpp
         src/commands/SetSplatMapCommand.cpp
         src/commands/CommandGroup.cpp
+        src/ui/widgets/TextInput.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

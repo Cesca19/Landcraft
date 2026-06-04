@@ -14,7 +14,8 @@
 
 class EditionController {
 public:
-    EditionController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition);
+    EditionController(WorldModel &model, WorldView &view, 
+        sf::Vector2f globalUIPosition, const sf::Vector2f &terrainGenerationMenuPosition, const sf::Vector2u &windowSize);
     void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, BrushController& brushController);
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, BrushController& brushController);
     bool isEditing() const;

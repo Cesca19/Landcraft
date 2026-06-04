@@ -237,6 +237,15 @@ void SpriteButton::setState(const WidgetState state)
     m_currentState = state;
 }
 
+void SpriteButton::handleKeyBoardEvents(const sf::Event &event)
+{
+}
+
+bool SpriteButton::shouldFocusOnClick() const
+{
+    return false;
+}
+
 void SpriteButton::resetIconScale()
 {
     m_baseScale /= 1.25f;

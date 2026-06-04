@@ -4,7 +4,8 @@
 
 #include "WorldMenu.hpp"
 
-WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition, const sf::Vector2f &mapNamePosition)
+WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition,
+    const sf::Vector2f &drawModesMenuPosition, const sf::Vector2f &mapNamePosition)
     : m_isQuitMenuVisible(true)
     , m_mapNameMenuPosition(mapNamePosition)
 {
@@ -20,21 +21,7 @@ WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &qu
     m_globalMenuBox = UIFactory::createBox(globalUIPosition, {225, 90});
     UIFactory::applyDefaultBoxStyle(m_globalMenuBox);
 
-    m_quitMenuBox = UIFactory::createBox(quitMenuPosition, {400, 200});
-    UIFactory::applyDefaultBoxStyle(m_quitMenuBox);
-    m_quitMenuTitle = UIFactory::createText(quitMenuPosition + sf::Vector2f(120, 20), "Quit Landcraft ?", 20);
-    UIFactory::applyDefaultTextStyle(m_quitMenuTitle, UIFactory::TextVariant::Title);
-    m_quitMenuDescription = UIFactory::createText(quitMenuPosition + sf::Vector2f(20, 60), "Do you want to save your progress before quitting ?", 15);
-    UIFactory::applyDefaultTextStyle(m_quitMenuDescription, UIFactory::TextVariant::Default);
-
-    m_saveMapButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(230, 100), "Save and Quit", 17);
-    UIFactory::applyDefaultTextButtonStyle(m_saveMapButton, UIFactory::TextVariant::Default);
-    m_dontSaveButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(40, 100), "Don't Save and Quit", 16);
-    UIFactory::applyDefaultTextButtonStyle(m_dontSaveButton, UIFactory::TextVariant::Default);
-    m_cancelButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(180, 150), "Cancel", 17);
-    UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
-
-    const sf::Vector2f wireframeShadedModeBoxPosition = globalUIPosition + sf::Vector2f(770, 0);
+    const sf::Vector2f wireframeShadedModeBoxPosition = drawModesMenuPosition;
     m_wireframeShadedModeBox = UIFactory::createBox(wireframeShadedModeBoxPosition, {300, 90});
     UIFactory::applyDefaultBoxStyle(m_wireframeShadedModeBox);
     m_drawModeTitle = UIFactory::createText(wireframeShadedModeBoxPosition + sf::Vector2f(10, 25), " Draw   \nModes ", 15);
@@ -60,6 +47,24 @@ WorldMenu::~WorldMenu()
     for (auto *widget : m_widgets)
         UIFactory::removeWidget(widget);
     m_widgets.clear();
+}
+
+void WorldMenu::initQuitMenu(const sf::Vector2f &quitMenuPosition)
+{
+    m_quitMenuBox = UIFactory::createBox(quitMenuPosition, {400, 200});
+    UIFactory::applyDefaultBoxStyle(m_quitMenuBox);
+    m_quitMenuTitle = UIFactory::createText(quitMenuPosition + sf::Vector2f(120, 20), "Quit Landcraft ?", 20);
+    UIFactory::applyDefaultTextStyle(m_quitMenuTitle, UIFactory::TextVariant::Title);
+    m_quitMenuDescription = UIFactory::createText(quitMenuPosition + sf::Vector2f(20, 60), "Do you want to save your progress before quitting ?", 15);
+    UIFactory::applyDefaultTextStyle(m_quitMenuDescription, UIFactory::TextVariant::Default);
+
+    m_saveMapButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(230, 100), "Save and Quit", 17);
+    UIFactory::applyDefaultTextButtonStyle(m_saveMapButton, UIFactory::TextVariant::Default);
+    m_dontSaveButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(40, 100), "Don't Save and Quit", 16);
+    UIFactory::applyDefaultTextButtonStyle(m_dontSaveButton, UIFactory::TextVariant::Default);
+    m_cancelButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(180, 150), "Cancel", 17);
+    UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
+    initWidgetsList();
 }
 
 void WorldMenu::setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const

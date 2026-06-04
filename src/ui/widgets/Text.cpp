@@ -71,9 +71,18 @@ void Text::setState(WidgetState state)
 {
 }
 
+void Text::handleKeyBoardEvents(const sf::Event &event)
+{
+}
+
 void Text::setPosition(const sf::Vector2f &position)
 {
     m_text.setPosition(position);
+}
+
+bool Text::shouldFocusOnClick() const
+{
+    return false;
 }
 
 void Text::onBase()

@@ -4,11 +4,21 @@
 
 #include "TerrainGenerationController.hpp"
 
-TerrainGenerationController::TerrainGenerationController() 
+TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &terrainGenerationMenuPosition, const sf::Vector2u &windowSize)
     : m_currentNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2)
 {
     m_noise.SetNoiseType(m_currentNoiseType);
     m_noise.SetFrequency(1);
+    m_terrainGenerationMenu = std::make_unique<TerrainGenerationMenu>(terrainGenerationMenuPosition, windowSize);
+    
+    m_terrainGenerationMenu->initOnTerrainGenerationMenuButtonClickCallback([this]() {
+        m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(true);
+    });
+    m_terrainGenerationMenu->initOnCloseTerrainGenerationMenuButtonClickCallback([this]() {
+        m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(false);
+    });
+    m_terrainGenerationMenu->initOnGenerateButtonClickCallback([this]() {
+    });
 }
 
 float TerrainGenerationController::getNoise(float nx, float ny)
@@ -24,6 +34,7 @@ std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(i
     // -> fastNoise is deterministic, so we can use the same seed for the same heightmap size to get the same result
     // If we want to get a different heightmap each time, we can use a random seed, for example based on the current time
     int noiseSeed = 1337;
+    std::cout << "Generating heightmap with seed: " << std::time(nullptr) << std::endl;
     m_noise.SetSeed(noiseSeed);
 
     for (int y = 0; y < height; y++) {

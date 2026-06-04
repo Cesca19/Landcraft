@@ -15,9 +15,9 @@ enum class DrawMode {
 
 class WorldMenu {
 public:
-    WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition,
-        const sf::Vector2f &mapNamePosition);
+    WorldMenu(sf::Vector2f globalUIPosition,const sf::Vector2f &drawModesMenuPosition, const sf::Vector2f &mapNamePosition);
     ~WorldMenu();
+    void initQuitMenu(const sf::Vector2f &quitMenuPosition);
     void setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const;
     void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
     void setCancelButtonOnClickCallback(const std::function<void()> &callback) const;

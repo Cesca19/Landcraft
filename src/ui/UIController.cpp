@@ -130,7 +130,15 @@ void UIController::handleMouseEvents(const sf::Event &event, const sf::RenderWin
             // Mouse interaction should not keep keyboard navigation focus active.
             if (m_focusedWidget != nullptr)
                 unfocusCurrentWidget();
+            if (m_hoveredWidget->isInteractable() && m_hoveredWidget->shouldFocusOnClick()) {
+                m_focusedWidget = m_hoveredWidget;
+                m_focusedWidget->setState(WidgetState::Focused);
+                m_hoveredWidget = nullptr;
+                return;
+            }
+            
             m_hoveredWidget->setState(WidgetState::Pressed);
+            
             m_isMouseHoverUI = true;
         } else if (m_hoveredWidget == nullptr)
             unfocusCurrentWidget();
@@ -168,6 +176,9 @@ void UIController::handleKeyBoardEvents(const sf::Event &event)
         && (event.key.code == sf::Keyboard::Space || event.key.code == sf::Keyboard::Enter)
         && m_focusedWidget != nullptr)
             m_focusedWidget->setState(WidgetState::Focused);
+    for (const auto& widget : m_widgets)
+        if (widget->isVisible())
+            widget->handleKeyBoardEvents(event);
 
 }
 

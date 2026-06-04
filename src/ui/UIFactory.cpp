@@ -43,6 +43,18 @@ Text * UIFactory::createText(const sf::Vector2f& position, const std::string &co
     return textPtr;
 }
 
+TextInput *UIFactory::createTextInput(sf::Vector2f position, sf::Vector2f size, const std::string &placeholder, 
+    unsigned int characterSize, bool isNumeric)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+    std::unique_ptr<TextInput> textInput = std::make_unique<TextInput>(position, size, placeholder, characterSize, isNumeric);
+    TextInput* textInputPtr = textInput.get();
+    s_uiController->addWidget(std::move(textInput));
+    return textInputPtr;
+}
+
 TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string &text, unsigned int characterSize)
 {
     if (!s_uiController) {
@@ -147,6 +159,30 @@ void UIFactory::applyDefaultTextButtonStyle(TextButton *button, TextVariant text
         sf::Color(140, 110, 200),  // focus
         sf::Color(110, 80, 170),   // pressed
         sf::Color(110, 95, 150)    // selected
+    );
+}
+
+void UIFactory::applyDefaultTextInputStyle(TextInput *textInput)
+{
+    textInput->initBackgroundColors(
+        sf::Color(248, 246, 252),  // normal
+        sf::Color(235, 225, 250),  // hover
+        sf::Color(235, 225, 250),  // focus
+        sf::Color(210, 190, 240)
+    );
+
+    textInput->initOutlineColors(
+        sf::Color(220, 210, 240),  // normal
+        sf::Color(180, 150, 230),  // hover
+        sf::Color(160, 120, 220),  // focus 
+        sf::Color(130, 95, 185)
+    );
+
+    textInput->initTextColors(
+        sf::Color(110, 95, 150),   // normal
+        sf::Color(140, 110, 200),  // hover
+        sf::Color(140, 110, 200),  // focus
+        sf::Color(110, 80, 170)
     );
 }
 

@@ -5,6 +5,7 @@
 #ifndef LANDCRAFT_TERRAINGENERATIONCONTROLLER_HPP
 #define LANDCRAFT_TERRAINGENERATIONCONTROLLER_HPP
 
+#include <ctime>
 #include <vector>
 #include <iostream>
 #include "../../lib/FastNoiseLite.h"
@@ -15,10 +16,11 @@
 #include "../commands/SetSplatMapCommand.hpp"
 #include "../commands/CommandGroup.hpp"
 #include "../commands/SetTerrainHeightMapCommand.hpp"
+#include "../view/menu/TerrainGenerationMenu.hpp"
 
 class TerrainGenerationController {
 public:
-    TerrainGenerationController();
+    TerrainGenerationController(const sf::Vector2f &terrainGenerationMenuPosition, const sf::Vector2u &windowSize);
     float getNoise(float nx, float ny);
     std::vector<std::vector<float>> generateHeightmap(int width, int height);
     std::vector<std::vector<float>> generateTerrainHeightmap(WorldModel &model, WorldView &view);
@@ -28,6 +30,7 @@ public:
 private:
     FastNoiseLite m_noise;
     FastNoiseLite::NoiseType m_currentNoiseType;
+    std::unique_ptr<TerrainGenerationMenu> m_terrainGenerationMenu;
 };
 
 
