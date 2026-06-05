@@ -202,7 +202,6 @@ void TextInput::onBase()
     m_background.setFillColor(m_backgroundBaseColor);
     m_background.setOutlineColor(m_outlineBaseColor);
     m_text.setFillColor(m_textBaseColor);
-    std::cout << "TextInput: onBase" << std::endl;
     m_canType = false;
 }
 
@@ -211,7 +210,6 @@ void TextInput::onHover()
     m_background.setFillColor(m_backgroundHoverColor);
     m_background.setOutlineColor(m_outlineHoverColor);
     m_text.setFillColor(m_textHoverColor);
-    std::cout << "TextInput: onHover" << std::endl;
 }
 
 void TextInput::onFocus()
@@ -220,7 +218,6 @@ void TextInput::onFocus()
     m_background.setOutlineColor(m_outlineFocusColor);
     m_text.setFillColor(m_textFocusColor);
     enableInput();
-    std::cout << "TextInput: onFocus" << std::endl;
 }
 
 void TextInput::onPress()
@@ -229,7 +226,6 @@ void TextInput::onPress()
     m_background.setOutlineColor(m_outlinePressColor);
     m_text.setFillColor(m_textPressColor);
     enableInput();
-    std::cout << "TextInput: onPress" << std::endl;
 }
 
 void TextInput::enableInput()
