@@ -36,6 +36,7 @@ private:
     void AddFrequencyStep(int factor);
     void AddOctavesStep(int factor);
     void AddExponentStep(int factor);
+    void AddNoiseTypeStep(int factor);
 
     int m_seed;
     float m_frequency;
@@ -49,6 +50,7 @@ private:
     CommandHistory *m_commandHistory;
     FastNoiseLite m_noise;
     FastNoiseLite::NoiseType m_currentNoiseType;
+    std::vector<std::string> m_noiseTypeNames;
     std::unique_ptr<TerrainGenerationMenu> m_terrainGenerationMenu;
 };
 

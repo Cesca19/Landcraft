@@ -20,10 +20,19 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
 {
     m_noise.SetNoiseType(m_currentNoiseType);
     m_noise.SetFrequency(1);
+    m_noiseTypeNames = {
+        "OpenSimplex2 ",
+        "OpenSimplex2S",
+        "  Cellular   ",
+        "    Perlin   ",
+        "  ValueCubic ",
+        "  WhiteNoise "
+    };
     m_terrainGenerationMenu = std::make_unique<TerrainGenerationMenu>(terrainGenerationMenuPosition, windowSize);
     m_terrainGenerationMenu->setFrequencyValueText(MathUtils::toString(m_frequency));
     m_terrainGenerationMenu->setOctavesValueText(std::to_string(m_octaves));
     m_terrainGenerationMenu->setExponentValueText(MathUtils::toString(m_exponent));
+    m_terrainGenerationMenu->selectNoiseType(m_noiseTypeNames[static_cast<int>(m_currentNoiseType)]);
     
     m_terrainGenerationMenu->initOnTerrainGenerationMenuButtonClickCallback([this]() {
         m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(true);
@@ -58,6 +67,12 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
     m_terrainGenerationMenu->initOnExponentDecreaseButtonClickCallback([this]() {
         AddExponentStep(-1);
     });
+    m_terrainGenerationMenu->initOnNextNoiseTypeButtonClickCallback([this]() {
+        AddNoiseTypeStep(1);
+    });
+    m_terrainGenerationMenu->initOnPreviousNoiseTypeButtonClickCallback([this]() {
+        AddNoiseTypeStep(-1);
+    });
 }
 
 float TerrainGenerationController::getNoise(float nx, float ny)
@@ -71,7 +86,6 @@ std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(i
     
     // -> fastNoise is deterministic, so we can use the same seed for the same heightmap size to get the same result
     // If we want to get a different heightmap each time, we can use a random seed, for example based on the current time
-    std::cout << "Generating heightmap with seed: " << m_seed << std::endl;
     m_noise.SetSeed(m_seed);
 
     for (int y = 0; y < height; y++) {
@@ -153,27 +167,19 @@ void TerrainGenerationController::generateTerrain()
     commandGroup->addCommand(std::move(splatmapCommand));
     
     m_commandHistory->addCommand(std::move(commandGroup), *m_model, *m_view, true);
+    // m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(false);
 }
 
 void TerrainGenerationController::handleEvents(const sf::Event &event, sf::RenderWindow &window)
 {
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::G) {
-        std::cout << "Generating terrain..." << std::endl;
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::G)
         generateTerrain();
-    }
-
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N) {
-        m_currentNoiseType = (m_currentNoiseType == FastNoiseLite::NoiseType::NoiseType_Perlin) 
-            ? FastNoiseLite::NoiseType::NoiseType_OpenSimplex2 
-            : FastNoiseLite::NoiseType::NoiseType_Perlin;
-        m_noise.SetNoiseType(m_currentNoiseType);
-        std::cout << "Noise type changed to: " << (m_currentNoiseType == FastNoiseLite::NoiseType::NoiseType_Perlin ? "Perlin" : "OpenSimplex2") << std::endl;
-    }
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N)
+        AddNoiseTypeStep(1);
 }
 
 void TerrainGenerationController::OnGenerateButtonClick()
 {
-    std::cout << "Generating terrain..." << std::endl;
     std::string seedText = m_terrainGenerationMenu->getSeedInputText();
 
     if (!seedText.empty())
@@ -213,4 +219,14 @@ void TerrainGenerationController::AddExponentStep(int factor)
     m_exponent += m_exponentIncreaseStep * factor;
     m_exponent = std::clamp(m_exponent, 0.01f, 10.0f);
     m_terrainGenerationMenu->setExponentValueText(MathUtils::toString(m_exponent));
+}
+
+void TerrainGenerationController::AddNoiseTypeStep(int factor)
+{
+    int noiseTypeCount = m_noiseTypeNames.size();
+    int currentNoiseTypeIndex = static_cast<int>(m_currentNoiseType);
+    currentNoiseTypeIndex = (currentNoiseTypeIndex + factor + noiseTypeCount) % noiseTypeCount;
+    m_currentNoiseType = static_cast<FastNoiseLite::NoiseType>(currentNoiseTypeIndex);
+    m_noise.SetNoiseType(m_currentNoiseType);
+    m_terrainGenerationMenu->selectNoiseType(m_noiseTypeNames[currentNoiseTypeIndex]);
 }

@@ -23,6 +23,8 @@ public:
     void initOnOctavesDecreaseButtonClickCallback(const std::function<void()> &callback);
     void initOnExponentIncreaseButtonClickCallback(const std::function<void()> &callback);
     void initOnExponentDecreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnNextNoiseTypeButtonClickCallback(const std::function<void()> &callback);
+    void initOnPreviousNoiseTypeButtonClickCallback(const std::function<void()> &callback);
 
     void setSeedInputText(const std::string &text);
     void setFrequencyValueText(const std::string &value);
@@ -31,6 +33,7 @@ public:
     std::string getSeedInputText() const;
 
     void setTerrainGenerationMenuVisibility(bool isVisible);
+    void selectNoiseType(const std::string &noiseTypeName);
 private:
     void initTerrainGenerationMenu(const sf::Vector2u &windowSize);
     void initWidgetsList();
@@ -45,7 +48,7 @@ private:
     Text *m_seedText;
     Text *m_frequencyText;
     Text *m_octavesText;
-    Text *m_ExponentText;
+    Text *m_exponentText;
     TextButton *m_generateButton;
     TextButton *m_cancelButton;
     TextInput *m_seedInput;
@@ -59,6 +62,10 @@ private:
     Text *m_exponentValueText;
     SpriteButton *m_exponentIncreaseButton;
     SpriteButton *m_exponentDecreaseButton;
+    Text *m_noiseTypeText;
+    Text *m_noiseTypeValueText;
+    SpriteButton *m_nextNoiseTypeButton;
+    SpriteButton *m_prevNoiseTypeButton;
 
     std::vector<IWidget *> m_menuWidgets;
     std::vector<IWidget *> m_widgets;

@@ -84,6 +84,16 @@ void TerrainGenerationMenu::initOnExponentDecreaseButtonClickCallback(const std:
     m_exponentDecreaseButton->initOnClickCallback(callback);
 }
 
+void TerrainGenerationMenu::initOnNextNoiseTypeButtonClickCallback(const std::function<void()> &callback)
+{
+    m_nextNoiseTypeButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnPreviousNoiseTypeButtonClickCallback(const std::function<void()> &callback)
+{
+    m_prevNoiseTypeButton->initOnClickCallback(callback);
+}
+
 void TerrainGenerationMenu::setSeedInputText(const std::string &text)
 {
     m_seedInput->setText(text);
@@ -115,9 +125,14 @@ void TerrainGenerationMenu::setTerrainGenerationMenuVisibility(bool isVisible)
         widget->setVisibility(isVisible);
 }
 
+void TerrainGenerationMenu::selectNoiseType(const std::string &noiseTypeName)
+{
+    m_noiseTypeValueText->setContent(noiseTypeName);
+}
+
 void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &windowSize)
 {
-    sf::Vector2f menuSize = sf::Vector2f(400, 350);
+    sf::Vector2f menuSize = sf::Vector2f(400, 380);
     sf::Vector2f menuPosition = sf::Vector2f(windowSize.x / 2.0f - menuSize.x / 2.0f, windowSize.y / 2.0f - menuSize.y / 2.0f);
     m_TerrainGenerationMenuBox = UIFactory::createBox(menuPosition, menuSize);
     UIFactory::applyDefaultBoxStyle(m_TerrainGenerationMenuBox);
@@ -135,14 +150,16 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     UIFactory::applyDefaultTextStyle(m_frequencyText, UIFactory::TextVariant::Value);
     m_octavesText = UIFactory::createText(menuPosition + sf::Vector2f(20, 170), "Octaves: ", 15);
     UIFactory::applyDefaultTextStyle(m_octavesText, UIFactory::TextVariant::Value);
-    m_ExponentText = UIFactory::createText(menuPosition + sf::Vector2f(20, 220), "Exponent: ", 15);
-    UIFactory::applyDefaultTextStyle(m_ExponentText, UIFactory::TextVariant::Value);
+    m_exponentText = UIFactory::createText(menuPosition + sf::Vector2f(20, 220), "Exponent: ", 15);
+    UIFactory::applyDefaultTextStyle(m_exponentText, UIFactory::TextVariant::Value);
+    m_noiseTypeText = UIFactory::createText(menuPosition + sf::Vector2f(20, 270), "Noise Type: ", 15);
+    UIFactory::applyDefaultTextStyle(m_noiseTypeText, UIFactory::TextVariant::Value);
 
-    m_generateButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(240, 270), "  Generate  ", 17);
+    m_generateButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(240, 320), "  Generate  ", 17);
     UIFactory::applyDefaultTextButtonStyle(m_generateButton, UIFactory::TextVariant::Default);
     m_generateButton->initBackgroundStatesColor( sf::Color(235, 225, 250), sf::Color(248, 246, 252), 
         sf::Color(248, 246, 252), sf::Color(210, 190, 240), sf::Color(235, 225, 250));
-    m_cancelButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(85, 270), "   Cancel   ", 17);
+    m_cancelButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(85, 320), "   Cancel   ", 17);
     UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
 
     m_seedInput = UIFactory::createTextInput(menuPosition + sf::Vector2f(140, 60), sf::Vector2f(160, 40), "Enter seed (Ex: 1337)", 18, true);
@@ -185,13 +202,22 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_exponentDecreaseButton->setContinuousClick(true, 0.1f);
     m_exponentIncreaseButton->setContinuousClick(true, 0.1f);
 
+    m_noiseTypeValueText = UIFactory::createText(menuPosition + sf::Vector2f(195, 267.5), "OpenSimplex2s", 16);
+    UIFactory::applyDefaultTextStyle(m_noiseTypeValueText, UIFactory::TextVariant::Default);
+    m_nextNoiseTypeButton = UIFactory::createSpriteButton("assets/textures/ui/next_64.png", 
+        menuPosition + sf::Vector2f(330, 260), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_nextNoiseTypeButton, HighlightTextAlign::Down);
+    m_prevNoiseTypeButton = UIFactory::createSpriteButton("assets/textures/ui/prev_64.png", 
+        menuPosition + sf::Vector2f(140, 260), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_prevNoiseTypeButton, HighlightTextAlign::Down);
+
     m_menuWidgets.push_back(m_TerrainGenerationMenuBox);
     m_menuWidgets.push_back(m_closeTerrainGenerationMenuButton);
     m_menuWidgets.push_back(m_TerrainGenerationMenuTitle);
     m_menuWidgets.push_back(m_seedText);
     m_menuWidgets.push_back(m_frequencyText);
     m_menuWidgets.push_back(m_octavesText);
-    m_menuWidgets.push_back(m_ExponentText);
+    m_menuWidgets.push_back(m_exponentText);
     m_menuWidgets.push_back(m_generateButton);
     m_menuWidgets.push_back(m_cancelButton);
     m_menuWidgets.push_back(m_seedInput);
@@ -205,6 +231,10 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_menuWidgets.push_back(m_exponentValueText);
     m_menuWidgets.push_back(m_exponentIncreaseButton);
     m_menuWidgets.push_back(m_exponentDecreaseButton);
+    m_menuWidgets.push_back(m_noiseTypeText);
+    m_menuWidgets.push_back(m_noiseTypeValueText);
+    m_menuWidgets.push_back(m_nextNoiseTypeButton);
+    m_menuWidgets.push_back(m_prevNoiseTypeButton);
 }
 
 void TerrainGenerationMenu::initWidgetsList()
