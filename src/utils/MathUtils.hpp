@@ -9,6 +9,8 @@
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 #include <vector>
+#include <string>
+#include <sstream>
 
 namespace MathUtils
 {
@@ -18,6 +20,7 @@ namespace MathUtils
     float dotProduct(const sf::Vector2f &v1, const sf::Vector2f &v2);
     float magnitude(const sf::Vector2f &v);
     sf::Vector2f normalize(const sf::Vector2f &v);
+    std::string toString(float value);
 
     /**
      * @brief Projects a point onto a line defined by a point and a direction.

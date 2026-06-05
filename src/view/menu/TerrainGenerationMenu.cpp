@@ -49,6 +49,66 @@ void TerrainGenerationMenu::initOnSeedInputValidatedCallback(const std::function
     m_seedInput->initOnValidateCallback(callback);
 }
 
+void TerrainGenerationMenu::initOnRandomSeedButtonClickCallback(const std::function<void()> &callback)
+{
+    m_randomSeedButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnFrequencyIncreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_frequencyIncreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnFrequencyDecreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_frequencyDecreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnOctavesIncreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_octavesIncreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnOctavesDecreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_octavesDecreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnExponentIncreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_exponentIncreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnExponentDecreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_exponentDecreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::setSeedInputText(const std::string &text)
+{
+    m_seedInput->setText(text);
+}
+
+void TerrainGenerationMenu::setFrequencyValueText(const std::string &value)
+{
+    m_frequencyValueText->setContent(value);
+}
+
+void TerrainGenerationMenu::setOctavesValueText(const std::string &value)
+{
+    m_octavesValueText->setContent(value);
+}
+
+void TerrainGenerationMenu::setExponentValueText(const std::string &value)
+{
+    m_exponentValueText->setContent(value);
+}
+
+std::string TerrainGenerationMenu::getSeedInputText() const
+{
+    return m_seedInput->getText();
+}
+
 void TerrainGenerationMenu::setTerrainGenerationMenuVisibility(bool isVisible)
 {
     for (auto *widget : m_menuWidgets)
@@ -66,7 +126,7 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
         menuPosition + sf::Vector2f(menuSize.x - 50, 10), {15, 15}, "Close", 12);
     UIFactory::applyDefaultSpriteButtonStyle(m_closeTerrainGenerationMenuButton, HighlightTextAlign::Down);
 
-    m_TerrainGenerationMenuTitle = UIFactory::createText(menuPosition + sf::Vector2f(90, 20), "Terrain Generation", 18);
+    m_TerrainGenerationMenuTitle = UIFactory::createText(menuPosition + sf::Vector2f(110, 20), "Terrain Generation", 18);
     UIFactory::applyDefaultTextStyle(m_TerrainGenerationMenuTitle, UIFactory::TextVariant::Title);
 
     m_seedText = UIFactory::createText(menuPosition + sf::Vector2f(20, 70), "Seed: ", 15);
@@ -78,18 +138,52 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_ExponentText = UIFactory::createText(menuPosition + sf::Vector2f(20, 220), "Exponent: ", 15);
     UIFactory::applyDefaultTextStyle(m_ExponentText, UIFactory::TextVariant::Value);
 
-    m_generateButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(40, 270), "Generate", 17);
+    m_generateButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(240, 270), "  Generate  ", 17);
     UIFactory::applyDefaultTextButtonStyle(m_generateButton, UIFactory::TextVariant::Default);
-    m_cancelButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(200, 270), "Cancel", 17);
+    m_generateButton->initBackgroundStatesColor( sf::Color(235, 225, 250), sf::Color(248, 246, 252), 
+        sf::Color(248, 246, 252), sf::Color(210, 190, 240), sf::Color(235, 225, 250));
+    m_cancelButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(85, 270), "   Cancel   ", 17);
     UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
 
-    m_seedInput = UIFactory::createTextInput(menuPosition + sf::Vector2f(170, 60), sf::Vector2f(160, 40), "Enter seed (Ex: 1337)", 18, true);
+    m_seedInput = UIFactory::createTextInput(menuPosition + sf::Vector2f(140, 60), sf::Vector2f(160, 40), "Enter seed (Ex: 1337)", 18, true);
     m_seedInput->initCharacterLimit(10);
     UIFactory::applyDefaultTextInputStyle(m_seedInput);
-
     m_randomSeedButton = UIFactory::createSpriteButton("assets/textures/ui/random_512.png", 
-        menuPosition + sf::Vector2f(345, 60), {18, 18}, "Random", 12);
+        menuPosition + sf::Vector2f(315, 60), {18, 18}, "Random", 12);
     UIFactory::applyDefaultSpriteButtonStyle(m_randomSeedButton, HighlightTextAlign::Down);
+
+    m_frequencyValueText = UIFactory::createText(menuPosition + sf::Vector2f(210, 115), "1.0", 20);
+    UIFactory::applyDefaultTextStyle(m_frequencyValueText, UIFactory::TextVariant::Default);
+    m_frequencyIncreaseButton = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", 
+        menuPosition + sf::Vector2f(265, 110), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_frequencyIncreaseButton, HighlightTextAlign::Down);
+    m_frequencyDecreaseButton = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", 
+        menuPosition + sf::Vector2f(140, 110), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_frequencyDecreaseButton, HighlightTextAlign::Down);
+    m_frequencyDecreaseButton->setContinuousClick(true, 0.1f);
+    m_frequencyIncreaseButton->setContinuousClick(true, 0.1f);
+
+    m_octavesValueText = UIFactory::createText(menuPosition + sf::Vector2f(210, 165), "1", 20);
+    UIFactory::applyDefaultTextStyle(m_octavesValueText, UIFactory::TextVariant::Default);
+    m_octavesIncreaseButton = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", 
+        menuPosition + sf::Vector2f(265, 160), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_octavesIncreaseButton, HighlightTextAlign::Down);
+    m_octavesDecreaseButton = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", 
+        menuPosition + sf::Vector2f(140, 160), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_octavesDecreaseButton, HighlightTextAlign::Down);
+    m_octavesDecreaseButton->setContinuousClick(true);
+    m_octavesIncreaseButton->setContinuousClick(true);
+
+    m_exponentValueText = UIFactory::createText(menuPosition + sf::Vector2f(210, 215), "1.0", 20);
+    UIFactory::applyDefaultTextStyle(m_exponentValueText, UIFactory::TextVariant::Default);
+    m_exponentIncreaseButton = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", 
+        menuPosition + sf::Vector2f(265, 210), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_exponentIncreaseButton, HighlightTextAlign::Down);
+    m_exponentDecreaseButton = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", 
+        menuPosition + sf::Vector2f(140, 210), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_exponentDecreaseButton, HighlightTextAlign::Down);
+    m_exponentDecreaseButton->setContinuousClick(true, 0.1f);
+    m_exponentIncreaseButton->setContinuousClick(true, 0.1f);
 
     m_menuWidgets.push_back(m_TerrainGenerationMenuBox);
     m_menuWidgets.push_back(m_closeTerrainGenerationMenuButton);
@@ -102,6 +196,15 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_menuWidgets.push_back(m_cancelButton);
     m_menuWidgets.push_back(m_seedInput);
     m_menuWidgets.push_back(m_randomSeedButton);
+    m_menuWidgets.push_back(m_frequencyValueText);
+    m_menuWidgets.push_back(m_frequencyIncreaseButton);
+    m_menuWidgets.push_back(m_frequencyDecreaseButton);
+    m_menuWidgets.push_back(m_octavesValueText);
+    m_menuWidgets.push_back(m_octavesIncreaseButton);
+    m_menuWidgets.push_back(m_octavesDecreaseButton);
+    m_menuWidgets.push_back(m_exponentValueText);
+    m_menuWidgets.push_back(m_exponentIncreaseButton);
+    m_menuWidgets.push_back(m_exponentDecreaseButton);
 }
 
 void TerrainGenerationMenu::initWidgetsList()

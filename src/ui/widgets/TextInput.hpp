@@ -37,6 +37,7 @@ public:
     void initOnValidateCallback(std::function<void(const std::string&)> callback);
     void setNumericInput(bool isNumeric);
     std::string getText() const;
+    void setText(const std::string& text);
 
 private:
     void onBase() override;

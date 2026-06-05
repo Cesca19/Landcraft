@@ -16,6 +16,19 @@ public:
     void initOnCloseTerrainGenerationMenuButtonClickCallback(const std::function<void()> &callback);
     void initOnGenerateButtonClickCallback(const std::function<void()> &callback);
     void initOnSeedInputValidatedCallback(const std::function<void(const std::string&)> &callback);
+    void initOnRandomSeedButtonClickCallback(const std::function<void()> &callback);
+    void initOnFrequencyIncreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnFrequencyDecreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnOctavesIncreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnOctavesDecreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnExponentIncreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnExponentDecreaseButtonClickCallback(const std::function<void()> &callback);
+
+    void setSeedInputText(const std::string &text);
+    void setFrequencyValueText(const std::string &value);
+    void setOctavesValueText(const std::string &value);
+    void setExponentValueText(const std::string &value);
+    std::string getSeedInputText() const;
 
     void setTerrainGenerationMenuVisibility(bool isVisible);
 private:
@@ -37,6 +50,15 @@ private:
     TextButton *m_cancelButton;
     TextInput *m_seedInput;
     SpriteButton *m_randomSeedButton;
+    Text *m_frequencyValueText;
+    SpriteButton *m_frequencyIncreaseButton;
+    SpriteButton *m_frequencyDecreaseButton;
+    Text *m_octavesValueText;
+    SpriteButton *m_octavesIncreaseButton;
+    SpriteButton *m_octavesDecreaseButton;
+    Text *m_exponentValueText;
+    SpriteButton *m_exponentIncreaseButton;
+    SpriteButton *m_exponentDecreaseButton;
 
     std::vector<IWidget *> m_menuWidgets;
     std::vector<IWidget *> m_widgets;

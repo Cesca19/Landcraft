@@ -11,7 +11,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
     , m_editionView(std::make_unique<EditionMenu>(globalUIPosition))
     , m_editionToolsBoxPosition(0, 250)
     , m_toolsMenuStartPosition(m_editionToolsBoxPosition + sf::Vector2f(95, 0))
-    , m_terrainGenerationController(terrainGenerationMenuPosition, windowSize)
+    , m_terrainGenerationController(terrainGenerationMenuPosition, windowSize, &model, &view, &m_commandHistory)
 {
     m_editionTools.emplace_back(std::make_unique<ElevationTool>(m_toolsMenuStartPosition));
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsMenuStartPosition));
@@ -35,7 +35,7 @@ void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &
     handleEditionToolSwitchEvents(event);
     m_editionTools[m_currentEditionTool]->handleEvents(window, event, model, view, brushController, m_commandHistory);
     handleUndoRedoEvents(window, event, model, view);
-    m_terrainGenerationController.handleEvents(event, window, model, view, m_commandHistory);
+    m_terrainGenerationController.handleEvents(event, window);
 
 }
 

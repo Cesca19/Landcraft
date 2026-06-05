@@ -194,7 +194,12 @@ void TextInput::setNumericInput(bool isNumeric)
 
 std::string TextInput::getText() const
 {
-    return m_text.getString();
+    return (m_text.getString() == m_placeholder) ? "" : m_text.getString();
+}
+
+void TextInput::setText(const std::string &text)
+{
+    m_text.setString(text);
 }
 
 void TextInput::onBase()
