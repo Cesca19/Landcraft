@@ -42,6 +42,8 @@ public:
     void update(float deltaTime) override;
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
+    void handleKeyBoardEvents(const sf::Event& event) override;
+    bool shouldFocusOnClick() const override;
 
     void resetIconScale();
     void setPosition(const sf::Vector2f& position) override;

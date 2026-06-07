@@ -24,6 +24,7 @@ public:
     void resetTileMap(const std::vector<std::vector<Tile>>& tiles);
     void initSplatMap(const std::string& filepath, const sf::Vector2i& tileSize, int nbCols, int nbRows);
     void initWaterView(int nbCols, int nbRows, const sf::Vector2i& tileSize);
+    void setWaterHeight(float height);
     void initEnvironment(sf::Vector2u windowSize);
     void update(float deltaTime, const std::vector<std::vector<Tile>>& tiles, const sf::RenderWindow &window);
     void draw(sf::RenderWindow& window) const;

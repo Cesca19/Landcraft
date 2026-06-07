@@ -44,6 +44,8 @@ void UIController::handleEvents(const sf::Event &event, const sf::RenderWindow &
 {
     handleMouseEvents(event, window);
     handleKeyBoardEvents(event);
+    if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased)
+        findHoveredWidget(window);
 }
 
 void UIController::handleContinuousEvents(float deltaTime, const sf::RenderWindow &window)
@@ -128,17 +130,25 @@ void UIController::handleMouseEvents(const sf::Event &event, const sf::RenderWin
         if ((event.mouseButton.button == sf::Mouse::Left || event.mouseButton.button == sf::Mouse::Right)
         && m_hoveredWidget != nullptr) {
             // Mouse interaction should not keep keyboard navigation focus active.
-            if (m_focusedWidget != nullptr)
+            if (m_focusedWidget != nullptr && m_focusedWidget != m_hoveredWidget)
                 unfocusCurrentWidget();
-            m_hoveredWidget->setState(WidgetState::Pressed);
+            if (m_hoveredWidget->isInteractable() && m_hoveredWidget->shouldFocusOnClick()) {
+                m_focusedWidget = m_hoveredWidget;
+                m_focusedWidget->setState(WidgetState::Focused);
+            } else
+                m_hoveredWidget->setState(WidgetState::Pressed);
             m_isMouseHoverUI = true;
         } else if (m_hoveredWidget == nullptr)
             unfocusCurrentWidget();
     }
     if (event.type == sf::Event::MouseButtonReleased
         && (event.mouseButton.button == sf::Mouse::Left || event.mouseButton.button == sf::Mouse::Right)
-        && m_hoveredWidget != nullptr)
-        m_hoveredWidget->setState(WidgetState::Hovered);
+        && m_hoveredWidget != nullptr) {
+            if (m_hoveredWidget == m_focusedWidget)
+                m_hoveredWidget->setState(WidgetState::Focused);
+            else
+                m_hoveredWidget->setState(WidgetState::Hovered);
+        }
 }
 
 void UIController::handleKeyBoardEvents(const sf::Event &event)
@@ -168,6 +178,9 @@ void UIController::handleKeyBoardEvents(const sf::Event &event)
         && (event.key.code == sf::Keyboard::Space || event.key.code == sf::Keyboard::Enter)
         && m_focusedWidget != nullptr)
             m_focusedWidget->setState(WidgetState::Focused);
+    for (const auto& widget : m_widgets)
+        if (widget->isVisible())
+            widget->handleKeyBoardEvents(event);
 
 }
 
@@ -183,20 +196,32 @@ void UIController::findHoveredWidget(const sf::RenderWindow &window)
             m_isMouseHoverUI = true;
         if (widget->isInteractable() && bounds.contains(mousePos))
         {
-            if (m_hoveredWidget == widget.get())
+            // If we're already hovering this widget, no need to change state
+            if (m_hoveredWidget == widget.get()) {
+                if (m_hoveredWidget != m_focusedWidget &&
+                    !sf::Mouse::isButtonPressed(sf::Mouse::Left) &&
+                    !sf::Mouse::isButtonPressed(sf::Mouse::Right))
+                    m_hoveredWidget->setState(WidgetState::Hovered);
                 return;
-            if (m_hoveredWidget != nullptr)
+            }
+            // if the hovered widget is focused and should keep focus on click, 
+            // we register it as hovered without changing its state
+            if (widget.get() == m_focusedWidget && widget->shouldFocusOnClick()) {
+                m_hoveredWidget = widget.get();
+                return;
+            }
+            if (m_hoveredWidget != nullptr && m_hoveredWidget != m_focusedWidget)
                 m_hoveredWidget->setState(WidgetState::Base);
-            if (m_focusedWidget != nullptr)
-                unfocusCurrentWidget();
-
-            widget->setState(WidgetState::Hovered);
+            if (widget.get() != m_focusedWidget)
+                widget->setState(WidgetState::Hovered);
             m_hoveredWidget = widget.get();
             return;
         }
     }
     if (m_hoveredWidget != nullptr) {
-        m_hoveredWidget->setState(WidgetState::Base);
+        // the last hovered widget should return to its base state, unless it's focused
+        if (m_hoveredWidget != m_focusedWidget)
+            m_hoveredWidget->setState(WidgetState::Base);
         m_hoveredWidget = nullptr;
     }
 }
@@ -211,16 +236,14 @@ sf::Vector2f UIController::getMouseScreenPosition(const sf::RenderWindow &window
 
 void UIController::spatialNavigation(const sf::Keyboard::Key key)
 {
-    if (m_hoveredWidget) {
-        m_hoveredWidget->setState(WidgetState::Base);
-        m_focusedWidget = m_hoveredWidget;
-        m_focusedWidget->setState(WidgetState::Focused);
-        m_hoveredWidget = nullptr;
-    }
-
     if (!m_focusedWidget) {
-        focusOnDefaultWidget();
-        return;
+
+        if (m_hoveredWidget) {
+            m_focusedWidget = m_hoveredWidget;
+        } else {
+            focusOnDefaultWidget();
+            return;
+        }
     }
 
     sf::Vector2f mainAxis(0.f, 0.f);
@@ -353,6 +376,9 @@ void UIController::unfocusCurrentWidget()
 {
     if (m_focusedWidget == nullptr)
         return;
-    m_focusedWidget->setState(WidgetState::Base);
+    if (m_focusedWidget == m_hoveredWidget)
+        m_focusedWidget->setState(WidgetState::Hovered);
+    else
+        m_focusedWidget->setState(WidgetState::Base);
     m_focusedWidget = nullptr;
 }

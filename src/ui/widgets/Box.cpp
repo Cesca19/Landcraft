@@ -74,6 +74,15 @@ void Box::setState(WidgetState state)
     // This widget does not have different states, so this function does nothing.
 }
 
+void Box::handleKeyBoardEvents(const sf::Event &event)
+{
+}
+
+bool Box::shouldFocusOnClick() const
+{
+    return false;
+}
+
 void Box::setPosition(const sf::Vector2f &position)
 {
     m_rectangle.setPosition(position);

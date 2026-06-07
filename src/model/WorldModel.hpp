@@ -24,12 +24,12 @@ class WorldModel
 public:
     WorldModel();
     ~WorldModel();
-    void loadMap(std::string mapFilePath);
+    void loadMap(const std::string &mapFilePath);
     sf::Vector2i getTilesSize() const;
-    std::string getSplatmapFilepath() const;
+    std::string getSplatMapFilepath() const;
     sf::Vector2i getMapSize() const;
     std::string getMapName() const;
-    void saveMapToFile(std::string mapFilePath, std::string splatmapFileName);
+    void saveMapToFile(const std::string &mapFilePath, const std::string &splatMapFileName) const;
     std::vector<std::vector<Tile>>& getTiles();
     std::vector<std::vector<std::unique_ptr<TileCorner>>>& getCorners();
     sf::Vector2f getCenter() const;
@@ -40,10 +40,11 @@ public:
     float getMinElevation() const;
     float getMaxElevation() const;
     float getWaterHeight() const;
+    void setWaterHeight(float height);
 private:
-    std::unique_ptr<WorldMap> loadMapFromFile(std::string mapFilePath);
+    std::unique_ptr<WorldMap> loadMapFromFile(const std::string& mapFilePath) const;
     sf::Vector2i loadTilesSize(std::ifstream &mapFile) const;
-    std::string loadSplatmapFilepath(std::ifstream &mapFile) const;
+    std::string loadSplatMapFilepath(std::ifstream &mapFile) const;
     sf::Vector2i loadMapSize(std::ifstream &mapFile) const;
     std::vector<std::vector<float>> loadTileCornersHeightmap(std::ifstream &mapFile, int nb_rows, int nb_cols) const;
 
@@ -52,14 +53,13 @@ private:
     void createWorldTileCorners();
 
     std::vector<std::vector<float>> m_tileCornersHeightmap;
-    // std::vector<std::vector<int>> m_tileTextureIdMap;
     std::vector<std::vector<std::unique_ptr<TileCorner>>> m_corners;
     std::vector<std::vector<Tile>> m_tiles;
     float m_highestTileCornerHeight;
 
     sf::Vector2i m_tilesSize;
     std::string m_mapName;
-    std::string m_splatmapFilepath;
+    std::string m_splatMapFilepath;
 
     float m_minElevation;
     float m_maxElevation;

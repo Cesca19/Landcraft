@@ -272,6 +272,12 @@ void TileMap::updateSplatMapImage()
     m_splatmapImage = m_splatmap.getTexture().copyToImage();
 }
 
+void TileMap::setWaterHeight(float height)
+{
+    m_waterHeight = height;
+    m_terrainShader.setUniform("u_WaterHeight", m_waterHeight);
+}
+
 void TileMap::updateTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::set<std::pair<int, int>>& tilesToUpdate, const Camera &camera)
 {
     if (worldTiles.empty() || worldTiles[0].empty()) 

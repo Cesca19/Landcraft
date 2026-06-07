@@ -5,6 +5,7 @@
 #ifndef LANDCRAFT_WORLDCONTROLLER_HPP
 #define LANDCRAFT_WORLDCONTROLLER_HPP
 
+#include "../utils/MathUtils.hpp"
 #include "../model/WorldModel.hpp"
 #include "../view/world/WorldView.hpp"
 #include "../view/menu/WorldMenu.hpp"
@@ -12,7 +13,6 @@
 #include "BrushController.hpp"
 #include "NavigationController.hpp"
 #include "MapLoadSaveController.hpp"
-
 
 struct CameraSettings {
     float tileSizeX;
@@ -48,7 +48,10 @@ public:
     void onMapLoaded();
 private:
     void onDrawModeButtonClicked(DrawMode mode);
+    void onWaterLevelButtonClicked(int factor);
+    void setWaterLevelValueText(float waterHeight) const;
 
+    float waterLevelIncrementStep;
     sf::Vector2u m_minWindowSize;
     sf::Vector2u m_maxWindowSize;
     DrawMode m_currentDrawMode;

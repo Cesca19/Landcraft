@@ -10,10 +10,12 @@
 #include "../commands/CommandHistory.hpp"
 #include "../editionTools/EditionTools.hpp"
 #include "../view/menu/EditionMenu.hpp"
+#include "TerrainGenerationController.hpp"
 
 class EditionController {
 public:
-    EditionController(WorldModel &model, WorldView &view, sf::Vector2f globalUIPosition);
+    EditionController(WorldModel &model, WorldView &view, 
+        sf::Vector2f globalUIPosition, const sf::Vector2f &terrainGenerationMenuPosition, const sf::Vector2u &windowSize);
     void handleEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, BrushController& brushController);
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel& model, WorldView& view, BrushController& brushController);
     bool isEditing() const;
@@ -32,6 +34,7 @@ private:
     std::unique_ptr<EditionMenu> m_editionView;
     sf::Vector2f m_editionToolsBoxPosition;
     sf::Vector2f m_toolsMenuStartPosition;
+    TerrainGenerationController m_terrainGenerationController;
 };
 
 #endif //LANDCRAFT_EDITIONCONTROLLER_HPP

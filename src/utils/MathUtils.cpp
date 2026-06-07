@@ -39,6 +39,14 @@ namespace MathUtils {
         return v / mag;
     }
 
+    std::string toString(float value)
+    {
+        std::stringstream s;
+        s << value;
+        std::string result=s.str();
+      return result;
+    }
+
     sf::Vector2f projectPointOnLine(const sf::Vector2f &point, const sf::Vector2f &linePoint, const sf::Vector2f &direction)
     {
         const sf::Vector2f AP = point - linePoint;

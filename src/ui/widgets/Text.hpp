@@ -31,7 +31,9 @@ public:
     void update(float deltaTime) override;
     void draw(sf::RenderWindow& window) const override;
     void setState(WidgetState state) override;
+    void handleKeyBoardEvents(const sf::Event& event) override;
     void setPosition(const sf::Vector2f& position) override;
+    bool shouldFocusOnClick() const override;
 protected:
     void onBase() override;
     void onHover() override;

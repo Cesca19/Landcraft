@@ -15,9 +15,10 @@ enum class DrawMode {
 
 class WorldMenu {
 public:
-    WorldMenu(sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition,
-        const sf::Vector2f &mapNamePosition);
+    WorldMenu(sf::Vector2f globalUIPosition,const sf::Vector2f &drawModesMenuPosition, const sf::Vector2f &mapNamePosition);
     ~WorldMenu();
+    void initQuitMenu(const sf::Vector2f &quitMenuPosition);
+    void initWaterLevelMenu(const sf::Vector2f &waterLevelMenuPosition);
     void setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const;
     void setDontSaveButtonOnClickCallback(const std::function<void()> &callback) const;
     void setCancelButtonOnClickCallback(const std::function<void()> &callback) const;
@@ -28,6 +29,9 @@ public:
     void selectDrawModeButton(DrawMode mode);
     void unselectDrawModeButton(DrawMode mode);
     void setMapName(const std::string &mapName);
+    void initOnWaterLevelIncrementButtonClickCallback(const std::function<void()> &callback) const;
+    void initOnWaterLevelDecrementButtonClickCallback(const std::function<void()> &callback) const;
+    void setWaterLevelValueText(const std::string &value) const;
 private:
     void updateMapNameMenu();
     void initWidgetsList();
@@ -47,6 +51,11 @@ private:
     Text *m_drawModeTitle;
     TextButton *m_mapNameBtn;
     bool m_isQuitMenuVisible;
+    Box *m_waterLevelMenuBox;
+    Text *m_waterLevelTitle;
+    Text *m_waterLevelValueText;
+    SpriteButton *m_decrementWaterLevel;
+    SpriteButton *m_incrementWaterLevel;
     std::vector<IWidget *> m_widgets;
     std::unordered_map<DrawMode, SpriteButton*> m_drawModeButtons;
 };

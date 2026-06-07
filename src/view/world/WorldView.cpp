@@ -74,6 +74,14 @@ void WorldView::initWaterView(int nbCols, int nbRows, const sf::Vector2i &tileSi
     m_waterView->init(nbCols, nbRows, tileSize, m_waterHeight, *m_camera);
 }
 
+void WorldView::setWaterHeight(float height)
+{
+    m_waterHeight = height;
+    m_waterView->setWaterHeight(height);
+    m_waterView->updatePositions(*m_camera);
+    m_tileMap->setWaterHeight(height);
+}
+
 void WorldView::initEnvironment(const sf::Vector2u windowSize)
 {
     m_environmentView = std::make_unique<EnvironmentView>();

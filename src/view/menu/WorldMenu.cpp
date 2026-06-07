@@ -4,7 +4,8 @@
 
 #include "WorldMenu.hpp"
 
-WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &quitMenuPosition, const sf::Vector2f &mapNamePosition)
+WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition,
+    const sf::Vector2f &drawModesMenuPosition, const sf::Vector2f &mapNamePosition)
     : m_isQuitMenuVisible(true)
     , m_mapNameMenuPosition(mapNamePosition)
 {
@@ -20,21 +21,7 @@ WorldMenu::WorldMenu(const sf::Vector2f globalUIPosition, const sf::Vector2f &qu
     m_globalMenuBox = UIFactory::createBox(globalUIPosition, {225, 90});
     UIFactory::applyDefaultBoxStyle(m_globalMenuBox);
 
-    m_quitMenuBox = UIFactory::createBox(quitMenuPosition, {400, 200});
-    UIFactory::applyDefaultBoxStyle(m_quitMenuBox);
-    m_quitMenuTitle = UIFactory::createText(quitMenuPosition + sf::Vector2f(120, 20), "Quit Landcraft ?", 20);
-    UIFactory::applyDefaultTextStyle(m_quitMenuTitle, UIFactory::TextVariant::Title);
-    m_quitMenuDescription = UIFactory::createText(quitMenuPosition + sf::Vector2f(20, 60), "Do you want to save your progress before quitting ?", 15);
-    UIFactory::applyDefaultTextStyle(m_quitMenuDescription, UIFactory::TextVariant::Default);
-
-    m_saveMapButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(230, 100), "Save and Quit", 17);
-    UIFactory::applyDefaultTextButtonStyle(m_saveMapButton, UIFactory::TextVariant::Default);
-    m_dontSaveButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(40, 100), "Don't Save and Quit", 16);
-    UIFactory::applyDefaultTextButtonStyle(m_dontSaveButton, UIFactory::TextVariant::Default);
-    m_cancelButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(180, 150), "Cancel", 17);
-    UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
-
-    const sf::Vector2f wireframeShadedModeBoxPosition = globalUIPosition + sf::Vector2f(770, 0);
+    const sf::Vector2f wireframeShadedModeBoxPosition = drawModesMenuPosition;
     m_wireframeShadedModeBox = UIFactory::createBox(wireframeShadedModeBoxPosition, {300, 90});
     UIFactory::applyDefaultBoxStyle(m_wireframeShadedModeBox);
     m_drawModeTitle = UIFactory::createText(wireframeShadedModeBoxPosition + sf::Vector2f(10, 25), " Draw   \nModes ", 15);
@@ -60,6 +47,52 @@ WorldMenu::~WorldMenu()
     for (auto *widget : m_widgets)
         UIFactory::removeWidget(widget);
     m_widgets.clear();
+}
+
+void WorldMenu::initQuitMenu(const sf::Vector2f &quitMenuPosition)
+{
+    m_quitMenuBox = UIFactory::createBox(quitMenuPosition, {400, 200});
+    UIFactory::applyDefaultBoxStyle(m_quitMenuBox);
+    m_quitMenuTitle = UIFactory::createText(quitMenuPosition + sf::Vector2f(120, 20), "Quit Landcraft ?", 20);
+    UIFactory::applyDefaultTextStyle(m_quitMenuTitle, UIFactory::TextVariant::Title);
+    m_quitMenuDescription = UIFactory::createText(quitMenuPosition + sf::Vector2f(20, 60), "Do you want to save your progress before quitting ?", 15);
+    UIFactory::applyDefaultTextStyle(m_quitMenuDescription, UIFactory::TextVariant::Default);
+
+    m_saveMapButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(230, 100), "Save and Quit", 17);
+    UIFactory::applyDefaultTextButtonStyle(m_saveMapButton, UIFactory::TextVariant::Default);
+    m_dontSaveButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(40, 100), "Don't Save and Quit", 16);
+    UIFactory::applyDefaultTextButtonStyle(m_dontSaveButton, UIFactory::TextVariant::Default);
+    m_cancelButton = UIFactory::createTextButton(quitMenuPosition + sf::Vector2f(180, 150), "Cancel", 17);
+    UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
+    initWidgetsList();
+}
+
+void WorldMenu::initWaterLevelMenu(const sf::Vector2f &waterLevelMenuPosition)
+{
+    m_waterLevelMenuBox = UIFactory::createBox(waterLevelMenuPosition, {270, 90});
+    UIFactory::applyDefaultBoxStyle(m_waterLevelMenuBox);
+    m_waterLevelTitle = UIFactory::createText(waterLevelMenuPosition + sf::Vector2f(10, 25), " Water\n  Level ", 15);
+    UIFactory::applyDefaultTextStyle(m_waterLevelTitle, UIFactory::TextVariant::Label);
+    m_waterLevelValueText = UIFactory::createText(waterLevelMenuPosition + sf::Vector2f(140, 30), "-10", 20);
+    UIFactory::applyDefaultTextStyle(m_waterLevelValueText, UIFactory::TextVariant::Value);
+
+    const sf::Vector2f startButtonPosition = waterLevelMenuPosition + sf::Vector2f(40, 5);
+    m_decrementWaterLevel = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png",
+                                                         startButtonPosition + sf::Vector2f(40, 15),
+                                                         sf::Vector2f(28, 28), "Reduce", 12);
+    m_incrementWaterLevel = UIFactory::createSpriteButton("assets/textures/ui/add_512.png",
+                                                         startButtonPosition + sf::Vector2f(160, 15),
+                                                         sf::Vector2f(28, 28), "Add", 12);
+
+    m_incrementWaterLevel->setContinuousClick(true);
+    m_decrementWaterLevel->setContinuousClick(true);
+    UIFactory::applyDefaultSpriteButtonStyle(m_decrementWaterLevel, HighlightTextAlign::Down);
+    UIFactory::applyDefaultSpriteButtonStyle(m_incrementWaterLevel, HighlightTextAlign::Down);
+    m_widgets.push_back(m_waterLevelMenuBox);
+    m_widgets.push_back(m_waterLevelTitle);
+    m_widgets.push_back(m_waterLevelValueText);
+    m_widgets.push_back(m_decrementWaterLevel);
+    m_widgets.push_back(m_incrementWaterLevel);
 }
 
 void WorldMenu::setSaveMapButtonOnClickCallback(const std::function<void()> &callback) const
@@ -122,6 +155,21 @@ void WorldMenu::setMapName(const std::string &mapName)
 {
     m_mapNameBtn->setContent(mapName);
     updateMapNameMenu();
+}
+
+void WorldMenu::initOnWaterLevelIncrementButtonClickCallback(const std::function<void()> &callback) const
+{
+    m_incrementWaterLevel->initOnClickCallback(callback);
+}
+
+void WorldMenu::initOnWaterLevelDecrementButtonClickCallback(const std::function<void()> &callback) const
+{
+    m_decrementWaterLevel->initOnClickCallback(callback);
+}
+
+void WorldMenu::setWaterLevelValueText(const std::string &value) const
+{
+    m_waterLevelValueText->setContent(value);
 }
 
 void WorldMenu::updateMapNameMenu()
