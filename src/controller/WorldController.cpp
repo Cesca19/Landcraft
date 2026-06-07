@@ -8,13 +8,14 @@ WorldController::WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWin
     : m_minWindowSize(minWindowSize)
     , m_maxWindowSize(maxWindowSize)
     , m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
+    , waterLevelIncrementStep(0.25f)
 {
 }
 
 void WorldController::init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings)
 {
-    constexpr float globalToolBoxOffset = 650;
+    constexpr float globalToolBoxOffset = 800;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
     sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 150);
     sf::Vector2f mapNamePosition = sf::Vector2f(static_cast<float>(viewSettings.windowSize.x) / 2.f, 
@@ -22,7 +23,8 @@ void WorldController::init(const std::string &mapName,
     sf::Vector2f brushMenuPosition = globalUIPosition + sf::Vector2f(245, 0); 
     sf::Vector2f drawModesMenuPosition = brushMenuPosition + sf::Vector2f(300, 0);
     sf::Vector2f mapSaveMenuPosition = drawModesMenuPosition + sf::Vector2f(320, 0);
-    sf::Vector2f terrainGenerationMenuPosition = mapSaveMenuPosition + sf::Vector2f(230, 0);
+    sf::Vector2f terrainGenerationMenuPosition = mapSaveMenuPosition + sf::Vector2f(225, 0);
+    sf::Vector2f waterLevelMenuPosition = terrainGenerationMenuPosition + sf::Vector2f(220, 0);
 
     m_worldMenu = std::make_unique<WorldMenu>(globalUIPosition, drawModesMenuPosition, mapNamePosition);
     m_worldMenu->setDrawModeButtonOnClickCallback(DrawMode::SHADED, [this] () { this->onDrawModeButtonClicked(DrawMode::SHADED); } );
@@ -37,8 +39,11 @@ void WorldController::init(const std::string &mapName,
     m_mapLoadSaveController = std::make_unique<MapLoadSaveController>(&m_worldModel, &m_worldView, 
         m_editionController.get(), mapSaveMenuPosition, [this] () { this->onMapLoaded(); });
 
+    m_worldMenu->initWaterLevelMenu(waterLevelMenuPosition);
     m_worldMenu->initQuitMenu(quitMenuPosition);
     m_worldMenu->setQuitMenuVisibility(false);
+    m_worldMenu->initOnWaterLevelIncrementButtonClickCallback([this] () { this->onWaterLevelButtonClicked(1); });
+    m_worldMenu->initOnWaterLevelDecrementButtonClickCallback([this] () { this->onWaterLevelButtonClicked(-1); });
 
     m_worldModel.loadMap(mapName);
     onMapLoaded();
@@ -51,6 +56,7 @@ void WorldController::init(const std::string &mapName,
     m_worldView.initSplatMap(m_worldModel.getSplatMapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
     m_worldView.initWaterView(m_worldModel.getMapSize().x, m_worldModel.getMapSize().y, m_worldModel.getTilesSize());
     m_worldView.initEnvironment(viewSettings.windowSize);
+    setWaterLevelValueText(m_worldModel.getWaterHeight());
 }
 
 void WorldController::handleEvents(const sf::Event &event, sf::RenderWindow &window)
@@ -152,4 +158,19 @@ void WorldController::onDrawModeButtonClicked(const DrawMode mode)
     }
     m_currentDrawMode = mode;
     m_worldMenu->selectDrawModeButton(m_currentDrawMode);
+}
+
+void WorldController::onWaterLevelButtonClicked(int factor)
+{
+    float newLevel = static_cast<float>(m_worldModel.getWaterHeight()) + (static_cast<float>(factor) * waterLevelIncrementStep);
+    newLevel = std::clamp(newLevel, -10.0f, 10.0f);
+    m_worldModel.setWaterHeight(newLevel);
+    m_worldView.setWaterHeight(m_worldModel.getWaterHeight());
+    setWaterLevelValueText(m_worldModel.getWaterHeight());
+    m_worldView.updatePositions(m_worldModel.getTiles(), m_worldView.getCamera());
+}
+
+void WorldController::setWaterLevelValueText(float waterHeight) const
+{
+    m_worldMenu->setWaterLevelValueText(MathUtils::toString(waterHeight));
 }

@@ -31,7 +31,7 @@ public:
     void restoreSplatMapArea(const sf::IntRect& area, const sf::Image& pixels);
     const sf::Image& getSplatMapImage() const;
     void updateSplatMapImage();
-
+    void setWaterHeight(float height);
 private:
     void updateTiles(const std::vector<std::vector<Tile>>& worldTiles, const std::set<std::pair<int, int>>& tilesToUpdate, const Camera& camera);
     void updateShadedTile(const Tile& tile, const Camera& camera, int shadedIndex);

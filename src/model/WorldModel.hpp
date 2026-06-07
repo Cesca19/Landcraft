@@ -40,6 +40,7 @@ public:
     float getMinElevation() const;
     float getMaxElevation() const;
     float getWaterHeight() const;
+    void setWaterHeight(float height);
 private:
     std::unique_ptr<WorldMap> loadMapFromFile(const std::string& mapFilePath) const;
     sf::Vector2i loadTilesSize(std::ifstream &mapFile) const;

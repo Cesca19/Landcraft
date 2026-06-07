@@ -139,6 +139,11 @@ float WorldModel::getWaterHeight() const
     return m_waterHeight;
 }
 
+void WorldModel::setWaterHeight(float height)
+{
+    m_waterHeight = height;
+}
+
 std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(const std::string& mapFilePath) const
 {
     std::ifstream mapFile(mapFilePath);

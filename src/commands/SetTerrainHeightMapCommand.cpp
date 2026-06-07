@@ -30,7 +30,7 @@ void SetTerrainHeightMapCommand::undo(WorldModel &model, WorldView &view)
 
 std::string SetTerrainHeightMapCommand::getName()
 {
-    return "Generate Terrain";
+    return "Set Terrain Height Map";
 }
 
 void SetTerrainHeightMapCommand::applyHeightmapToModel(WorldModel &model, const WorldView &view, const std::vector<std::vector<float>> &heightmap)

@@ -26,5 +26,5 @@ void SetSplatMapCommand::undo(WorldModel &model, WorldView &view)
 
 std::string SetSplatMapCommand::getName()
 {
-    return "Set Splat Map";
+    return "Set Terrain Splat Map";
 }

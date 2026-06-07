@@ -177,7 +177,7 @@ void TerrainGenerationController::generateTerrain()
     blankImage.create(splatMapImage.getSize().x, splatMapImage.getSize().y, sf::Color(255, 0, 0, 0));
     std::unique_ptr<SetTerrainHeightMapCommand> heightmapCommand = std::make_unique<SetTerrainHeightMapCommand>(heightmap);
     std::unique_ptr<SetSplatMapCommand> splatMapCommand = std::make_unique<SetSplatMapCommand>(m_view->getSplatmapImage(), blankImage);
-    std::unique_ptr<CommandGroup> commandGroup = std::make_unique<CommandGroup>("Generate Terrain");
+    std::unique_ptr<CommandGroup> commandGroup = std::make_unique<CommandGroup>("Generating Terrain");
     commandGroup->addCommand(std::move(heightmapCommand));
     commandGroup->addCommand(std::move(splatMapCommand));
     

@@ -7,14 +7,12 @@
 CommandGroup::CommandGroup(const std::string &actionName)
     : m_actionName(actionName)
 {
-    m_actionName = "Group Command: " + m_actionName + " :";
-    for (const auto &command : m_commands) {
-        m_actionName += "\n\t->  " + command->getName();
-    }
+    m_actionName += " :";
 }
 
 void CommandGroup::addCommand(std::unique_ptr<ICommand> command)
 {
+    m_actionName += "\n\t->  " + command->getName();
     m_commands.push_back(std::move(command));
 }
 
