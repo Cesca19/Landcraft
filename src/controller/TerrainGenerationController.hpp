@@ -24,13 +24,13 @@ class TerrainGenerationController {
 public:
     TerrainGenerationController(const sf::Vector2f &terrainGenerationMenuPosition, const sf::Vector2u &windowSize,
         WorldModel *model, WorldView *view, CommandHistory *commandHistory);
-    float getNoise(float nx, float ny);
+    float getNoise(float nx, float ny) const;
     std::vector<std::vector<float>> generateHeightmap(int width, int height);
     std::vector<std::vector<float>> generateTerrainHeightmap();
     void generateTerrain();
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
 private:
-    float applyHeightStep(float height);
+    float applyHeightStep(float height) const;
     void onGenerateButtonClick();
     void onSeedInputValidated(const std::string &seed);
     void onRandomSeedButtonClick();

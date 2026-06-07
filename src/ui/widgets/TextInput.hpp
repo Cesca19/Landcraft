@@ -21,7 +21,7 @@ public:
 
     void initBackgroundColors(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor);
     void initOutlineColors(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor);
-    void initTextColors(const sf::Color& baseColor, const sf::Color& hover, const sf::Color& focusColor, const sf::Color& pressColor);
+    void initTextColors(const sf::Color& baseColor, const sf::Color& hoverColor, const sf::Color& focusColor, const sf::Color& pressColor);
     void initCharacterLimit(unsigned int limit);
 
     sf::FloatRect getBounds() const override;

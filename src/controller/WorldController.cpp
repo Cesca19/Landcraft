@@ -14,7 +14,7 @@ WorldController::WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWin
 void WorldController::init(const std::string &mapName, 
         const CameraSettings& cameraSettings, const ViewSettings& viewSettings)
 {
-    const float globalToolBoxOffset = 650;
+    constexpr float globalToolBoxOffset = 650;
     const sf::Vector2f globalUIPosition{static_cast<float>(viewSettings.windowSize.x) / 2.f - globalToolBoxOffset, 10};
     sf::Vector2f quitMenuPosition = sf::Vector2f(viewSettings.windowSize.x / 2.f, viewSettings.windowSize.y / 2.f) - sf::Vector2f(200, 150);
     sf::Vector2f mapNamePosition = sf::Vector2f(static_cast<float>(viewSettings.windowSize.x) / 2.f, 
@@ -48,7 +48,7 @@ void WorldController::init(const std::string &mapName,
         cameraSettings.projectionAngleX, cameraSettings.projectionAngleY, m_worldModel.getCenter());
     m_worldView.initTileMap(m_worldModel.getTiles(), m_worldModel.getMinElevation(), m_worldModel.getMaxElevation(), m_worldModel.getWaterHeight());
     m_worldView.initBrushes(m_brushController->getBrushesImagePaths());
-    m_worldView.initSplatMap(m_worldModel.getSplatmapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
+    m_worldView.initSplatMap(m_worldModel.getSplatMapFilepath(), sf::Vector2i(tilesSize.x, tilesSize.y), m_worldModel.getMapSize().x, m_worldModel.getMapSize().y);
     m_worldView.initWaterView(m_worldModel.getMapSize().x, m_worldModel.getMapSize().y, m_worldModel.getTilesSize());
     m_worldView.initEnvironment(viewSettings.windowSize);
 }

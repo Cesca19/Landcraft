@@ -15,7 +15,7 @@ public:
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;
 private:
-    void applyHeightmapToModel(WorldModel& model, WorldView& view, const std::vector<std::vector<float>>& heightmap);
+    void applyHeightmapToModel(WorldModel& model, const WorldView& view, const std::vector<std::vector<float>>& heightmap);
     std::vector<std::vector<float>> m_heightmap;
     std::vector<std::vector<float>> m_previousHeightmap;
 };

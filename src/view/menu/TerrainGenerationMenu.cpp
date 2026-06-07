@@ -29,108 +29,108 @@ TerrainGenerationMenu::~TerrainGenerationMenu()
     m_widgets.clear();
 }
 
-void TerrainGenerationMenu::initOnTerrainGenerationMenuButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnTerrainGenerationMenuButtonClickCallback(const std::function<void()> &callback) const
 {
     m_TerrainGenerationMenuButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnCloseTerrainGenerationMenuButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnCloseTerrainGenerationMenuButtonClickCallback(const std::function<void()> &callback) const
 {
     m_closeTerrainGenerationMenuButton->initOnClickCallback(callback);
     m_cancelButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnGenerateButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnGenerateButtonClickCallback(const std::function<void()> &callback) const
 {
     m_generateButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnSeedInputValidatedCallback(const std::function<void(const std::string &)> &callback)
+void TerrainGenerationMenu::initOnSeedInputValidatedCallback(const std::function<void(const std::string &)> &callback) const
 {
     m_seedInput->initOnValidateCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnRandomSeedButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnRandomSeedButtonClickCallback(const std::function<void()> &callback) const
 {
     m_randomSeedButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnFrequencyIncreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnFrequencyIncreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_frequencyIncreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnFrequencyDecreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnFrequencyDecreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_frequencyDecreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnOctavesIncreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnOctavesIncreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_octavesIncreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnOctavesDecreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnOctavesDecreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_octavesDecreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnExponentIncreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnExponentIncreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_exponentIncreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnExponentDecreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnExponentDecreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_exponentDecreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnNextNoiseTypeButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnNextNoiseTypeButtonClickCallback(const std::function<void()> &callback) const
 {
     m_nextNoiseTypeButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnPreviousNoiseTypeButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnPreviousNoiseTypeButtonClickCallback(const std::function<void()> &callback) const
 {
     m_prevNoiseTypeButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnHeightStepOnButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnHeightStepOnButtonClickCallback(const std::function<void()> &callback) const
 {
     m_heightStepOnButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnHeightStepOffButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnHeightStepOffButtonClickCallback(const std::function<void()> &callback) const
 {
     m_heightStepOffButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnStepsNbIncreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnStepsNbIncreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_stepsNbIncreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::initOnStepsNbDecreaseButtonClickCallback(const std::function<void()> &callback)
+void TerrainGenerationMenu::initOnStepsNbDecreaseButtonClickCallback(const std::function<void()> &callback) const
 {
     m_stepsNbDecreaseButton->initOnClickCallback(callback);
 }
 
-void TerrainGenerationMenu::setSeedInputText(const std::string &text)
+void TerrainGenerationMenu::setSeedInputText(const std::string &text) const
 {
     m_seedInput->setText(text);
 }
 
-void TerrainGenerationMenu::setFrequencyValueText(const std::string &value)
+void TerrainGenerationMenu::setFrequencyValueText(const std::string &value) const
 {
     m_frequencyValueText->setContent(value);
 }
 
-void TerrainGenerationMenu::setOctavesValueText(const std::string &value)
+void TerrainGenerationMenu::setOctavesValueText(const std::string &value) const
 {
     m_octavesValueText->setContent(value);
 }
 
-void TerrainGenerationMenu::setExponentValueText(const std::string &value)
+void TerrainGenerationMenu::setExponentValueText(const std::string &value) const
 {
     m_exponentValueText->setContent(value);
 }
@@ -140,24 +140,24 @@ std::string TerrainGenerationMenu::getSeedInputText() const
     return m_seedInput->getText();
 }
 
-void TerrainGenerationMenu::setTerrainGenerationMenuVisibility(bool isVisible)
+void TerrainGenerationMenu::setTerrainGenerationMenuVisibility(const bool isVisible) const
 {
     for (auto *widget : m_menuWidgets)
         widget->setVisibility(isVisible);
 }
 
-void TerrainGenerationMenu::selectNoiseType(const std::string &noiseTypeName)
+void TerrainGenerationMenu::selectNoiseType(const std::string &noiseTypeName) const
 {
     m_noiseTypeValueText->setContent(noiseTypeName);
 }
 
-void TerrainGenerationMenu::setHeightStepMode(bool isOn)
+void TerrainGenerationMenu::setHeightStepMode(const bool isOn) const
 {
     m_heightStepOnButton->setSelected(isOn);
     m_heightStepOffButton->setSelected(!isOn);
 }
 
-void TerrainGenerationMenu::setStepsNbValueText(const std::string &stepsNb)
+void TerrainGenerationMenu::setStepsNbValueText(const std::string &stepsNb) const
 {
     m_stepsNbValueText->setContent(stepsNb);
 }

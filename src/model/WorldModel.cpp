@@ -18,13 +18,13 @@ WorldModel::~WorldModel()
 {
 }
 
-void WorldModel::loadMap(std::string mapFilePath)
+void WorldModel::loadMap(const std::string &mapFilePath)
 {
     std::unique_ptr<WorldMap> worldMap = loadMapFromFile(mapFilePath);
     m_tileCornersHeightmap.clear();
     m_tileCornersHeightmap = std::move(worldMap->TileCornersHeightMap);
     m_tilesSize = worldMap->TilesSize;
-    m_splatmapFilepath = worldMap->splatmapFilepath;
+    m_splatMapFilepath = worldMap->splatmapFilepath;
     m_mapName = worldMap->mapName;
     worldMap = nullptr;
     createWorldTileCorners();
@@ -37,9 +37,9 @@ sf::Vector2i WorldModel::getTilesSize() const
     return m_tilesSize;
 }
 
-std::string WorldModel::getSplatmapFilepath() const
+std::string WorldModel::getSplatMapFilepath() const
 {
-    return m_splatmapFilepath;
+    return m_splatMapFilepath;
 }
 
 sf::Vector2i WorldModel::getMapSize() const
@@ -52,7 +52,7 @@ std::string WorldModel::getMapName() const
     return m_mapName;
 }
 
-void WorldModel::saveMapToFile(std::string mapFilePath, std::string splatmapFileName)
+void WorldModel::saveMapToFile(const std::string &mapFilePath, const std::string &splatMapFileName) const
 {
         std::ofstream mapFile(mapFilePath);
         if (!mapFile.is_open()) {
@@ -62,9 +62,9 @@ void WorldModel::saveMapToFile(std::string mapFilePath, std::string splatmapFile
         mapFile << "[TILES_SIZE]\n";
         mapFile << m_tilesSize.x << " " << m_tilesSize.y << "\n\n";
 
-        // Write splatmap filepath
+        // Write splatMap filepath
         mapFile << "[SPLATMAP_FILEPATH]\n";
-        mapFile << splatmapFileName << "\n\n";
+        mapFile << splatMapFileName << "\n\n";
 
         // Write map size
         mapFile << "[MAP_SIZE]\n";
@@ -106,7 +106,7 @@ void WorldModel::onTileCornerHeightChanged()
         return;
     for (auto & corners_list : m_corners) {
         for (const auto & corner : corners_list) {
-            const float height = std::abs(corner.get()->getHeight());
+            const float height = std::abs(corner->getHeight());
             if (height > m_highestTileCornerHeight)
                 m_highestTileCornerHeight = height;
         }
@@ -139,7 +139,7 @@ float WorldModel::getWaterHeight() const
     return m_waterHeight;
 }
 
-std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapFilePath)
+std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(const std::string& mapFilePath) const
 {
     std::ifstream mapFile(mapFilePath);
     if (!mapFile.is_open())
@@ -149,10 +149,10 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapFilePath)
     if (tilesSize.x <= 0 || tilesSize.y <= 0)
         throw std::runtime_error("Invalid tiles size in file: " + mapFilePath);
 
-    std::string splatmapFileName = loadSplatmapFilepath(mapFile);
-    if (splatmapFileName.empty())
-         throw std::runtime_error("Failed to load splatmap filename from file: " + mapFilePath);
-    std::string splatmapFilePath = mapFilePath.substr(0, mapFilePath.find_last_of("/\\") + 1) + splatmapFileName;
+    std::string splatMapFileName = loadSplatMapFilepath(mapFile);
+    if (splatMapFileName.empty())
+         throw std::runtime_error("Failed to load splatMap filename from file: " + mapFilePath);
+    std::string splatMapFilePath = mapFilePath.substr(0, mapFilePath.find_last_of("/\\") + 1) + splatMapFileName;
     
     sf::Vector2i mapSize = loadMapSize(mapFile);
     if (mapSize.x <= 0 || mapSize.y <= 0) {
@@ -170,7 +170,7 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapFilePath)
     std::unique_ptr<WorldMap> worldMap = std::make_unique<WorldMap>();
     worldMap->TileCornersHeightMap = heightmap;
     worldMap->TilesSize = tilesSize;
-    worldMap->splatmapFilepath = splatmapFilePath;
+    worldMap->splatmapFilepath = splatMapFilePath;
     worldMap->mapName = mapFilePath.substr(mapFilePath.find_last_of("/\\") + 1);
     return worldMap;
 }
@@ -178,7 +178,7 @@ std::unique_ptr<WorldMap> WorldModel::loadMapFromFile(std::string mapFilePath)
 sf::Vector2i WorldModel::loadTilesSize(std::ifstream &mapFile) const
 {
     std::string line;
-    sf::Vector2i defaultSize(-1, -1);
+    const sf::Vector2i defaultSize(-1, -1);
     while (std::getline(mapFile, line)) {
         if (line.empty())
             continue;
@@ -197,7 +197,7 @@ sf::Vector2i WorldModel::loadTilesSize(std::ifstream &mapFile) const
     return defaultSize;
 }
 
-std::string WorldModel::loadSplatmapFilepath(std::ifstream &mapFile) const
+std::string WorldModel::loadSplatMapFilepath(std::ifstream &mapFile) const
 {
     std::string line;
     while (std::getline(mapFile, line)) {
@@ -234,7 +234,7 @@ sf::Vector2i WorldModel::loadMapSize(std::ifstream &mapFile) const
     return sf::Vector2i(-1, -1);
 }
 
-std::vector<std::vector<float>> WorldModel::loadTileCornersHeightmap(std::ifstream &mapFile, int nb_rows, int nb_cols) const
+std::vector<std::vector<float>> WorldModel::loadTileCornersHeightmap(std::ifstream &mapFile, const int nb_rows, const int nb_cols) const
 {
     std::vector<std::vector<float>> heightmap;
     std::string line;

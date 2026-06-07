@@ -12,7 +12,7 @@ SetSplatMapCommand::SetSplatMapCommand(const sf::Image &oldSplatMapImage, const 
 
 void SetSplatMapCommand::execute(WorldModel &model, WorldView &view)
 {
-    sf::IntRect area(0, 0, m_newSplatMapImage.getSize().x, m_newSplatMapImage.getSize().y);
+    const sf::IntRect area(0, 0, m_newSplatMapImage.getSize().x, m_newSplatMapImage.getSize().y);
     view.restoreSplatmapArea(area, m_newSplatMapImage);
     view.updateSplatmapImage();
 }

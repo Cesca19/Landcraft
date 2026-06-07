@@ -11,7 +11,7 @@ SetTerrainHeightMapCommand::SetTerrainHeightMapCommand(const std::vector<std::ve
 
 void SetTerrainHeightMapCommand::execute(WorldModel &model, WorldView &view)
 {
-    std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
+    const std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
     
     m_previousHeightmap.resize(corners.size());
     for (size_t row = 0; row < corners.size(); row++) {
@@ -33,9 +33,9 @@ std::string SetTerrainHeightMapCommand::getName()
     return "Generate Terrain";
 }
 
-void SetTerrainHeightMapCommand::applyHeightmapToModel(WorldModel &model, WorldView &view, const std::vector<std::vector<float>> &heightmap)
+void SetTerrainHeightMapCommand::applyHeightmapToModel(WorldModel &model, const WorldView &view, const std::vector<std::vector<float>> &heightmap)
 {
-    std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
+    const std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = model.getCorners();
     for (size_t row = 0; row < corners.size(); row++) {
         for (size_t col = 0; col < corners[row].size(); col++) {
             corners[row][col]->setHeight(heightmap[row][col]);

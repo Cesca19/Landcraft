@@ -20,5 +20,4 @@ private:
     std::string m_actionName;
 };
 
-
 #endif //LANDCRAFT_COMMANDGROUP_HPP

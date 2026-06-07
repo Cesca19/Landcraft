@@ -20,7 +20,7 @@ void CommandGroup::addCommand(std::unique_ptr<ICommand> command)
 
 void CommandGroup::execute(WorldModel &model, WorldView &view)
 {
-    for (auto &command : m_commands)
+    for (const auto &command : m_commands)
         command->execute(model, view);
 }
 

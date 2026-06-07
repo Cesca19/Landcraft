@@ -5,12 +5,15 @@
 #include "TextInput.hpp"
 
 TextInput::TextInput(const sf::Vector2f &position, const sf::Vector2f &size, 
-    const std::string &placeholder, int characterSize, bool isNumeric)
+    const std::string &placeholder, const int characterSize, const bool isNumeric)
     : m_placeholder(placeholder)
     , m_isNumeric(isNumeric)
     , m_isVisible(true)
+    , m_canType(false)
+    , m_characterLimit(256)
     , m_currentState(WidgetState::Base)
     , m_onValidateCallback(nullptr)
+    , m_background(size, 5, 5)
     , m_backgroundBaseColor(sf::Color::White)
     , m_backgroundHoverColor(sf::Color::White)
     , m_backgroundFocusColor(sf::Color::White)
@@ -23,15 +26,12 @@ TextInput::TextInput(const sf::Vector2f &position, const sf::Vector2f &size,
     , m_textHoverColor(sf::Color::Black)
     , m_textFocusColor(sf::Color::Black)
     , m_textPressColor(sf::Color::Black)
-    , m_background(size, 5, 5)
-    , m_canType(false)
-    , m_characterLimit(256)
 {
     m_background.setPosition(position);
     m_background.setFillColor(m_backgroundBaseColor);
     m_background.setOutlineColor(m_outlineBaseColor);
     m_background.setOutlineThickness(-2.0f);
-    sf::Vector2f padding =sf::Vector2f(10, 12.5f);
+    const sf::Vector2f padding = sf::Vector2f(10, 12.5f);
 
     m_text.setFillColor(m_textBaseColor);
     m_text.setFont(ResourceManager::getInstance().getFont("assets/fonts/ShadowsIntoLightTwo-Regular.ttf"));
@@ -51,7 +51,7 @@ bool TextInput::isVisible() const
     return m_isVisible;
 }
 
-void TextInput::setVisibility(bool isVisible)
+void TextInput::setVisibility(const bool isVisible)
 {
     m_isVisible = isVisible;
 }
@@ -95,7 +95,7 @@ void TextInput::initTextColors(const sf::Color &baseColor, const sf::Color &hove
         m_text.setFillColor(m_textBaseColor);
 }
 
-void TextInput::initCharacterLimit(unsigned int limit)
+void TextInput::initCharacterLimit(const unsigned int limit)
 {
     m_characterLimit = limit;
 }
@@ -128,7 +128,7 @@ void TextInput::draw(sf::RenderWindow &window) const
     window.draw(m_text);
 }
 
-void TextInput::setState(WidgetState state)
+void TextInput::setState(const WidgetState state)
 {
     if (m_currentState == state)
         return;
@@ -165,7 +165,7 @@ void TextInput::handleKeyBoardEvents(const sf::Event &event)
                 m_onValidateCallback(m_text.getString());
             }
         } else if (event.text.unicode < 128) { // Handle regular character input
-            char enteredChar = static_cast<char>(event.text.unicode);
+            const char enteredChar = static_cast<char>(event.text.unicode);
             if (!m_isNumeric || (std::isdigit(enteredChar))) {
                 std::string currentText = m_text.getString();
                 if (currentText.length() < m_characterLimit) {
@@ -187,7 +187,7 @@ void TextInput::initOnValidateCallback(std::function<void(const std::string &)> 
     m_onValidateCallback = std::move(callback);
 }
 
-void TextInput::setNumericInput(bool isNumeric)
+void TextInput::setNumericInput(const bool isNumeric)
 {
     m_isNumeric = isNumeric;
 }

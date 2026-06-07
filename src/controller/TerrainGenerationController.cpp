@@ -6,19 +6,19 @@
 
 TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &terrainGenerationMenuPosition, 
     const sf::Vector2u &windowSize, WorldModel *model, WorldView *view, CommandHistory *commandHistory)
-    : m_currentNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2)
-    , m_seed(std::time(nullptr))
+    : m_seed(std::time(nullptr))
     , m_frequency(1.0f)
     , m_octaves(3)
     , m_exponent(1.0f)
     , m_frequencyIncreaseStep(0.1f)
     , m_octavesIncreaseStep(1)
     , m_exponentIncreaseStep(0.1f)
+    , m_isHeightStepModeEnabled(false)
+    , m_stepsNb(1)
     , m_model(model)
     , m_view(view)
     , m_commandHistory(commandHistory)
-    , m_isHeightStepModeEnabled(false)
-    , m_stepsNb(1)
+    , m_currentNoiseType(FastNoiseLite::NoiseType::NoiseType_OpenSimplex2)
 {
     m_noise.SetNoiseType(m_currentNoiseType);
     m_noise.SetFrequency(1);
@@ -91,12 +91,12 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
     });
 }
 
-float TerrainGenerationController::getNoise(float nx, float ny)
+float TerrainGenerationController::getNoise(const float nx, const float ny) const
 {
     return m_noise.GetNoise(nx, ny);
 }
 
-std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(int width, int height)
+std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(const int width, const int height)
 {
     std::vector<std::vector<float>> heightmap(height, std::vector<float>(width));
     
@@ -110,8 +110,8 @@ std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(i
             // so we divide them by the width and height of the heightmap
             // -> then we want to set the center of the heightmap at (0, 0) in noise space, 
             // so we need to offset the coordinates by half the width and height
-            float nx = (static_cast<float>(x) / static_cast<float>(width)) - 0.5f;
-            float ny = (static_cast<float>(y) / static_cast<float>(height)) - 0.5f;
+            const float nx = (static_cast<float>(x) / static_cast<float>(width)) - 0.5f;
+            const float ny = (static_cast<float>(y) / static_cast<float>(height)) - 0.5f;
             float elevation = 0.0f;
 
             // -> An octave is a layer of noise with a specific frequency and amplitude. 
@@ -145,24 +145,24 @@ std::vector<std::vector<float>> TerrainGenerationController::generateHeightmap(i
 
 std::vector<std::vector<float>> TerrainGenerationController::generateTerrainHeightmap()
 {
-    std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = m_model->getCorners();
-    int width = corners[0].size();
-    int height = corners.size();
-    int minElevation = m_model->getMinElevation();
-    int maxElevation = m_model->getMaxElevation();
-    float noiseMin = -1.0f;
-    float noiseMax = 1.0f;
-    std::vector<std::vector<float>> heightmap = generateHeightmap(width, height);
+    const std::vector<std::vector<std::unique_ptr<TileCorner>>>& corners = m_model->getCorners();
+    const int width = corners[0].size();
+    const int height = corners.size();
+    const int minElevation = m_model->getMinElevation();
+    const int maxElevation = m_model->getMaxElevation();
+    const std::vector<std::vector<float>> heightmap = generateHeightmap(width, height);
     std::vector<std::vector<float>> finalHeightmap(height, std::vector<float>(width));
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            float heightValue = heightmap[y][x];
+            constexpr float noiseMax = 1.0f;
+            constexpr float noiseMin = -1.0f;
+            const float heightValue = heightmap[y][x];
             // scale height to [0, 1]
             float normalizedHeight = (heightValue - noiseMin) / (noiseMax - noiseMin);
             normalizedHeight = applyHeightStep(normalizedHeight);
             // we want to scale the height value to the range [minElevation, maxElevation]
-            float scaledHeight = normalizedHeight * (maxElevation - minElevation) + minElevation; // scale to [minElevation, maxElevation]
+            const float scaledHeight = normalizedHeight * (maxElevation - minElevation) + minElevation; // scale to [minElevation, maxElevation]
             finalHeightmap[y][x] = scaledHeight;
         }
     }
@@ -173,13 +173,13 @@ void TerrainGenerationController::generateTerrain()
 {
     std::vector<std::vector<float>> heightmap = generateTerrainHeightmap();
     sf::Image blankImage;
-    sf::Image splatmapImage = m_view->getSplatmapImage();
-    blankImage.create(splatmapImage.getSize().x, splatmapImage.getSize().y, sf::Color(255, 0, 0, 0));
+    sf::Image splatMapImage = m_view->getSplatmapImage();
+    blankImage.create(splatMapImage.getSize().x, splatMapImage.getSize().y, sf::Color(255, 0, 0, 0));
     std::unique_ptr<SetTerrainHeightMapCommand> heightmapCommand = std::make_unique<SetTerrainHeightMapCommand>(heightmap);
-    std::unique_ptr<SetSplatMapCommand> splatmapCommand = std::make_unique<SetSplatMapCommand>(m_view->getSplatmapImage(), blankImage);
+    std::unique_ptr<SetSplatMapCommand> splatMapCommand = std::make_unique<SetSplatMapCommand>(m_view->getSplatmapImage(), blankImage);
     std::unique_ptr<CommandGroup> commandGroup = std::make_unique<CommandGroup>("Generate Terrain");
     commandGroup->addCommand(std::move(heightmapCommand));
-    commandGroup->addCommand(std::move(splatmapCommand));
+    commandGroup->addCommand(std::move(splatMapCommand));
     
     m_commandHistory->addCommand(std::move(commandGroup), *m_model, *m_view, true);
     // m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(false);
@@ -193,7 +193,7 @@ void TerrainGenerationController::handleEvents(const sf::Event &event, sf::Rende
         addNoiseTypeStep(1);
 }
 
-float TerrainGenerationController::applyHeightStep(float height)
+float TerrainGenerationController::applyHeightStep(const float height) const
 {
     if (!m_isHeightStepModeEnabled || m_stepsNb < 1)
         return height;
@@ -202,7 +202,7 @@ float TerrainGenerationController::applyHeightStep(float height)
 
 void TerrainGenerationController::onGenerateButtonClick()
 {
-    std::string seedText = m_terrainGenerationMenu->getSeedInputText();
+    const std::string seedText = m_terrainGenerationMenu->getSeedInputText();
 
     if (!seedText.empty())
         m_seed = std::stoi(seedText);
@@ -222,30 +222,30 @@ void TerrainGenerationController::onRandomSeedButtonClick()
     m_terrainGenerationMenu->setSeedInputText(std::to_string(m_seed));
 }
 
-void TerrainGenerationController::addFrequencyStep(int factor)
+void TerrainGenerationController::addFrequencyStep(const int factor)
 {
     m_frequency += m_frequencyIncreaseStep * factor;
     m_frequency = std::clamp(m_frequency, 1.0f, 10.0f);
     m_terrainGenerationMenu->setFrequencyValueText(MathUtils::toString(m_frequency));
 }
 
-void TerrainGenerationController::addOctavesStep(int factor)
+void TerrainGenerationController::addOctavesStep(const int factor)
 {
     m_octaves += m_octavesIncreaseStep * factor;
     m_octaves = std::clamp(m_octaves, 1, 10);
     m_terrainGenerationMenu->setOctavesValueText(std::to_string(m_octaves));
 }
 
-void TerrainGenerationController::addExponentStep(int factor)
+void TerrainGenerationController::addExponentStep(const int factor)
 {
     m_exponent += m_exponentIncreaseStep * factor;
     m_exponent = std::clamp(m_exponent, 0.01f, 10.0f);
     m_terrainGenerationMenu->setExponentValueText(MathUtils::toString(m_exponent));
 }
 
-void TerrainGenerationController::addNoiseTypeStep(int factor)
+void TerrainGenerationController::addNoiseTypeStep(const int factor)
 {
-    int noiseTypeCount = m_noiseTypeNames.size();
+    const int noiseTypeCount = m_noiseTypeNames.size();
     int currentNoiseTypeIndex = static_cast<int>(m_currentNoiseType);
     currentNoiseTypeIndex = (currentNoiseTypeIndex + factor + noiseTypeCount) % noiseTypeCount;
     m_currentNoiseType = static_cast<FastNoiseLite::NoiseType>(currentNoiseTypeIndex);
@@ -253,13 +253,13 @@ void TerrainGenerationController::addNoiseTypeStep(int factor)
     m_terrainGenerationMenu->selectNoiseType(m_noiseTypeNames[currentNoiseTypeIndex]);
 }
 
-void TerrainGenerationController::setHeightStepMode(bool isOn)
+void TerrainGenerationController::setHeightStepMode(const bool isOn)
 {
     m_isHeightStepModeEnabled = isOn;
     m_terrainGenerationMenu->setHeightStepMode(isOn);
 }
 
-void TerrainGenerationController::addStepsNb(int factor)
+void TerrainGenerationController::addStepsNb(const int factor)
 {
     if (!m_isHeightStepModeEnabled)
         return;
