@@ -30,13 +30,16 @@ public:
     void generateTerrain();
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
 private:
-    void OnGenerateButtonClick();
-    void OnSeedInputValidated(const std::string &seed);
-    void OnRandomSeedButtonClick();
-    void AddFrequencyStep(int factor);
-    void AddOctavesStep(int factor);
-    void AddExponentStep(int factor);
-    void AddNoiseTypeStep(int factor);
+    float applyHeightStep(float height);
+    void onGenerateButtonClick();
+    void onSeedInputValidated(const std::string &seed);
+    void onRandomSeedButtonClick();
+    void addFrequencyStep(int factor);
+    void addOctavesStep(int factor);
+    void addExponentStep(int factor);
+    void addNoiseTypeStep(int factor);
+    void setHeightStepMode(bool isOn);
+    void addStepsNb(int factor);
 
     int m_seed;
     float m_frequency;
@@ -45,6 +48,8 @@ private:
     float m_frequencyIncreaseStep;
     int m_octavesIncreaseStep;
     float m_exponentIncreaseStep;
+    bool m_isHeightStepModeEnabled;
+    int m_stepsNb;
     WorldModel *m_model;
     WorldView *m_view;
     CommandHistory *m_commandHistory;

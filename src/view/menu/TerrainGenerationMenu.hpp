@@ -25,6 +25,10 @@ public:
     void initOnExponentDecreaseButtonClickCallback(const std::function<void()> &callback);
     void initOnNextNoiseTypeButtonClickCallback(const std::function<void()> &callback);
     void initOnPreviousNoiseTypeButtonClickCallback(const std::function<void()> &callback);
+    void initOnHeightStepOnButtonClickCallback(const std::function<void()> &callback);
+    void initOnHeightStepOffButtonClickCallback(const std::function<void()> &callback);
+    void initOnStepsNbIncreaseButtonClickCallback(const std::function<void()> &callback);
+    void initOnStepsNbDecreaseButtonClickCallback(const std::function<void()> &callback);
 
     void setSeedInputText(const std::string &text);
     void setFrequencyValueText(const std::string &value);
@@ -34,6 +38,8 @@ public:
 
     void setTerrainGenerationMenuVisibility(bool isVisible);
     void selectNoiseType(const std::string &noiseTypeName);
+    void setHeightStepMode(bool isOn);
+    void setStepsNbValueText(const std::string &stepsNb);
 private:
     void initTerrainGenerationMenu(const sf::Vector2u &windowSize);
     void initWidgetsList();
@@ -66,6 +72,13 @@ private:
     Text *m_noiseTypeValueText;
     SpriteButton *m_nextNoiseTypeButton;
     SpriteButton *m_prevNoiseTypeButton;
+    Text *m_heightStepText;
+    TextButton *m_heightStepOnButton;
+    TextButton *m_heightStepOffButton;
+    Text *m_stepsNbText;
+    Text *m_stepsNbValueText;
+    SpriteButton *m_stepsNbIncreaseButton;
+    SpriteButton *m_stepsNbDecreaseButton;
 
     std::vector<IWidget *> m_menuWidgets;
     std::vector<IWidget *> m_widgets;

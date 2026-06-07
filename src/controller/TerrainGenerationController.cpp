@@ -17,6 +17,8 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
     , m_model(model)
     , m_view(view)
     , m_commandHistory(commandHistory)
+    , m_isHeightStepModeEnabled(false)
+    , m_stepsNb(1)
 {
     m_noise.SetNoiseType(m_currentNoiseType);
     m_noise.SetFrequency(1);
@@ -33,6 +35,8 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
     m_terrainGenerationMenu->setOctavesValueText(std::to_string(m_octaves));
     m_terrainGenerationMenu->setExponentValueText(MathUtils::toString(m_exponent));
     m_terrainGenerationMenu->selectNoiseType(m_noiseTypeNames[static_cast<int>(m_currentNoiseType)]);
+    m_terrainGenerationMenu->setHeightStepMode(m_isHeightStepModeEnabled);
+    m_terrainGenerationMenu->setStepsNbValueText(std::to_string(m_stepsNb));
     
     m_terrainGenerationMenu->initOnTerrainGenerationMenuButtonClickCallback([this]() {
         m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(true);
@@ -41,37 +45,49 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
         m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(false);
     });
     m_terrainGenerationMenu->initOnGenerateButtonClickCallback([this]() {
-        OnGenerateButtonClick();
+        onGenerateButtonClick();
     });
     m_terrainGenerationMenu->initOnSeedInputValidatedCallback([this](const std::string &seed) {
-        OnSeedInputValidated(seed);
+        onSeedInputValidated(seed);
     });
     m_terrainGenerationMenu->initOnRandomSeedButtonClickCallback([this]() {
-        OnRandomSeedButtonClick();
+        onRandomSeedButtonClick();
     });
     m_terrainGenerationMenu->initOnFrequencyIncreaseButtonClickCallback([this]() {
-        AddFrequencyStep(1);
+        addFrequencyStep(1);
     });
     m_terrainGenerationMenu->initOnFrequencyDecreaseButtonClickCallback([this]() {
-        AddFrequencyStep(-1);
+        addFrequencyStep(-1);
     });
     m_terrainGenerationMenu->initOnOctavesIncreaseButtonClickCallback([this]() {
-        AddOctavesStep(1);
+        addOctavesStep(1);
     });
     m_terrainGenerationMenu->initOnOctavesDecreaseButtonClickCallback([this]() {
-        AddOctavesStep(-1);
+        addOctavesStep(-1);
     });
     m_terrainGenerationMenu->initOnExponentIncreaseButtonClickCallback([this]() {
-        AddExponentStep(1);
+        addExponentStep(1);
     });
     m_terrainGenerationMenu->initOnExponentDecreaseButtonClickCallback([this]() {
-        AddExponentStep(-1);
+        addExponentStep(-1);
     });
     m_terrainGenerationMenu->initOnNextNoiseTypeButtonClickCallback([this]() {
-        AddNoiseTypeStep(1);
+        addNoiseTypeStep(1);
     });
     m_terrainGenerationMenu->initOnPreviousNoiseTypeButtonClickCallback([this]() {
-        AddNoiseTypeStep(-1);
+        addNoiseTypeStep(-1);
+    });
+    m_terrainGenerationMenu->initOnHeightStepOnButtonClickCallback([this]() {
+        setHeightStepMode(true);
+    });
+    m_terrainGenerationMenu->initOnHeightStepOffButtonClickCallback([this]() {
+        setHeightStepMode(false);
+    });
+    m_terrainGenerationMenu->initOnStepsNbIncreaseButtonClickCallback([this]() {
+        addStepsNb(1);
+    });
+    m_terrainGenerationMenu->initOnStepsNbDecreaseButtonClickCallback([this]() {
+        addStepsNb(-1);
     });
 }
 
@@ -139,15 +155,14 @@ std::vector<std::vector<float>> TerrainGenerationController::generateTerrainHeig
     std::vector<std::vector<float>> heightmap = generateHeightmap(width, height);
     std::vector<std::vector<float>> finalHeightmap(height, std::vector<float>(width));
 
-    // TO DO: turn that into a custom command that we can undo/redo 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             float heightValue = heightmap[y][x];
             // scale height to [0, 1]
             float normalizedHeight = (heightValue - noiseMin) / (noiseMax - noiseMin);
+            normalizedHeight = applyHeightStep(normalizedHeight);
             // we want to scale the height value to the range [minElevation, maxElevation]
             float scaledHeight = normalizedHeight * (maxElevation - minElevation) + minElevation; // scale to [minElevation, maxElevation]
-            // corners[y][x]->setHeight(scaledHeight);
             finalHeightmap[y][x] = scaledHeight;
         }
     }
@@ -173,55 +188,62 @@ void TerrainGenerationController::generateTerrain()
 void TerrainGenerationController::handleEvents(const sf::Event &event, sf::RenderWindow &window)
 {
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::G)
-        generateTerrain();
+        onGenerateButtonClick();
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N)
-        AddNoiseTypeStep(1);
+        addNoiseTypeStep(1);
 }
 
-void TerrainGenerationController::OnGenerateButtonClick()
+float TerrainGenerationController::applyHeightStep(float height)
+{
+    if (!m_isHeightStepModeEnabled || m_stepsNb < 1)
+        return height;
+    return std::round(height * m_stepsNb) / m_stepsNb;
+}
+
+void TerrainGenerationController::onGenerateButtonClick()
 {
     std::string seedText = m_terrainGenerationMenu->getSeedInputText();
 
     if (!seedText.empty())
         m_seed = std::stoi(seedText);
     else
-        OnRandomSeedButtonClick();
+        onRandomSeedButtonClick();
     generateTerrain();
 }
 
-void TerrainGenerationController::OnSeedInputValidated(const std::string &seed)
+void TerrainGenerationController::onSeedInputValidated(const std::string &seed)
 {
     m_seed = std::stoi(seed);
 }
 
-void TerrainGenerationController::OnRandomSeedButtonClick()
+void TerrainGenerationController::onRandomSeedButtonClick()
 {
     m_seed = static_cast<int>(std::time(nullptr) ^ std::rand());
     m_terrainGenerationMenu->setSeedInputText(std::to_string(m_seed));
 }
 
-void TerrainGenerationController::AddFrequencyStep(int factor)
+void TerrainGenerationController::addFrequencyStep(int factor)
 {
     m_frequency += m_frequencyIncreaseStep * factor;
     m_frequency = std::clamp(m_frequency, 1.0f, 10.0f);
     m_terrainGenerationMenu->setFrequencyValueText(MathUtils::toString(m_frequency));
 }
 
-void TerrainGenerationController::AddOctavesStep(int factor)
+void TerrainGenerationController::addOctavesStep(int factor)
 {
     m_octaves += m_octavesIncreaseStep * factor;
     m_octaves = std::clamp(m_octaves, 1, 10);
     m_terrainGenerationMenu->setOctavesValueText(std::to_string(m_octaves));
 }
 
-void TerrainGenerationController::AddExponentStep(int factor)
+void TerrainGenerationController::addExponentStep(int factor)
 {
     m_exponent += m_exponentIncreaseStep * factor;
     m_exponent = std::clamp(m_exponent, 0.01f, 10.0f);
     m_terrainGenerationMenu->setExponentValueText(MathUtils::toString(m_exponent));
 }
 
-void TerrainGenerationController::AddNoiseTypeStep(int factor)
+void TerrainGenerationController::addNoiseTypeStep(int factor)
 {
     int noiseTypeCount = m_noiseTypeNames.size();
     int currentNoiseTypeIndex = static_cast<int>(m_currentNoiseType);
@@ -229,4 +251,19 @@ void TerrainGenerationController::AddNoiseTypeStep(int factor)
     m_currentNoiseType = static_cast<FastNoiseLite::NoiseType>(currentNoiseTypeIndex);
     m_noise.SetNoiseType(m_currentNoiseType);
     m_terrainGenerationMenu->selectNoiseType(m_noiseTypeNames[currentNoiseTypeIndex]);
+}
+
+void TerrainGenerationController::setHeightStepMode(bool isOn)
+{
+    m_isHeightStepModeEnabled = isOn;
+    m_terrainGenerationMenu->setHeightStepMode(isOn);
+}
+
+void TerrainGenerationController::addStepsNb(int factor)
+{
+    if (!m_isHeightStepModeEnabled)
+        return;
+    m_stepsNb += factor;
+    m_stepsNb = std::clamp(m_stepsNb, 1, 20);
+    m_terrainGenerationMenu->setStepsNbValueText(std::to_string(m_stepsNb));
 }

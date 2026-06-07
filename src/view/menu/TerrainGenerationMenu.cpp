@@ -17,6 +17,7 @@ TerrainGenerationMenu::TerrainGenerationMenu(const sf::Vector2f &terrainGenerati
     UIFactory::applyDefaultSpriteButtonStyle(m_TerrainGenerationMenuButton, HighlightTextAlign::Down);
 
     initTerrainGenerationMenu(windowSize);
+    
     setTerrainGenerationMenuVisibility(false);
     initWidgetsList();
 }
@@ -94,6 +95,26 @@ void TerrainGenerationMenu::initOnPreviousNoiseTypeButtonClickCallback(const std
     m_prevNoiseTypeButton->initOnClickCallback(callback);
 }
 
+void TerrainGenerationMenu::initOnHeightStepOnButtonClickCallback(const std::function<void()> &callback)
+{
+    m_heightStepOnButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnHeightStepOffButtonClickCallback(const std::function<void()> &callback)
+{
+    m_heightStepOffButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnStepsNbIncreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_stepsNbIncreaseButton->initOnClickCallback(callback);
+}
+
+void TerrainGenerationMenu::initOnStepsNbDecreaseButtonClickCallback(const std::function<void()> &callback)
+{
+    m_stepsNbDecreaseButton->initOnClickCallback(callback);
+}
+
 void TerrainGenerationMenu::setSeedInputText(const std::string &text)
 {
     m_seedInput->setText(text);
@@ -130,9 +151,20 @@ void TerrainGenerationMenu::selectNoiseType(const std::string &noiseTypeName)
     m_noiseTypeValueText->setContent(noiseTypeName);
 }
 
+void TerrainGenerationMenu::setHeightStepMode(bool isOn)
+{
+    m_heightStepOnButton->setSelected(isOn);
+    m_heightStepOffButton->setSelected(!isOn);
+}
+
+void TerrainGenerationMenu::setStepsNbValueText(const std::string &stepsNb)
+{
+    m_stepsNbValueText->setContent(stepsNb);
+}
+
 void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &windowSize)
 {
-    sf::Vector2f menuSize = sf::Vector2f(400, 380);
+    sf::Vector2f menuSize = sf::Vector2f(400, 480);
     sf::Vector2f menuPosition = sf::Vector2f(windowSize.x / 2.0f - menuSize.x / 2.0f, windowSize.y / 2.0f - menuSize.y / 2.0f);
     m_TerrainGenerationMenuBox = UIFactory::createBox(menuPosition, menuSize);
     UIFactory::applyDefaultBoxStyle(m_TerrainGenerationMenuBox);
@@ -154,12 +186,16 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     UIFactory::applyDefaultTextStyle(m_exponentText, UIFactory::TextVariant::Value);
     m_noiseTypeText = UIFactory::createText(menuPosition + sf::Vector2f(20, 270), "Noise Type: ", 15);
     UIFactory::applyDefaultTextStyle(m_noiseTypeText, UIFactory::TextVariant::Value);
+    m_heightStepText = UIFactory::createText(menuPosition + sf::Vector2f(20, 320), "Height Step:", 15);
+    UIFactory::applyDefaultTextStyle(m_heightStepText, UIFactory::TextVariant::Value);
+    m_stepsNbText = UIFactory::createText(menuPosition + sf::Vector2f(20, 370), "Steps Nb:", 15);
+    UIFactory::applyDefaultTextStyle(m_stepsNbText, UIFactory::TextVariant::Value);
 
-    m_generateButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(240, 320), "  Generate  ", 17);
+    m_generateButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(240, 420), "  Generate  ", 17);
     UIFactory::applyDefaultTextButtonStyle(m_generateButton, UIFactory::TextVariant::Default);
     m_generateButton->initBackgroundStatesColor( sf::Color(235, 225, 250), sf::Color(248, 246, 252), 
         sf::Color(248, 246, 252), sf::Color(210, 190, 240), sf::Color(235, 225, 250));
-    m_cancelButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(85, 320), "   Cancel   ", 17);
+    m_cancelButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(85, 420), "   Cancel   ", 17);
     UIFactory::applyDefaultTextButtonStyle(m_cancelButton, UIFactory::TextVariant::Default);
 
     m_seedInput = UIFactory::createTextInput(menuPosition + sf::Vector2f(140, 60), sf::Vector2f(160, 40), "Enter seed (Ex: 1337)", 18, true);
@@ -199,8 +235,8 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_exponentDecreaseButton = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", 
         menuPosition + sf::Vector2f(140, 210), {18, 18}, "", 12);
     UIFactory::applyDefaultSpriteButtonStyle(m_exponentDecreaseButton, HighlightTextAlign::Down);
-    m_exponentDecreaseButton->setContinuousClick(true, 0.1f);
-    m_exponentIncreaseButton->setContinuousClick(true, 0.1f);
+    m_exponentDecreaseButton->setContinuousClick(true);
+    m_exponentIncreaseButton->setContinuousClick(true);
 
     m_noiseTypeValueText = UIFactory::createText(menuPosition + sf::Vector2f(195, 267.5), "OpenSimplex2s", 16);
     UIFactory::applyDefaultTextStyle(m_noiseTypeValueText, UIFactory::TextVariant::Default);
@@ -210,6 +246,22 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_prevNoiseTypeButton = UIFactory::createSpriteButton("assets/textures/ui/prev_64.png", 
         menuPosition + sf::Vector2f(140, 260), {18, 18}, "", 12);
     UIFactory::applyDefaultSpriteButtonStyle(m_prevNoiseTypeButton, HighlightTextAlign::Down);
+
+    m_heightStepOnButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(140, 310), " On ", 14);
+    UIFactory::applyDefaultTextButtonStyle(m_heightStepOnButton);
+    m_heightStepOffButton = UIFactory::createTextButton(menuPosition + sf::Vector2f(210, 310), " Off ", 14);
+    UIFactory::applyDefaultTextButtonStyle(m_heightStepOffButton);
+
+    m_stepsNbValueText = UIFactory::createText(menuPosition + sf::Vector2f(210, 365), "1", 20);
+    UIFactory::applyDefaultTextStyle(m_stepsNbValueText, UIFactory::TextVariant::Default);
+    m_stepsNbIncreaseButton = UIFactory::createSpriteButton("assets/textures/ui/add_512.png", 
+        menuPosition + sf::Vector2f(265, 360), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_stepsNbIncreaseButton, HighlightTextAlign::Down);
+    m_stepsNbDecreaseButton = UIFactory::createSpriteButton("assets/textures/ui/reduce_512.png", 
+        menuPosition + sf::Vector2f(140, 360), {18, 18}, "", 12);
+    UIFactory::applyDefaultSpriteButtonStyle(m_stepsNbDecreaseButton, HighlightTextAlign::Down);
+    m_stepsNbDecreaseButton->setContinuousClick(true);
+    m_stepsNbIncreaseButton->setContinuousClick(true);
 
     m_menuWidgets.push_back(m_TerrainGenerationMenuBox);
     m_menuWidgets.push_back(m_closeTerrainGenerationMenuButton);
@@ -235,6 +287,13 @@ void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &window
     m_menuWidgets.push_back(m_noiseTypeValueText);
     m_menuWidgets.push_back(m_nextNoiseTypeButton);
     m_menuWidgets.push_back(m_prevNoiseTypeButton);
+    m_menuWidgets.push_back(m_heightStepText);
+    m_menuWidgets.push_back(m_heightStepOnButton);
+    m_menuWidgets.push_back(m_heightStepOffButton);
+    m_menuWidgets.push_back(m_stepsNbText);
+    m_menuWidgets.push_back(m_stepsNbValueText);
+    m_menuWidgets.push_back(m_stepsNbIncreaseButton);
+    m_menuWidgets.push_back(m_stepsNbDecreaseButton);
 }
 
 void TerrainGenerationMenu::initWidgetsList()
