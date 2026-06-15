@@ -1,98 +1,192 @@
-# 🌠 Landcraft
+# Landcraft
 
-[![CMake](https://img.shields.io/badge/CMake-064F8C?logo=cmake&logoColor=fff)](https://cmake.org/)
-[![Conan](https://img.shields.io/badge/-Conan-6699CB?style=flat&logo=conan&logoColor=white)](https://conan.io/)
-[![Platforms](https://img.shields.io/badge/Platforms-Windows%20%F0%9F%AA%9F%20%7C%20%F0%9F%90%A7%20Linux-F7C59F?labelColor=0D1117)](#-build--run-instructions)
-[![Programming languages](https://img.shields.io/badge/C++-027FDE?style=flat-square&logo=C%2B%2B&logoColor=white)](https://isocpp.org/)
+<!-- TODO: add a screenshot or GIF here, e.g. ![Landcraft](docs/preview.png) -->
 
-**Landcraft**  
-<br>
+**A real-time 3D isometric terrain editor written in modern C++ with SFML.**
 
-## ⚙️ Features & Goals
-- Portable setup using **CMake**  
-- Dependency management with **Conan**  
-- Ready-to-use build scripts for **Windows** and **Linux**  
-- Continuous Integration with **GitHub Actions**
-<br>
+Landcraft lets you sculpt, paint and procedurally generate stylized isometric
+worlds in real time: raise and dig terrain with weighted brushes, paint
+multi-texture surfaces through a GPU splatmap, generate landscapes from noise,
+and save/load your maps.
 
-## 📁 Project Structure
-| Path | Description |
-|------|--------------|
-| `CMakeLists.txt` | Main CMake configuration file |
-| `conanfile.py` | Conan dependency definitions (includes SFML) |
-| `.gitignore` | Excludes build and temporary files |
-| `src/` | Project source files |
-| `include/` | Public header files - In case you're building a library or a package |
-| `lib/` | Third party librairies |
-| `docs/` | Documentation files |
-| `.github/` | Configuration files for GitHub Actions and other GitHub features |
-| `scripts/` | Helper scripts for setup, builds or other tasks |
+> Built from scratch as a software engineering project, Landcraft features a command-based undo/redo architecture, a custom UI framework,  map serialization, procedural generation tools, and a cross-platform Conan/CMake build system with automated GitHub Actions releases.
 
 <br>
 
-## 🧰 Prerequisites
+## Table of Contents
 
-#### 🪟 Windows
-- [Python 3](https://www.python.org/downloads/) — required for Conan
-- [CMake](https://cmake.org/download/) ≥ 3.27
-- [Visual Studio](https://visualstudio.microsoft.com/) — with C++ desktop development tools   
- 
+- [Key technologies](#key-technologies)
+- [Technical Highlights](#technical-highlights)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Project Status](#project-status)
+- [Try It](#try-it)
+- [Controls](#controls)
+- [Building from Source](#building-from-source)
 
-#### 🐧 Linux
-- **GCC** (added with build essentials)
-- **CMake** ≥ 3.27
-- **Python 3**  
-- **Make**
+<br>
+
+## Key technologies:
+**C++17 • SFML (2.6.2) • GLSL (1.20) • CMake (3.28+) • Conan (2.x) • GitHub Actions**
+
+<br>
+
+## Technical Highlights
+The engineering work behind Landcraft, at a glance:
+
+- **Custom isometric renderer** — reversible `world ↔ screen` projection with
+  yaw/pitch, depth-correct draw ordering, and pixel-accurate mouse picking
+  (`src/view/world/Camera.cpp`, `src/view/world/TileMap.cpp`).
+- **Command pattern with undo/redo** — every editing action (elevation,
+  painting, procedural generation) is a reversible command (`src/commands/`).
+- **In-house UI toolkit** — buttons, text inputs, spatial keyboard navigation
+  and focus management (`src/ui/`).
+- **Cross-platform build & release automation** — Conan and CMake custom
+  build/clean scripts for Windows and Linux, and a tag-driven GitHub Actions
+  pipeline that builds and publishes release archives.
+
+<br>
+
+## Features
+
+### Terrain editing
+- **Elevation tool**: raise or dig terrain in real time with continuous
+  brush-based editing.
+- **Two selection modes**: edit either individual *tile corners* or whole *tiles*.
+- **Weighted brushes**: 8 brush shapes with adjustable size
+- Continous stroke interpolation to ensure seamless terrain modification
+
+### Texture painting
+- Real-time **GPU splatmap painting** with grass, sand, rock and snow, and texture erasing support
+
+### Procedural generation
+- **Noise-based heightmap generation** using FastNoiseLite as the noise source,
+  with configurable **seed, frequency, octaves, exponent and noise type**
+- **Height-step / terracing mode** for stylized, stepped landscapes.
+
+### Navigation & UX
+- Smooth (lerped) **zoom-to-cursor**, **panning** (drag or keyboard), and
+  **orbit rotation** (yaw + pitch) with recenter option.
+- Maps **save / load** system via native file dialogs.
+- **Undo / redo** with a command history.
+- Keyboard-navigable UI (Tab / arrow keys)
+
+<br>
+
+## Architecture
+
+The codebase follows a Model–View–Controller separation:
+
+```text
+src/
+├── model/          # Core data & world state, edited by the controllers
+│                   #   (no rendering, no input handling)
+├── view/
+│   ├── world/      # Real-time rendering of the 3D world (camera, terrain mesh,
+│   │               #   water, environment, brush overlay)
+│   └── menu/       # On-screen menus and tool panels
+├── controller/     # Input handling & orchestration tying model and view together
+├── editionTools/   # The editor's editing tools (how the user mutates the world)
+├── commands/       # Reversible actions powering undo/redo
+├── ui/             # Reusable UI framework (widgets + management)
+└── utils/          # Shared helpers: math, file I/O, resource loading
+```
+
 <br>
 
 
-## 💻 Build an run Instructions
-#### 1. Clone the repository
+## Project Status
+
+Landcraft is an actively developed personal project. The terrain editing,
+texture painting, procedural generation, rendering and build/release pipeline
+are functional. Some areas (e.g. additional edition tools) are still evolving.
+
+<br>
+
+## Try It
+No build required — grab a ready-to-run package from the
+[**Releases**](../../releases/latest) page:
+
+1. Open the [Releases](../../releases/latest) page and download the archive for
+   your OS:
+   - **Windows** — `Landcraft-<version>-Windows.zip`
+   - **Linux** — `Landcraft-<version>-Linux.tar.gz`
+2. Extract the archive (keep the `assets/` folder next to the executable).
+3. Launch the editor:
+   - **Windows** — double-click `landcraft.exe`
+   - **Linux** — `./landcraft` (you may need X11 libraries installed)
+
+> Prefer building it yourself? See [Building from Source](#building-from-source).
+
+<br>
+
+## Controls
+> Movement keys follow an AZERTY layout (`Z/Q/S/D`).
+
+| Action | Input |
+| --- | --- |
+| Pan camera | Middle-mouse drag, or `Z` / `Q` / `S` / `D` |
+| Zoom | Mouse wheel (to cursor), or `I` / `P` |
+| Orbit (yaw) | Right-mouse drag, or `K` / `M` |
+| Tilt (pitch) | Right-mouse drag, or `O` / `L` |
+| Recenter view | `R` |
+| Switch edition tool | `T` |
+| Toggle selection mode (corner/tile) | `Space` |
+| Brush size | `+` / `-` |
+| Cycle brush shape | `A` / `E` |
+| Select paint texture | `0`–`4` (clear, grass, sand, rock, snow) |
+| Generate terrain / cycle noise | `G` / `N` |
+| Undo / Redo | `Ctrl+Z` / `Ctrl+Y` |
+| Save / Load map | `Ctrl+S` / `Ctrl+O` |
+| Quit (with confirmation) | `Esc` |
+
+When a UI input is focused, navigation keys (`Tab`, arrow keys, `Space`,
+`Enter`, `Esc`) are captured by the UI layer instead of the world.
+
+<br>
+
+## Building from Source
+The project ships with **custom build scripts** that bootstrap the whole
+toolchain (check Python/CMake, install Conan locally, resolve dependencies,
+configure CMake and build). Both scripts accept a build type and a runtime
+linkage mode.
+
+### Prerequisites
+- A C++17 compiler (MSVC on Windows, GCC on Linux)
+- [Python 3.7+](https://www.python.org/downloads/) and [CMake 3.28+](https://cmake.org/download/)
+- Conan is installed automatically by the scripts if missing
+
+### Windows
+
+```bat
+@REM Usage: build_windows.bat [BUILD_TYPE] [RUNTIME_LINK]
+@REM BUILD_TYPE   = Debug | Release      (default: Debug)
+@REM RUNTIME_LINK = static | dynamic     (default: dynamic)
+
+scripts\build_windows.bat Release dynamic
+```
+
+### Linux
+
 ```bash
-git clone git@github.com:Cesca19/Landcraft.git
-cd Landcraft
-```
-<br>
+# Usage: ./scripts/build_linux.sh [BUILD_TYPE] [RUNTIME_LINK]
+# BUILD_TYPE   = Debug | Release       (default: Debug)
+# RUNTIME_LINK = static | dynamic      (default: dynamic)
 
-#### 2. Launch the build scripts
-Open your terminal at the root of the repository and launch the following commands
-
-##### On Linux
-```
-./scripts/build_linux.sh
-```
-
-##### On Windows
-```
-.\scripts\build_windows.bat
-```
-<br>
-
-#### 3. Execute the binaries
-Ater a successful build, execute the binaries by launching the following commands
-
-##### On Linux
-```
-./bin/landcraft
-```
-
-##### On Windows
-```
-.\bin\landcraft.exe
-```
-<br>
-
-## 🛠️ Build Options
-The build scripts support configurable options:
-* Build Type: Debug (default) or Release
-* Runtime Link: dynamic (default) or static
-Example:
-```
+chmod +x ./scripts/build_linux.sh
 ./scripts/build_linux.sh Release static
 ```
-This will produce a Release build with static libgcc/libstdc++, leaving system libraries dynamic. Only the direct dependencies listed in conanfile.py will follow this shared/static setting. 
 
-<br>
+The resulting executable is placed in `bin/` next to its required shared
+libraries. Run it with an optional map path:
 
+```bash
+./bin/landcraft                                   # loads the default map
+./bin/landcraft assets/maps/landcraft-map.legend  # loads a specific map
+```
 
+> The build supports both **static** and **dynamic** runtime linkage. CMake
+> handles MSVC runtime selection and Linux `RPATH`/static `libgcc`/`libstdc++`
+> so the produced builds are portable.
 
+To clean build artifacts: `scripts\clean_windows.bat` / `./scripts/clean_linux.sh`.
