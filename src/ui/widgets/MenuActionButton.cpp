@@ -5,11 +5,11 @@
 #include "MenuActionButton.hpp"
 #include <algorithm>
 
-namespace {
-    constexpr float ICON_SIZE = 34.f;
-    constexpr float ICON_LEFT_PADDING = 22.f;
-    constexpr float TEXT_LEFT_PADDING = 72.f;
-}
+// namespace {
+//     constexpr float ICON_SIZE = 34.f;
+//     constexpr float ICON_LEFT_PADDING = 22.f;
+//     constexpr float TEXT_LEFT_PADDING = 72.f;
+// }
 
 MenuActionButton::MenuActionButton(const sf::Vector2f position, const sf::Vector2f size,
     const std::string &iconPath, const std::string &title, const std::string &subtitle,
@@ -191,18 +191,21 @@ void MenuActionButton::setSize(const sf::Vector2f &size)
 
 void MenuActionButton::refreshLayout()
 {
+    constexpr float iconSize = 34.f;
+    constexpr float iconLeftPadding = 22.f;
+    constexpr float textLeftPadding = 72.f;
     m_background.setPosition(m_position);
     m_background.setSize(m_size);
 
     const sf::FloatRect iconLocal = m_iconSprite.getLocalBounds();
-    const float iconScale = ICON_SIZE / std::max(iconLocal.width, iconLocal.height);
+    const float iconScale = iconSize / std::max(iconLocal.width, iconLocal.height);
     m_iconSprite.setScale(iconScale, iconScale);
     m_iconSprite.setPosition(
-        m_position.x + ICON_LEFT_PADDING + ICON_SIZE / 2.f,
+        m_position.x + iconLeftPadding + iconSize / 2.f,
         m_position.y + m_size.y / 2.f);
 
-    m_title.setPosition(m_position.x + TEXT_LEFT_PADDING, m_position.y + 16.f);
-    m_subtitle.setPosition(m_position.x + TEXT_LEFT_PADDING, m_position.y + 44.f);
+    m_title.setPosition(m_position.x + textLeftPadding, m_position.y + 16.f);
+    m_subtitle.setPosition(m_position.x + textLeftPadding, m_position.y + 44.f);
 }
 
 void MenuActionButton::onBase()

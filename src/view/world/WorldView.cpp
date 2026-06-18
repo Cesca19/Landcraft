@@ -5,7 +5,7 @@
 #include "WorldView.hpp"
 
 WorldView::WorldView()
-    : m_minZoom(0.05f)
+    : m_minZoom(0.001f)
     , m_maxZoom(5.0f)
     , m_currentZoom(1.0f)
     , m_targetZoom(1.0f)

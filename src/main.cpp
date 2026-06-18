@@ -9,7 +9,7 @@
 int main(int ac, char** av)
 {
     try {
-        std::string mapName = "assets/maps/landcraft-map.legend";
+        std::string mapName;
         if (ac > 1)
             mapName = av[1];
         LandcraftEditor m_editor(mapName);

@@ -101,6 +101,8 @@ add_executable(${MY_TARGET}
         src/utils/BrushUtils.cpp
         src/controller/TerrainGenerationController.cpp
         src/view/menu/TerrainGenerationMenu.cpp
+        src/view/menu/StartMenu.cpp
+        src/view/menu/HelpMenu.cpp
         src/commands/SetTerrainHeightMapCommand.cpp
         src/commands/SetSplatMapCommand.cpp
         src/commands/CommandGroup.cpp
