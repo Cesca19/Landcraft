@@ -83,10 +83,12 @@ add_executable(${MY_TARGET}
         src/ui/UIFactory.cpp
         src/ui/UIController.cpp
         src/ui/widgets/TextButton.cpp
+        src/ui/widgets/MenuActionButton.cpp
         src/ui/widgets/SpriteButton.cpp
         src/utils/ResourceManager.cpp
         src/ui/widgets/Box.cpp
         src/ui/widgets/Text.cpp
+        src/ui/widgets/Image.cpp
         src/view/menu/EditionMenu.cpp
         src/ui/widgets/RoundedRectangleShape.cpp
         src/view/menu/BrushMenu.cpp

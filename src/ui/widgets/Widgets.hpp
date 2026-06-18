@@ -11,5 +11,7 @@
 #include "TextInput.hpp"
 #include "TextButton.hpp"
 #include "SpriteButton.hpp"
+#include "MenuActionButton.hpp"
+#include "Image.hpp"
 
 #endif //LANDCRAFT_WIDGETS_HPP
