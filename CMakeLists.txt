@@ -84,6 +84,9 @@ add_executable(${MY_TARGET}
         src/ui/UIController.cpp
         src/ui/widgets/TextButton.cpp
         src/ui/widgets/MenuActionButton.cpp
+        src/ui/widgets/Keycap.cpp
+        src/ui/widgets/HelpSectionHeader.cpp
+        src/ui/widgets/HelpControlRow.cpp
         src/ui/widgets/SpriteButton.cpp
         src/utils/ResourceManager.cpp
         src/ui/widgets/Box.cpp

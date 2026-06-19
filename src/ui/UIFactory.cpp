@@ -111,6 +111,53 @@ Image *UIFactory::createImage(const std::string &texturePath, const sf::Vector2f
     return imagePtr;
 }
 
+Keycap *UIFactory::createKeycap(const sf::Vector2f position, const std::string &label,
+    const unsigned int characterSize)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<Keycap> keycap = std::make_unique<Keycap>(position, label, characterSize);
+    Keycap *keycapPtr = keycap.get();
+    s_uiController->addWidget(std::move(keycap));
+    applyDefaultKeycapStyle(keycapPtr);
+    return keycapPtr;
+}
+
+HelpSectionHeader *UIFactory::createHelpSectionHeader(const sf::Vector2f position,
+    const std::string &iconPath, const std::string &title, const unsigned int titleSize)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<HelpSectionHeader> header = std::make_unique<HelpSectionHeader>(
+        position, iconPath, title, titleSize);
+    HelpSectionHeader *headerPtr = header.get();
+    s_uiController->addWidget(std::move(header));
+    applyDefaultHelpSectionHeaderStyle(headerPtr);
+    return headerPtr;
+}
+
+HelpControlRow *UIFactory::createHelpControlRow(const sf::Vector2f position,
+    const sf::Vector2f size, const std::string &iconPath, const std::string &title,
+    const std::string &subtitle, const std::vector<HelpControlRow::MouseHint> &mouseHints,
+    const std::vector<std::vector<std::string>> &shortcutGroups,
+    const std::vector<HelpControlRow::LegendItem> &legendItems)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<HelpControlRow> row = std::make_unique<HelpControlRow>(
+        position, size, iconPath, title, subtitle,
+        mouseHints, shortcutGroups, legendItems);
+    HelpControlRow *rowPtr = row.get();
+    s_uiController->addWidget(std::move(row));
+    return rowPtr;
+}
+
 void UIFactory::applyDefaultTextStyle(Text* text, const TextVariant variant)
 {
     if (!text) return;
@@ -221,6 +268,24 @@ void UIFactory::applyDefaultMenuActionButtonStyle(MenuActionButton *button)
         sf::Color(110, 95, 150),
         sf::Color(140, 110, 200)
     );
+}
+
+void UIFactory::applyDefaultKeycapStyle(Keycap *keycap)
+{
+    if (!keycap)
+        return;
+    keycap->initColors(
+        sf::Color::White,
+        sf::Color(200, 195, 210),
+        sf::Color(100, 80, 150));
+}
+
+void UIFactory::applyDefaultHelpSectionHeaderStyle(HelpSectionHeader *header)
+{
+    if (!header)
+        return;
+    header->initIconColor(sf::Color(110, 95, 150));
+    header->initTitleColor(sf::Color(110, 95, 150));
 }
 
 void UIFactory::applyDefaultTextInputStyle(TextInput *textInput)

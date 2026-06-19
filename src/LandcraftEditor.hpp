@@ -14,6 +14,7 @@
 
 enum class AppState {
     StartMenu,
+    HelpMenu,
     Editor
 };
 
@@ -26,14 +27,18 @@ private:
     void handleEvents();
     void handleContinuousEvents(float deltaTime) const;
     void initStartMenu();
+    void initHelpMenu();
     void initWorldController();
     void transitionToEditor();
     void onLoadMapRequested();
     void setHelpMenuVisibility(bool isVisible);
+    void toggleHelpMenu();
     void onCloseEditorRequested();
     void onCloseStartMenuRequested();
 
+    bool m_isHelpMenuVisible;
     AppState m_appState;
+    AppState m_previousAppState;
     bool m_isEditorInitialized;
     std::string m_emptyMapName;
     std::string m_startingMapName;

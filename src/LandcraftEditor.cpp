@@ -40,6 +40,8 @@ LandcraftEditor::LandcraftEditor(std::string mapName)
         initStartMenu();
     else if (m_appState == AppState::Editor)
         initWorldController();
+    m_previousAppState = m_appState;
+    initHelpMenu();
 }
 
 void LandcraftEditor::run()
@@ -77,13 +79,27 @@ void LandcraftEditor::handleEvents()
     {
         if (event.type == sf::Event::Closed)
             m_window.close();
+        else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::H) {
+            toggleHelpMenu();
+            continue;
+        }
         else if (event.type == sf::Event::KeyPressed
             && event.key.code == sf::Keyboard::Escape
             && !m_uiController->isKeyBoardNavigatingHoverUI()) {
-            if (m_appState == AppState::StartMenu)
-                onCloseStartMenuRequested();
-            else
-                onCloseEditorRequested();
+
+                switch (m_appState) {
+                    case AppState::StartMenu:
+                        onCloseStartMenuRequested();
+                        break;
+                    case AppState::Editor:
+                        onCloseEditorRequested();
+                        break;
+                    case AppState::HelpMenu:
+                        setHelpMenuVisibility(false);
+                        break;
+                    default:
+                        break;
+                }
         }
 
         switch (event.type) {
@@ -97,14 +113,12 @@ void LandcraftEditor::handleEvents()
                 break;
             case sf::Event::Resized:
                 m_windowSize = sf::Vector2u(event.size.width, event.size.height);
-                if (m_appState == AppState::StartMenu) {
-                    if (m_startMenu != nullptr)
-                        m_startMenu->onWindowResized(sf::Vector2f(m_windowSize));
-                    if (m_helpMenu != nullptr)
-                        m_helpMenu->onWindowResized(sf::Vector2f(m_windowSize));
-                } else {
+                if (m_startMenu != nullptr && m_appState == AppState::StartMenu)
+                     m_startMenu->onWindowResized(sf::Vector2f(m_windowSize));
+                if (m_helpMenu != nullptr)
+                    m_helpMenu->onWindowResized(sf::Vector2f(m_windowSize));
+                if (m_worldController != nullptr && m_appState == AppState::Editor)
                     m_worldController->onWindowResized(m_windowSize, m_window);
-                }
                 applyWindowIcon();
                 break;
             default:
@@ -127,11 +141,21 @@ void LandcraftEditor::handleContinuousEvents(const float deltaTime) const
         m_worldController->handleContinuousEvents(deltaTime, m_window);
 }
 
+void LandcraftEditor::initHelpMenu()
+{
+    const sf::Vector2f windowSize(
+        static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y));
+    m_helpMenu = std::make_unique<HelpMenu>(windowSize);
+    m_helpMenu->setCloseButtonOnClickCallback([this] () {
+        setHelpMenuVisibility(false);
+    });
+    m_isHelpMenuVisible = false;
+}
+
 void LandcraftEditor::initStartMenu()
 {
     const sf::Vector2f windowSize(static_cast<float>(m_windowSize.x), static_cast<float>(m_windowSize.y));
     m_startMenu = std::make_unique<StartMenu>(windowSize);
-    m_helpMenu = std::make_unique<HelpMenu>(windowSize);
 
     m_startMenu->setNewProjectButtonOnClickCallback([this] () {
         m_startingMapName = m_emptyMapName;
@@ -142,9 +166,6 @@ void LandcraftEditor::initStartMenu()
     });
     m_startMenu->setHelpButtonOnClickCallback([this] () {
         setHelpMenuVisibility(true);
-    });
-    m_helpMenu->setCloseButtonOnClickCallback([this] () {
-        setHelpMenuVisibility(false);
     });
 }
 
@@ -182,10 +203,8 @@ void LandcraftEditor::initWorldController()
 
 void LandcraftEditor::transitionToEditor()
 {
-    setHelpMenuVisibility(false);
     if (m_startMenu != nullptr)
         m_startMenu->setVisibility(false);
-
     m_appState = AppState::Editor;
     initWorldController();
 }
@@ -206,6 +225,18 @@ void LandcraftEditor::setHelpMenuVisibility(bool isVisible)
 {
     if (m_helpMenu != nullptr)
         m_helpMenu->setVisibility(isVisible);
+    m_isHelpMenuVisible = isVisible;
+    if (isVisible) {
+        m_previousAppState = m_appState;
+        m_appState = AppState::HelpMenu;
+    } else {
+        m_appState = m_previousAppState;
+    }
+}
+
+void LandcraftEditor::toggleHelpMenu()
+{
+    setHelpMenuVisibility(!m_isHelpMenuVisible);
 }
 
 void LandcraftEditor::onCloseEditorRequested()
