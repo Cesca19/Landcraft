@@ -8,7 +8,7 @@
 EditionController::EditionController(WorldModel &model, WorldView &view, 
     const sf::Vector2f globalUIPosition, const sf::Vector2f &terrainGenerationMenuPosition, const sf::Vector2u &windowSize)
     : m_currentEditionTool(-1)
-    , m_editionView(std::make_unique<EditionMenu>(globalUIPosition))
+    , m_editionMenu(std::make_unique<EditionMenu>(globalUIPosition))
     , m_editionToolsBoxPosition(0, 250)
     , m_toolsMenuStartPosition(m_editionToolsBoxPosition + sf::Vector2f(95, 0))
     , m_terrainGenerationController(terrainGenerationMenuPosition, windowSize, &model, &view, &m_commandHistory)
@@ -17,14 +17,14 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsMenuStartPosition));
 
     for (int i = 0; i < m_editionTools.size(); i++ ) {
-        m_editionView->setEditionToolButtonOnCLickCallback(i, [this, i] () {
+        m_editionMenu->setEditionToolButtonOnCLickCallback(i, [this, i] () {
             this->selectEditionTool(i);
         });
     }
-    m_editionView->setUndoButtonOnClickCallback([this, &model, &view] () {
+    m_editionMenu->setUndoButtonOnClickCallback([this, &model, &view] () {
         m_commandHistory.undoCommand(model, view);
     });
-    m_editionView->setRedoButtonOnClickCallback([this, &model, &view] () {
+    m_editionMenu->setRedoButtonOnClickCallback([this, &model, &view] () {
         m_commandHistory.redoCommand(model, view);
     });
     selectEditionTool(0);
@@ -69,6 +69,13 @@ void EditionController::clearCommandHistory()
     m_commandHistory.clearHistory();
 }
 
+void EditionController::setVisibility(bool isVisible) const
+{
+    m_editionMenu->setVisibility(isVisible);
+    m_editionTools[m_currentEditionTool]->setVisibility(isVisible);
+    m_terrainGenerationController.setVisibility(isVisible);
+}
+
 void EditionController::handleUndoRedoEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view)
 {
     const bool isCtrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
@@ -96,10 +103,10 @@ void EditionController::selectEditionTool(const int toolId)
     if (toolId > m_editionTools.size() - 1 || toolId < 0)
         throw std::out_of_range("Invalid tool id");
     if (m_currentEditionTool != -1) {
-        m_editionView->unselectEditionTool(m_currentEditionTool);
+        m_editionMenu->unselectEditionTool(m_currentEditionTool);
         m_editionTools[m_currentEditionTool]->onToolUnSelected();
     }
     m_currentEditionTool = toolId;
-    m_editionView->selectEditionTool(m_currentEditionTool);
+    m_editionMenu->selectEditionTool(m_currentEditionTool);
     m_editionTools[m_currentEditionTool]->onToolSelected();
 }

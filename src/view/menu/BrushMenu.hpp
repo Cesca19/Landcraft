@@ -17,6 +17,7 @@ public:
     void setBrushTypeButtonCallback(int index, const std::function<void()> &callback) const;
     void selectBrush(int index) const;
     void unselectBrush(int index) const;
+    void setVisibility(bool visible) const;
 private:
     void initBrushTypeWidgets(const std::vector<std::string> &brushImagePaths);
     void initBrushSizeWidgets(sf::Vector2f brushSizeUIStartPosition);

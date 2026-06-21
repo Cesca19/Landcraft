@@ -100,6 +100,11 @@ void ElevationTool::handleContinuousEvents(const sf::RenderWindow& window, World
     handleHeightEditingEvents(window, model, view, brushController, history);
 }
 
+void ElevationTool::setVisibility(bool isVisible) const
+{
+    setUIVisibility(isVisible);
+}
+
 void ElevationTool::handleSelectionModeEditingEvents(const sf::Event &event)
 {
     // keyboard

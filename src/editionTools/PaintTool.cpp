@@ -141,25 +141,12 @@ void PaintTool::handleContinuousEvents(const sf::RenderWindow& window, WorldMode
             brushController.getCurrentBrushId(), brushController.getCurrentBrushRadius());
     }
     m_previousMousePosition = currentMousePosition;
-    /*
-    // tiles painting
-    if (m_previousMousePosition == sf::Vector2i{-1, -1}) {
-        m_ongoingPaintCommand->AddTiles(selectedTiles, model, view);
-        m_previousMousePosition = currentMousePosition;
-        return;
-    }
-    const std::vector<std::vector<Tile>> &worldTiles = model.getTiles();
-    if (worldTiles.empty() || worldTiles[0].empty())
-        return;
-    const std::vector<sf::Vector2i> lineTilesPositions =
-            MathUtils::getBresenhamLine(m_previousMousePosition, currentMousePosition);
-    for (const sf::Vector2i& pos : lineTilesPositions)
-        if (pos.y >= 0 && pos.y < static_cast<int>(worldTiles.size())
-        && pos.x >= 0 && pos.x < static_cast<int>(worldTiles[0].size())) {
-            std::vector<BrushTileHit> tilesInBrush = brushController.getNeighborsTilesInBrush(model, pos.x, pos.y);
-            m_ongoingPaintCommand->AddTiles(tilesInBrush, model, view);
-        }
-    m_previousMousePosition = currentMousePosition;*/
+}
+
+void PaintTool::setVisibility(bool isVisible) const
+{
+    for (const auto widget : m_widgets)
+        widget->setVisibility(isVisible);
 }
 
 void PaintTool::paintStroke(const sf::Vector2f &position, WorldModel &model, WorldView &view, int brushId, int brushRadius)

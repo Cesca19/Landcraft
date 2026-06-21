@@ -39,6 +39,13 @@ void MapSaveLoadMenu::setLoadFileButtonOnClickCallback(const std::function<void(
     m_loadFileButton->initOnClickCallback(callback);
 }
 
+void MapSaveLoadMenu::setVisibility(bool visible) const
+{
+    for (auto *widget: m_widgets) {
+        widget->setVisibility(visible);
+    }
+}
+
 void MapSaveLoadMenu::initWidgetsList()
 {
     m_widgets.push_back(m_menuBox);

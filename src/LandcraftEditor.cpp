@@ -62,10 +62,10 @@ void LandcraftEditor::run()
             if (m_appState == AppState::Editor)
                 m_worldController->update(deltaTime, m_window);
         }
+        m_window.clear(sf::Color(235, 230, 250));
         if (m_appState == AppState::Editor) {
-            m_worldController->draw(m_window);
-        } else 
-            m_window.clear(sf::Color(235, 230, 250));
+           m_worldController->draw(m_window);
+        }
         m_uiController->draw(m_window);
         m_window.display();
     }
@@ -226,12 +226,13 @@ void LandcraftEditor::setHelpMenuVisibility(bool isVisible)
     if (m_helpMenu != nullptr)
         m_helpMenu->setVisibility(isVisible);
     m_isHelpMenuVisible = isVisible;
+    if ((m_appState == AppState::Editor || m_previousAppState == AppState::Editor && m_worldController != nullptr))
+        m_worldController->setVisibility(!isVisible);
     if (isVisible) {
         m_previousAppState = m_appState;
         m_appState = AppState::HelpMenu;
-    } else {
+    } else
         m_appState = m_previousAppState;
-    }
 }
 
 void LandcraftEditor::toggleHelpMenu()

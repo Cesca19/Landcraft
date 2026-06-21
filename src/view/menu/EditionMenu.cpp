@@ -43,6 +43,13 @@ void EditionMenu::unselectEditionTool(const int toolId) const
     m_editionToolsButtons[toolId]->setSelected(false);
 }
 
+void EditionMenu::setVisibility(bool visible) const
+{
+    for (auto *widget: m_widgets) {
+        widget->setVisibility(visible);
+    }
+}
+
 void EditionMenu::setEditionToolButtonOnCLickCallback(const int toolId, const std::function<void()> &callback) const
 {
     m_editionToolsButtons[toolId]->initOnClickCallback(callback);

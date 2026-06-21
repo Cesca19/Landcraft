@@ -172,6 +172,13 @@ void WorldMenu::setWaterLevelValueText(const std::string &value) const
     m_waterLevelValueText->setContent(value);
 }
 
+void WorldMenu::setVisibility(bool visible) const
+{
+    for (auto *widget: m_widgets) {
+        widget->setVisibility(visible);
+    }
+}
+
 void WorldMenu::updateMapNameMenu()
 {
     sf::FloatRect textBounds = m_mapNameBtn->getBounds();

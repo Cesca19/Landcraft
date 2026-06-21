@@ -13,6 +13,7 @@ public:
     ~MapSaveLoadMenu();
     void setSaveFileButtonOnClickCallback(const std::function<void()> &callback) const;
     void setLoadFileButtonOnClickCallback(const std::function<void()> &callback) const;
+    void setVisibility(bool visible) const;
 private:
     void initWidgetsList();
 

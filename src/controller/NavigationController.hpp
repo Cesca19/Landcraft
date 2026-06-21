@@ -15,6 +15,7 @@ public:
     ~NavigationController();
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view, bool isEditing);
     void handleContinuousEvents(float deltaTime, WorldView& view) const;
+    void setVisibility(bool isVisible) const;
 private:
     void handlePanEvents(const sf::RenderWindow& window, const sf::Event &event, WorldView& view);
     void handleContinuousPanEvents(float deltaTime, WorldView& view) const;

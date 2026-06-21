@@ -24,6 +24,7 @@ public:
     virtual void onToolSelected() const = 0;
     virtual void onToolUnSelected() const = 0;
     virtual bool areEditableTilesVisible() const = 0;
+    virtual void setVisibility(bool isVisible) const = 0;
 };
 
 #endif //LANDCRAFT_IEDITIONTOOL_HPP
