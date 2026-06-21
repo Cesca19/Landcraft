@@ -19,6 +19,7 @@ public:
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
     void saveMapToFile();
     void loadMapFromFile();
+    void setVisibility(bool isVisible) const;
 private:
     void resetEditor();
     std::string getFilePathWithoutExtension(const std::string& filePath);

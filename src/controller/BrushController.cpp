@@ -160,6 +160,11 @@ int BrushController::getCurrentBrushRadius() const
     return m_brushSize;
 }
 
+void BrushController::setVisibility(bool visible) const
+{
+    m_brushMenu->setVisibility(visible);
+}
+
 void BrushController::getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, const SelectionMode selectionMode)
 {
     // get the current mouse position in the window in pixels

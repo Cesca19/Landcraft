@@ -14,6 +14,7 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
     , m_octavesIncreaseStep(1)
     , m_exponentIncreaseStep(0.1f)
     , m_isHeightStepModeEnabled(false)
+    , m_isTerrainGenerationMenuVisible(false)
     , m_stepsNb(1)
     , m_model(model)
     , m_view(view)
@@ -40,9 +41,11 @@ TerrainGenerationController::TerrainGenerationController(const sf::Vector2f &ter
     
     m_terrainGenerationMenu->initOnTerrainGenerationMenuButtonClickCallback([this]() {
         m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(true);
+        m_isTerrainGenerationMenuVisible = true;
     });
     m_terrainGenerationMenu->initOnCloseTerrainGenerationMenuButtonClickCallback([this]() {
         m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(false);
+        m_isTerrainGenerationMenuVisible = false;
     });
     m_terrainGenerationMenu->initOnGenerateButtonClickCallback([this]() {
         onGenerateButtonClick();
@@ -191,6 +194,13 @@ void TerrainGenerationController::handleEvents(const sf::Event &event, sf::Rende
         onGenerateButtonClick();
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N)
         addNoiseTypeStep(1);
+}
+
+void TerrainGenerationController::setVisibility(bool isVisible) const
+{
+    m_terrainGenerationMenu->setVisibility(isVisible);
+    if (isVisible)
+        m_terrainGenerationMenu->setTerrainGenerationMenuVisibility(m_isTerrainGenerationMenuVisible);
 }
 
 float TerrainGenerationController::applyHeightStep(const float height) const

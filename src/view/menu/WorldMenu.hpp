@@ -32,6 +32,7 @@ public:
     void initOnWaterLevelIncrementButtonClickCallback(const std::function<void()> &callback) const;
     void initOnWaterLevelDecrementButtonClickCallback(const std::function<void()> &callback) const;
     void setWaterLevelValueText(const std::string &value) const;
+    void setVisibility(bool visible) const;
 private:
     void updateMapNameMenu();
     void initWidgetsList();

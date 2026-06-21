@@ -83,10 +83,15 @@ add_executable(${MY_TARGET}
         src/ui/UIFactory.cpp
         src/ui/UIController.cpp
         src/ui/widgets/TextButton.cpp
+        src/ui/widgets/MenuActionButton.cpp
+        src/ui/widgets/Keycap.cpp
+        src/ui/widgets/HelpSectionHeader.cpp
+        src/ui/widgets/HelpControlRow.cpp
         src/ui/widgets/SpriteButton.cpp
         src/utils/ResourceManager.cpp
         src/ui/widgets/Box.cpp
         src/ui/widgets/Text.cpp
+        src/ui/widgets/Image.cpp
         src/view/menu/EditionMenu.cpp
         src/ui/widgets/RoundedRectangleShape.cpp
         src/view/menu/BrushMenu.cpp
@@ -99,6 +104,8 @@ add_executable(${MY_TARGET}
         src/utils/BrushUtils.cpp
         src/controller/TerrainGenerationController.cpp
         src/view/menu/TerrainGenerationMenu.cpp
+        src/view/menu/StartMenu.cpp
+        src/view/menu/HelpMenu.cpp
         src/commands/SetTerrainHeightMapCommand.cpp
         src/commands/SetSplatMapCommand.cpp
         src/commands/CommandGroup.cpp

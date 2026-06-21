@@ -9,6 +9,7 @@ WorldController::WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWin
     , m_maxWindowSize(maxWindowSize)
     , m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
     , waterLevelIncrementStep(0.25f)
+    , m_wasQuitMenuVisibleBeforeHiding(false)
 {
 }
 
@@ -41,7 +42,7 @@ void WorldController::init(const std::string &mapName,
 
     m_worldMenu->initWaterLevelMenu(waterLevelMenuPosition);
     m_worldMenu->initQuitMenu(quitMenuPosition);
-    m_worldMenu->setQuitMenuVisibility(false);
+    setQuitMenuVisibility(false);
     m_worldMenu->initOnWaterLevelIncrementButtonClickCallback([this] () { this->onWaterLevelButtonClicked(1); });
     m_worldMenu->initOnWaterLevelDecrementButtonClickCallback([this] () { this->onWaterLevelButtonClicked(-1); });
 
@@ -132,6 +133,19 @@ void WorldController::saveMapToFile() const
 void WorldController::onMapLoaded()
 {
     m_worldMenu->setMapName(m_worldModel.getMapName());
+}
+
+void WorldController::setVisibility(bool isVisible)
+{
+    m_worldMenu->setVisibility(isVisible);
+    m_editionController->setVisibility(isVisible);
+    m_brushController->setVisibility(isVisible);
+    m_navigationController->setVisibility(isVisible);
+    m_mapLoadSaveController->setVisibility(isVisible);
+    if (!isVisible)
+        m_wasQuitMenuVisibleBeforeHiding = m_worldMenu->isQuitMenuVisible();
+    else
+        m_worldMenu->setQuitMenuVisibility(m_wasQuitMenuVisibleBeforeHiding);
 }
 
 void WorldController::onDrawModeButtonClicked(const DrawMode mode)

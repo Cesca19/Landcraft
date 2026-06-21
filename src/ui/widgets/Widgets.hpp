@@ -11,5 +11,10 @@
 #include "TextInput.hpp"
 #include "TextButton.hpp"
 #include "SpriteButton.hpp"
+#include "MenuActionButton.hpp"
+#include "Image.hpp"
+#include "Keycap.hpp"
+#include "HelpSectionHeader.hpp"
+#include "HelpControlRow.hpp"
 
 #endif //LANDCRAFT_WIDGETS_HPP

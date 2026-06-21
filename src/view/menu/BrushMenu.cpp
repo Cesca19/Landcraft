@@ -50,6 +50,13 @@ void BrushMenu::unselectBrush(const int index) const
     m_brushTypesButtons[index]->setSelected(false);
 }
 
+void BrushMenu::setVisibility(bool visible) const
+{
+    for (auto *widget: m_widgets) {
+        widget->setVisibility(visible);
+    }
+}
+
 void BrushMenu::initBrushTypeWidgets(const std::vector<std::string> &brushImagePaths)
 {
     sf::Vector2f menuPosition = m_brushSizeUIStartPosition + sf::Vector2f(1800, 150);

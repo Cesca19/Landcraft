@@ -23,6 +23,7 @@ public:
     bool areEditableTilesVisible() const;
     SelectionMode getSelectionMode() const;
     void clearCommandHistory();
+    void setVisibility(bool isVisible) const;
 private:
     void handleUndoRedoEvents(sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view);
     void handleEditionToolSwitchEvents(const sf::Event& event);
@@ -31,7 +32,7 @@ private:
     CommandHistory m_commandHistory;
     int m_currentEditionTool;
     std::vector<std::unique_ptr<IEditionTool>> m_editionTools;
-    std::unique_ptr<EditionMenu> m_editionView;
+    std::unique_ptr<EditionMenu> m_editionMenu;
     sf::Vector2f m_editionToolsBoxPosition;
     sf::Vector2f m_toolsMenuStartPosition;
     TerrainGenerationController m_terrainGenerationController;

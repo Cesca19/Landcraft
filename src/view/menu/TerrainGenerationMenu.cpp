@@ -162,6 +162,13 @@ void TerrainGenerationMenu::setStepsNbValueText(const std::string &stepsNb) cons
     m_stepsNbValueText->setContent(stepsNb);
 }
 
+void TerrainGenerationMenu::setVisibility(bool visible) const
+{
+    for (auto *widget: m_widgets) {
+        widget->setVisibility(visible);
+    }
+}
+
 void TerrainGenerationMenu::initTerrainGenerationMenu(const sf::Vector2u &windowSize)
 {
     sf::Vector2f menuSize = sf::Vector2f(400, 480);

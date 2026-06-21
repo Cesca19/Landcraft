@@ -22,6 +22,7 @@ public:
     void handleEvents(const sf::RenderWindow& window, const sf::Event& event, WorldModel& model, WorldView& view,
                               BrushController& brushController, CommandHistory& history) override;
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
+    void setVisibility(bool isVisible) const override;
 private:
     void paintStroke(const sf::Vector2f& position, WorldModel& model, WorldView& view, int brushId, int brushRadius);
     void selectPaintTexture(int textureId);

@@ -73,6 +73,11 @@ void MapLoadSaveController::loadMapFromFile()
     }
 }
 
+void MapLoadSaveController::setVisibility(bool isVisible) const
+{
+    m_mapSaveLoadMenu->setVisibility(isVisible);
+}
+
 void MapLoadSaveController::resetEditor()
 {
     m_editionController->clearCommandHistory();
