@@ -19,9 +19,10 @@ UIController::~UIController()
         m_onDestroy();
 }
 
-void UIController::addWidget(std::unique_ptr<IWidget> widget)
+void UIController::addWidget(std::unique_ptr<IWidget> widget, int drawOrder)
 {
     m_widgets.push_back(std::move(widget));
+    m_widgetsByDrawOrder[drawOrder].push_back(m_widgets.back().get());
 }
 
 void UIController::removeWidget(IWidget *widgetToRemove)
@@ -31,9 +32,20 @@ void UIController::removeWidget(IWidget *widgetToRemove)
     if (m_hoveredWidget == widgetToRemove)
         m_hoveredWidget = nullptr;
 
+    
+    for (auto &[drawOrder, widgets] : m_widgetsByDrawOrder) {
+        widgets.erase(
+            std::remove_if(widgets.begin(), widgets.end(),
+                [widgetToRemove](IWidget *widget) {
+                    return widget == widgetToRemove;
+                }),
+            widgets.end()
+        );
+    }
+
     m_widgets.erase(
         std::remove_if(m_widgets.begin(), m_widgets.end(),
-            [widgetToRemove](const std::unique_ptr<IWidget>& widget) {
+            [widgetToRemove](const std::unique_ptr<IWidget> &widget) {
                 return widget.get() == widgetToRemove;
             }),
         m_widgets.end()
@@ -64,9 +76,12 @@ void UIController::draw(sf::RenderWindow &window) const
     const sf::View lastView = window.getView();
 
     window.setView(window.getDefaultView());
-    for (const auto& widget : m_widgets)
-        if (widget->isVisible())
-            widget->draw(window);
+    for (const auto& [drawOrder, widgets] : m_widgetsByDrawOrder) {
+        for (const auto& widget : widgets) {
+            if (widget->isVisible())
+                widget->draw(window);
+        }
+    }
     window.setView(lastView);
 }
 

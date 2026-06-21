@@ -67,6 +67,22 @@ TextButton *UIFactory::createTextButton(sf::Vector2f position, const std::string
     return buttonPtr;
 }
 
+MenuActionButton *UIFactory::createMenuActionButton(const sf::Vector2f position, const sf::Vector2f size,
+    const std::string &iconPath, const std::string &title, const std::string &subtitle,
+    const unsigned int titleSize, const unsigned int subtitleSize)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<MenuActionButton> button = std::make_unique<MenuActionButton>(
+        position, size, iconPath, title, subtitle, titleSize, subtitleSize);
+    MenuActionButton *buttonPtr = button.get();
+    s_uiController->addWidget(std::move(button));
+    applyDefaultMenuActionButtonStyle(buttonPtr);
+    return buttonPtr;
+}
+
 SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Vector2f position, sf::Vector2f size,
     const std::string &highlightText, int highlightTextSize)
 {
@@ -79,6 +95,67 @@ SpriteButton * UIFactory::createSpriteButton(const std::string &iconPath, sf::Ve
     s_uiController->addWidget(std::move(button));
     return buttonPtr;
 
+}
+
+Image *UIFactory::createImage(const std::string &texturePath, const sf::Vector2f position,
+    const sf::Vector2f displaySize)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<Image> image = std::make_unique<Image>(
+        texturePath, position, displaySize);
+    Image *imagePtr = image.get();
+    s_uiController->addWidget(std::move(image));
+    return imagePtr;
+}
+
+Keycap *UIFactory::createKeycap(const sf::Vector2f position, const std::string &label,
+    const unsigned int characterSize)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<Keycap> keycap = std::make_unique<Keycap>(position, label, characterSize);
+    Keycap *keycapPtr = keycap.get();
+    s_uiController->addWidget(std::move(keycap));
+    applyDefaultKeycapStyle(keycapPtr);
+    return keycapPtr;
+}
+
+HelpSectionHeader *UIFactory::createHelpSectionHeader(const sf::Vector2f position,
+    const std::string &iconPath, const std::string &title, const unsigned int titleSize)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<HelpSectionHeader> header = std::make_unique<HelpSectionHeader>(
+        position, iconPath, title, titleSize);
+    HelpSectionHeader *headerPtr = header.get();
+    s_uiController->addWidget(std::move(header));
+    applyDefaultHelpSectionHeaderStyle(headerPtr);
+    return headerPtr;
+}
+
+HelpControlRow *UIFactory::createHelpControlRow(const sf::Vector2f position,
+    const sf::Vector2f size, const std::string &iconPath, const std::string &title,
+    const std::string &subtitle, const std::vector<HelpControlRow::MouseHint> &mouseHints,
+    const std::vector<std::vector<std::string>> &shortcutGroups,
+    const std::vector<HelpControlRow::LegendItem> &legendItems)
+{
+    if (!s_uiController) {
+        throw std::runtime_error("UIFactory not initialized with a UIController");
+    }
+
+    std::unique_ptr<HelpControlRow> row = std::make_unique<HelpControlRow>(
+        position, size, iconPath, title, subtitle,
+        mouseHints, shortcutGroups, legendItems);
+    HelpControlRow *rowPtr = row.get();
+    s_uiController->addWidget(std::move(row));
+    return rowPtr;
 }
 
 void UIFactory::applyDefaultTextStyle(Text* text, const TextVariant variant)
@@ -160,6 +237,55 @@ void UIFactory::applyDefaultTextButtonStyle(TextButton *button, TextVariant text
         sf::Color(110, 80, 170),   // pressed
         sf::Color(110, 95, 150)    // selected
     );
+}
+
+void UIFactory::applyDefaultMenuActionButtonStyle(MenuActionButton *button)
+{
+    if (!button)
+        return;
+
+    button->initOutlineStatesColors(
+        sf::Color(220, 210, 240),
+        sf::Color(180, 150, 230),
+        sf::Color(160, 120, 220),
+        sf::Color(130, 95, 185),
+        sf::Color(160, 120, 220)
+    );
+    button->initBackgroundStatesColor(
+        sf::Color::White,
+        sf::Color(248, 246, 252),
+        sf::Color(248, 246, 252),
+        sf::Color(235, 225, 250),
+        sf::Color(248, 246, 252)
+    );
+    button->initTextColors(
+        sf::Color(100, 80, 150),
+        sf::Color(120, 95, 180),
+        sf::Color(140, 130, 175),
+        sf::Color(120, 110, 165)
+    );
+    button->initIconColors(
+        sf::Color(110, 95, 150),
+        sf::Color(140, 110, 200)
+    );
+}
+
+void UIFactory::applyDefaultKeycapStyle(Keycap *keycap)
+{
+    if (!keycap)
+        return;
+    keycap->initColors(
+        sf::Color::White,
+        sf::Color(200, 195, 210),
+        sf::Color(100, 80, 150));
+}
+
+void UIFactory::applyDefaultHelpSectionHeaderStyle(HelpSectionHeader *header)
+{
+    if (!header)
+        return;
+    header->initIconColor(sf::Color(110, 95, 150));
+    header->initTitleColor(sf::Color(110, 95, 150));
 }
 
 void UIFactory::applyDefaultTextInputStyle(TextInput *textInput)

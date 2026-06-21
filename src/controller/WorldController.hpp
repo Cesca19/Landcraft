@@ -46,6 +46,7 @@ public:
     bool isQuitMenuVisible() const;
     void saveMapToFile() const;
     void onMapLoaded();
+    void setVisibility(bool isVisible);
 private:
     void onDrawModeButtonClicked(DrawMode mode);
     void onWaterLevelButtonClicked(int factor);
@@ -57,6 +58,7 @@ private:
     DrawMode m_currentDrawMode;
     WorldView m_worldView;
     WorldModel m_worldModel;
+    bool m_wasQuitMenuVisibleBeforeHiding;
     std::unique_ptr<WorldMenu> m_worldMenu;
     std::unique_ptr<EditionController> m_editionController;
     std::unique_ptr<BrushController> m_brushController;

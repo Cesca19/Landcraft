@@ -38,7 +38,8 @@ public:
     
     int getCurrentBrushId() const;
     int getCurrentBrushRadius() const;
-    private:
+    void setVisibility(bool visible) const;
+private:
     void getSelectedCorners(const sf::RenderWindow &window, const Camera &camera, WorldModel &worldModel, SelectionMode selectionMode);
     void getSelectedTilesCorners(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);
     void getSelectedTiles(const Camera &camera, WorldModel &worldModel, sf::Vector2i mouseWorldPosition, sf::Vector2f mouseScreenPosition);

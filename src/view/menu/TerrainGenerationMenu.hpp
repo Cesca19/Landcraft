@@ -40,6 +40,7 @@ public:
     void selectNoiseType(const std::string &noiseTypeName) const;
     void setHeightStepMode(bool isOn) const;
     void setStepsNbValueText(const std::string &stepsNb) const;
+    void setVisibility(bool visible) const;
 private:
     void initTerrainGenerationMenu(const sf::Vector2u &windowSize);
     void initWidgetsList();

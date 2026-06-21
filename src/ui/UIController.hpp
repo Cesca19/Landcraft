@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <limits>
+#include <map>
 #include "widgets/IWidget.hpp"
 #include "../utils/MathUtils.hpp"
 
@@ -18,7 +19,7 @@ public:
     // to do : send the window size and create a custom ui view
     UIController();
     ~UIController();
-    void addWidget(std::unique_ptr<IWidget> widget);
+    void addWidget(std::unique_ptr<IWidget> widget, int drawOrder = 0);
     void removeWidget(IWidget* widgetToRemove);
     void handleEvents(const sf::Event &event, const sf::RenderWindow& window);
     void handleContinuousEvents(float deltaTime, const sf::RenderWindow& window);
@@ -45,6 +46,7 @@ private:
     bool m_isMouseHoverUI;
     std::function<void()> m_onDestroy;
     std::vector<std::unique_ptr<IWidget>> m_widgets;
+    std::map<int, std::vector<IWidget*>> m_widgetsByDrawOrder;
     IWidget* m_focusedWidget;
     IWidget* m_hoveredWidget;
 };

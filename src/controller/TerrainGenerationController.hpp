@@ -29,6 +29,7 @@ public:
     std::vector<std::vector<float>> generateTerrainHeightmap();
     void generateTerrain();
     void handleEvents(const sf::Event &event, sf::RenderWindow& window);
+    void setVisibility(bool isVisible) const;
 private:
     float applyHeightStep(float height) const;
     void onGenerateButtonClick();
@@ -50,6 +51,7 @@ private:
     float m_exponentIncreaseStep;
     bool m_isHeightStepModeEnabled;
     int m_stepsNb;
+    bool m_isTerrainGenerationMenuVisible;
     WorldModel *m_model;
     WorldView *m_view;
     CommandHistory *m_commandHistory;

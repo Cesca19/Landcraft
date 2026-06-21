@@ -38,6 +38,11 @@ void NavigationController::handleContinuousEvents(const float deltaTime, WorldVi
     handleContinuousPanEvents(deltaTime, view);
 }
 
+void NavigationController::setVisibility(bool isVisible) const
+{
+    m_recenterViewButton->setVisibility(isVisible);
+}
+
 void NavigationController::handlePanEvents(const sf::RenderWindow &window, const sf::Event &event, WorldView& view)
 {
     //  drag and drop with middle mouse button

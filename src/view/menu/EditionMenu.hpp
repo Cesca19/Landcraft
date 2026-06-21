@@ -16,6 +16,7 @@ public:
     void setRedoButtonOnClickCallback(const std::function<void()> &callback) const;
     void selectEditionTool(int toolId) const;
     void unselectEditionTool(int toolId) const;
+    void setVisibility(bool visible) const;
 private:
     void applyUIStyle();
     void initWidgetsList();

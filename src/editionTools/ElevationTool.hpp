@@ -21,6 +21,8 @@ public:
     bool areEditableTilesVisible() const override;
     void handleEvents(const sf::RenderWindow& window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
     void handleContinuousEvents(const sf::RenderWindow& window, WorldModel &model, WorldView &view, BrushController &brushController, CommandHistory &history) override;
+    void setVisibility(bool isVisible) const override;
+
 private:
     void handleSelectionModeEditingEvents(const sf::Event& event);
     void handleHeightStepEditingEvents(const sf::Event& event);
