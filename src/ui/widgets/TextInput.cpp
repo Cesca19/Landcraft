@@ -8,6 +8,8 @@ TextInput::TextInput(const sf::Vector2f &position, const sf::Vector2f &size,
     const std::string &placeholder, const int characterSize, const bool isNumeric)
     : m_placeholder(placeholder)
     , m_isNumeric(isNumeric)
+    , m_allowFloatInput(false)
+    , m_allowNegativeInput(false)
     , m_isVisible(true)
     , m_canType(false)
     , m_characterLimit(256)
@@ -166,11 +168,21 @@ void TextInput::handleKeyBoardEvents(const sf::Event &event)
             }
         } else if (event.text.unicode < 128) { // Handle regular character input
             const char enteredChar = static_cast<char>(event.text.unicode);
-            if (!m_isNumeric || (std::isdigit(enteredChar))) {
+            if (!m_isNumeric /*|| (std::isdigit(enteredChar))*/) {
                 std::string currentText = m_text.getString();
                 if (currentText.length() < m_characterLimit) {
                     currentText += enteredChar;
                     m_text.setString(currentText);
+                }
+            }
+            if (m_isNumeric) {
+                const char enteredChar = static_cast<char>(event.text.unicode);
+                std::string currentText = m_text.getString();
+                if (currentText.length() < m_characterLimit) {
+                    if (std::isdigit(enteredChar) || (m_allowFloatInput && enteredChar == '.') || (m_allowNegativeInput && enteredChar == '-' && currentText.empty())) {
+                        currentText += enteredChar;
+                        m_text.setString(currentText);
+                    }
                 }
             }
         }
@@ -190,6 +202,16 @@ void TextInput::initOnValidateCallback(std::function<void(const std::string &)> 
 void TextInput::setNumericInput(const bool isNumeric)
 {
     m_isNumeric = isNumeric;
+}
+
+void TextInput::setAllowFloatInput(const bool allowFloat)
+{
+    m_allowFloatInput = allowFloat;
+}
+
+void TextInput::setAllowNegativeInput(const bool allowNegative)
+{
+    m_allowNegativeInput = allowNegative;
 }
 
 std::string TextInput::getText() const

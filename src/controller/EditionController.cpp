@@ -15,6 +15,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
 {
     m_editionTools.emplace_back(std::make_unique<ElevationTool>(m_toolsMenuStartPosition));
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsMenuStartPosition));
+    m_editionTools.emplace_back(std::make_unique<SetHeightTool>(m_toolsMenuStartPosition));
 
     for (int i = 0; i < m_editionTools.size(); i++ ) {
         m_editionMenu->setEditionToolButtonOnCLickCallback(i, [this, i] () {
@@ -27,7 +28,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
     m_editionMenu->setRedoButtonOnClickCallback([this, &model, &view] () {
         m_commandHistory.redoCommand(model, view);
     });
-    selectEditionTool(0);
+    selectEditionTool(2);
 }
 
 void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController)
