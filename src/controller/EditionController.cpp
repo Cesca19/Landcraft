@@ -28,7 +28,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
     m_editionMenu->setRedoButtonOnClickCallback([this, &model, &view] () {
         m_commandHistory.redoCommand(model, view);
     });
-    selectEditionTool(2);
+    selectEditionTool(0);
 }
 
 void EditionController::handleEvents(sf::RenderWindow &window, const sf::Event &event, WorldModel &model, WorldView &view, BrushController &brushController)

@@ -23,6 +23,7 @@ void EditTilesCornersHeightCommand::addCorners(const std::vector<BrushTileCorner
         }
         cornersToUpdate.push_back(corner);
     }
+    model.onTileCornerHeightChanged();
     view.updateTileCorners(model.getTiles(), cornersToUpdate);
 }
 

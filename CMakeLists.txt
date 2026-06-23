@@ -111,6 +111,7 @@ add_executable(${MY_TARGET}
         src/commands/CommandGroup.cpp
         src/ui/widgets/TextInput.cpp
         src/editionTools/SetHeightTool.cpp
+        src/commands/SetTilesCornersHeightCommand.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---
