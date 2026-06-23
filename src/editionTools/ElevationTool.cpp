@@ -160,6 +160,7 @@ void ElevationTool::startContinuousElevation(const sf::RenderWindow& window, Wor
     m_lastMouseWorldPosition = brushController.getMouseWorldPosition();
 }
 
+
 void ElevationTool::updateContinuousElevation(const sf::RenderWindow& window, WorldModel &model, const WorldView &view,
     const BrushController &brushController, const float heightStep)
 {
@@ -231,7 +232,7 @@ void ElevationTool::stopContinuousElevation(WorldModel &model, WorldView &view, 
     m_isSelectionLocked = false;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Vector2i(-1, -1);
-    model.onTileCornerHeightChanged();
+   // model.onTileCornerHeightChanged();
 }
 
 

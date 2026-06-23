@@ -249,7 +249,8 @@ void TerrainGenerationController::addOctavesStep(const int factor)
 void TerrainGenerationController::addExponentStep(const int factor)
 {
     m_exponent += m_exponentIncreaseStep * factor;
-    m_exponent = std::clamp(m_exponent, 0.01f, 10.0f);
+    m_exponent = std::clamp(m_exponent, 0.1f, 10.0f);
+    m_exponent = MathUtils::roundToDecimalPlaces(m_exponent, 2);
     m_terrainGenerationMenu->setExponentValueText(MathUtils::toString(m_exponent));
 }
 

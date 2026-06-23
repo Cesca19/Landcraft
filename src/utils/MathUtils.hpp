@@ -21,6 +21,7 @@ namespace MathUtils
     float magnitude(const sf::Vector2f &v);
     sf::Vector2f normalize(const sf::Vector2f &v);
     std::string toString(float value);
+    float roundToDecimalPlaces(float value, int decimalPlaces);
 
     /**
      * @brief Projects a point onto a line defined by a point and a direction.
