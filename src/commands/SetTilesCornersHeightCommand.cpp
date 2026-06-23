@@ -35,9 +35,11 @@ void SetTilesCornersHeightCommand::addCorners(std::unordered_map<TileCorner *, f
     for (const auto &[corner, targetHeight] : cornersTargetHeightValues) {
         if (corner->getHeight() == targetHeight)
             continue;
+        if (std::abs(corner->getHeight() - targetHeight) < 0.001f)
+            continue;
         if (m_previousCornersHeight.find(corner) == m_previousCornersHeight.end())
             m_previousCornersHeight[corner] = corner->getHeight();
-        if (m_cornersHeightValues.find(corner) == m_cornersHeightValues.end())
+        if (m_cornersHeightValues.find(corner) == m_cornersHeightValues.end() || m_cornersHeightValues[corner] != targetHeight)
             m_cornersHeightValues[corner] = targetHeight;
         corner->setHeight(targetHeight);
         cornersToUpdate.push_back(corner);

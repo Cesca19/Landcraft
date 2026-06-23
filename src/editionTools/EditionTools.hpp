@@ -8,5 +8,6 @@
 #include "PaintTool.hpp"
 #include "ElevationTool.hpp"
 #include "SetHeightTool.hpp"
+#include "SmoothHeightTool.hpp"
 
 #endif //LANDCRAFT_EDITIONTOOLS_HPP

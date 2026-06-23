@@ -47,6 +47,12 @@ namespace MathUtils {
       return result;
     }
 
+    float roundToDecimalPlaces(float value, int decimalPlaces)
+    {
+        float multiplier = std::pow(10.0f, decimalPlaces);
+        return std::round(value * multiplier) / multiplier;
+    }
+
     sf::Vector2f projectPointOnLine(const sf::Vector2f &point, const sf::Vector2f &linePoint, const sf::Vector2f &direction)
     {
         const sf::Vector2f AP = point - linePoint;

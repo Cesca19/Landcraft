@@ -26,6 +26,9 @@ SetHeightTool::SetHeightTool(sf::Vector2f startMenuPosition)
 
 SetHeightTool::~SetHeightTool()
 {
+    for (const auto widget : m_widgets)
+        UIFactory::removeWidget(widget);
+    m_widgets.clear();
 }
 
 bool SetHeightTool::isEditing() const
