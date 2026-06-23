@@ -110,8 +110,8 @@ void SetHeightTool::startContinuousElevation(const sf::RenderWindow &window, Wor
     if (brushSelection.empty()) 
         return;
     updateHeightValue(getSetHeightInputValue());
-    m_ongoingSetTilesCornersHeightCommand = std::make_unique<SetTilesCornersHeightCommand>(m_heightValue);
-    m_ongoingSetTilesCornersHeightCommand->addCorners(brushSelection, model, view);
+    m_ongoingSetTilesCornersHeightCommand = std::make_unique<SetTilesCornersHeightCommand>();
+    m_ongoingSetTilesCornersHeightCommand->addCorners(brushSelection, m_heightValue, model, view);
     m_isSelectionLocked = true;
     m_continuousElevationClock.restart();
     m_lastMouseScreenPosition = sf::Mouse::getPosition(window);
@@ -162,7 +162,7 @@ void SetHeightTool::applySetHeightOnCurrentSelection(WorldModel &model, const Wo
 {
     const std::vector<BrushTileCornerHit> &brushSelection =  (m_selectionModes[m_currentSelectionMode] == SelectionMode::TILE_CORNER) ? brushController.getBrushTileCornersSelection() : brushController.getBrushTilesSelectionAsTileCorners();
     if (brushSelection.empty()) return;
-    m_ongoingSetTilesCornersHeightCommand->addCorners(brushSelection, model, view);
+    m_ongoingSetTilesCornersHeightCommand->addCorners(brushSelection, m_heightValue, model, view);
 }
 
 void SetHeightTool::applySetHeightAlongPath(sf::Vector2i targetPosition, WorldModel &model, const WorldView &view, const BrushController &brushController)
@@ -177,7 +177,7 @@ void SetHeightTool::applySetHeightAlongPath(sf::Vector2i targetPosition, WorldMo
         else
             stepSelection = brushController.getNeighborsTilesInBrushAsTileCorners(model, pos.x, pos.y);
         if (!stepSelection.empty())
-            m_ongoingSetTilesCornersHeightCommand->addCorners(stepSelection, model, view);
+            m_ongoingSetTilesCornersHeightCommand->addCorners(stepSelection, m_heightValue, model, view);
     }
 }
 
