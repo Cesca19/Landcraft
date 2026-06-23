@@ -10,14 +10,15 @@
 
 class SetTilesCornersHeightCommand : public ICommand {
 public:
-    SetTilesCornersHeightCommand(float heightValue);
-    void addCorners(const std::vector<BrushTileCornerHit> &brushSelection, WorldModel &model, const WorldView &view);
+    SetTilesCornersHeightCommand();
+    void addCorners(const std::vector<BrushTileCornerHit> &brushSelection, float heightValue, WorldModel &model, const WorldView &view);
+    void addCorners(std::unordered_map<TileCorner *, float> cornersTargetHeightValues, WorldModel &model, const WorldView &view);
     void execute(WorldModel& model, WorldView& view) override;
     void undo(WorldModel& model, WorldView& view) override;
     std::string getName() override;
 private:
     std::unordered_map<TileCorner *, float> m_previousCornersHeight;
-    float m_heightValue;
+    std::unordered_map<TileCorner *, float> m_cornersHeightValues;
     float m_minWeightThreshold;
 };
 
