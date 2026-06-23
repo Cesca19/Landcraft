@@ -110,6 +110,9 @@ add_executable(${MY_TARGET}
         src/commands/SetSplatMapCommand.cpp
         src/commands/CommandGroup.cpp
         src/ui/widgets/TextInput.cpp
+        src/editionTools/SetHeightTool.cpp
+        src/commands/SetTilesCornersHeightCommand.cpp
+        src/editionTools/SmoothHeightTool.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

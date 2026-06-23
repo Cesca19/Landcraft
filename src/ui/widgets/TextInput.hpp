@@ -36,6 +36,8 @@ public:
 
     void initOnValidateCallback(std::function<void(const std::string&)> callback);
     void setNumericInput(bool isNumeric);
+    void setAllowFloatInput(bool allowFloat);
+    void setAllowNegativeInput(bool allowNegative);
     std::string getText() const;
     void setText(const std::string& text);
 
@@ -50,6 +52,8 @@ private:
     bool m_isNumeric;
     bool m_isVisible;
     bool m_canType;
+    bool m_allowFloatInput;
+    bool m_allowNegativeInput;
     unsigned int m_characterLimit;
     WidgetState m_currentState;
     std::function<void(const std::string&)> m_onValidateCallback;

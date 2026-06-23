@@ -10,11 +10,13 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
     : m_currentEditionTool(-1)
     , m_editionMenu(std::make_unique<EditionMenu>(globalUIPosition))
     , m_editionToolsBoxPosition(0, 250)
-    , m_toolsMenuStartPosition(m_editionToolsBoxPosition + sf::Vector2f(95, 0))
+    , m_toolsMenuStartPosition(m_editionToolsBoxPosition + sf::Vector2f(115, 0))
     , m_terrainGenerationController(terrainGenerationMenuPosition, windowSize, &model, &view, &m_commandHistory)
 {
     m_editionTools.emplace_back(std::make_unique<ElevationTool>(m_toolsMenuStartPosition));
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsMenuStartPosition));
+    m_editionTools.emplace_back(std::make_unique<SetHeightTool>(m_toolsMenuStartPosition));
+    m_editionTools.emplace_back(std::make_unique<SmoothHeightTool>(m_toolsMenuStartPosition));
 
     for (int i = 0; i < m_editionTools.size(); i++ ) {
         m_editionMenu->setEditionToolButtonOnCLickCallback(i, [this, i] () {
