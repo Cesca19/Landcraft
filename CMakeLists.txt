@@ -113,6 +113,7 @@ add_executable(${MY_TARGET}
         src/editionTools/SetHeightTool.cpp
         src/commands/SetTilesCornersHeightCommand.cpp
         src/editionTools/SmoothHeightTool.cpp
+        src/editionTools/ResetTerrainTool.cpp
 )
 
 # --- ADDRESS SANITIZER IN DEBUG MODE ---

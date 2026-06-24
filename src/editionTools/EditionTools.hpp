@@ -9,5 +9,6 @@
 #include "ElevationTool.hpp"
 #include "SetHeightTool.hpp"
 #include "SmoothHeightTool.hpp"
+#include "ResetTerrainTool.hpp"
 
 #endif //LANDCRAFT_EDITIONTOOLS_HPP
