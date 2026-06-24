@@ -13,7 +13,7 @@ EditionMenu::EditionMenu(sf::Vector2f globalUIPosition)
         globalUIPosition + sf::Vector2f(15, 16), {28, 28}, "Undo", 12);
     m_redoButton = UIFactory::createSpriteButton("assets/textures/ui/redo_512.png",
         globalUIPosition + sf::Vector2f(85, 16), {28, 28}, "Redo", 12);
-    m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {105, 380});
+    m_editionToolsBox = UIFactory::createBox(m_editionToolsBoxPosition, {105, 470});
     UIFactory::applyDefaultBoxStyle(m_editionToolsBox);
     m_toolsText = UIFactory::createText(m_editionToolsBoxPosition + sf::Vector2f(15, 10), "Tools:", 20);
     UIFactory::applyDefaultTextStyle(m_toolsText, UIFactory::TextVariant::Title);
@@ -22,10 +22,13 @@ EditionMenu::EditionMenu(sf::Vector2f globalUIPosition)
     SpriteButton *paintButton = UIFactory::createSpriteButton("assets/textures/ui/paint_palette_64.png", toolStartPos + sf::Vector2f(0, 80), {32, 32}, "Paint", 15);
     SpriteButton *setHeightButton = UIFactory::createSpriteButton("assets/textures/ui/set_height_512.png", toolStartPos + sf::Vector2f(0, 160), {32, 32}, "Set Height", 15);
     SpriteButton *smoothHeightButton = UIFactory::createSpriteButton("assets/textures/ui/smooth_height_512.png", toolStartPos + sf::Vector2f(0, 240), {32, 32}, "Smooth Height", 14);
+    SpriteButton *resetTerrainButton = UIFactory::createSpriteButton("assets/textures/ui/reset_terrain_512.png", toolStartPos + sf::Vector2f(0, 320), {32, 32}, "Reset Terrain", 14);
+    
     m_editionToolsButtons.emplace_back(elevationButton);
     m_editionToolsButtons.emplace_back(paintButton);
     m_editionToolsButtons.emplace_back(setHeightButton);
     m_editionToolsButtons.emplace_back(smoothHeightButton);
+    m_editionToolsButtons.emplace_back(resetTerrainButton);
     applyUIStyle();
     initWidgetsList();
 }

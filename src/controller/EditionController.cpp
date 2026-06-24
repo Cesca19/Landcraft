@@ -17,6 +17,7 @@ EditionController::EditionController(WorldModel &model, WorldView &view,
     m_editionTools.emplace_back(std::make_unique<PaintTool>(m_toolsMenuStartPosition));
     m_editionTools.emplace_back(std::make_unique<SetHeightTool>(m_toolsMenuStartPosition));
     m_editionTools.emplace_back(std::make_unique<SmoothHeightTool>(m_toolsMenuStartPosition));
+    m_editionTools.emplace_back(std::make_unique<ResetTerrainTool>(m_toolsMenuStartPosition, &model, &view, &m_commandHistory));
 
     for (int i = 0; i < m_editionTools.size(); i++ ) {
         m_editionMenu->setEditionToolButtonOnCLickCallback(i, [this, i] () {
