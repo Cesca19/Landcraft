@@ -1,6 +1,5 @@
-# Landcraft
 
-<!-- TODO: add a screenshot or GIF here, e.g. ![Landcraft](docs/preview.png) -->
+# Landcraft
 
 **A real-time 3D isometric terrain editor written in modern C++ with SFML.**
 
@@ -8,7 +7,11 @@ Landcraft lets you sculpt terrain through elevation, flattening and smoothing to
 paint multi-texture surfaces through a GPU splatmap, 
 generate procedurallandscapes, and save/load your maps.
 
-> Built from scratch as a software engineering project, Landcraft features a command-based undo/redo architecture, a custom UI framework,  map serialization, procedural generation tools, and a cross-platform Conan/CMake build system with automated GitHub Actions releases.
+
+https://github.com/user-attachments/assets/1c1b4585-d962-4100-9eea-a99c921415b7
+
+
+> Built from scratch as a software engineering project, Landcraft features a command-based undo/redo architecture, a custom UI framework,  map serialization, procedural generation tools, and a cross-platform Conan/CMake build system with automated GitHub Actions releases. Want to see more? Watch the full demonstration [here](https://www.youtube.com/watch?v=aNOjXF5DSZw)
 
 <br>
 
