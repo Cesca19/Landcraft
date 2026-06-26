@@ -8,7 +8,7 @@ WorldController::WorldController(sf::Vector2u minWindowSize, sf::Vector2u maxWin
     : m_minWindowSize(minWindowSize)
     , m_maxWindowSize(maxWindowSize)
     , m_currentDrawMode(DrawMode::WIREFRAME_SHADED)
-    , waterLevelIncrementStep(0.25f)
+    , waterLevelIncrementStep(0.5f)
     , m_wasQuitMenuVisibleBeforeHiding(false)
 {
 }
@@ -177,7 +177,7 @@ void WorldController::onDrawModeButtonClicked(const DrawMode mode)
 void WorldController::onWaterLevelButtonClicked(int factor)
 {
     float newLevel = static_cast<float>(m_worldModel.getWaterHeight()) + (static_cast<float>(factor) * waterLevelIncrementStep);
-    newLevel = std::clamp(newLevel, -10.0f, 10.0f);
+    newLevel = std::clamp(newLevel, -50.0f, 50.0f);
     m_worldModel.setWaterHeight(newLevel);
     m_worldView.setWaterHeight(m_worldModel.getWaterHeight());
     setWaterLevelValueText(m_worldModel.getWaterHeight());

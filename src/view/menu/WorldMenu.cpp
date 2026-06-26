@@ -169,7 +169,16 @@ void WorldMenu::initOnWaterLevelDecrementButtonClickCallback(const std::function
 
 void WorldMenu::setWaterLevelValueText(const std::string &value) const
 {
-    m_waterLevelValueText->setContent(value);
+    if (value.size() == 1)
+        m_waterLevelValueText->setContent(value + ".00");
+    else if (value.size() == 2 && value[0] == '-')
+        m_waterLevelValueText->setContent(value + ".0");
+    else if (value.size() == 2 && value[0] != '-')
+        m_waterLevelValueText->setContent(value + ".0");
+    else if (value.size() == 3 && value[0] != '-')
+        m_waterLevelValueText->setContent(value + "0");
+    else
+        m_waterLevelValueText->setContent(value);
 }
 
 void WorldMenu::setVisibility(bool visible) const

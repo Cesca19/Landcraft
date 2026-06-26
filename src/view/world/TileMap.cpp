@@ -456,13 +456,18 @@ void TileMap::draw(sf::RenderTarget &target, sf::RenderStates states) const
         if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 0.0f);
         nonConstShader->setUniform("u_ShowGrid", m_isWireframeVisible ? 1.0f : 0.0f);
         target.draw(m_shadedTilesVertexArray, states);
+
+        // Draw the visible front walls on top (they are always the closest to the camera)
+        states.shader = nullptr;
+        states.texture = nullptr;
+        target.draw(m_groundVertexArray, states);
     }
 
     // Draw Wireframe Grid with Shader filtering
     if (m_isWireframeVisible && !m_areShadedTilesVisible) {
         states.shader = nonConstShader;
-        if (nonConstShader) nonConstShader->setUniform("u_IsWireframe", 1.0f);
-        nonConstShader->setUniform("u_IsWireframe", 1.0f);
+        if (nonConstShader) 
+            nonConstShader->setUniform("u_IsWireframe", 1.0f);
         target.draw(m_wireframeTilesVertexArray, states);
     }
 }
