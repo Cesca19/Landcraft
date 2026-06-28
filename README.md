@@ -5,7 +5,7 @@
 
 Landcraft lets you sculpt terrain through elevation, flattening and smoothing tools, 
 paint multi-texture surfaces through a GPU splatmap, 
-generate procedurallandscapes, and save/load your maps.
+generate procedural landscapes, and save/load your maps.
 
 
 https://github.com/user-attachments/assets/1c1b4585-d962-4100-9eea-a99c921415b7
@@ -23,8 +23,8 @@ https://github.com/user-attachments/assets/1c1b4585-d962-4100-9eea-a99c921415b7
 - [Architecture](#architecture)
 - [Project Status](#project-status)
 - [Try It](#try-it)
+- [How to build from source](#how-to-build-from-source)
 - [Controls](#controls)
-- [Building from Source](#building-from-source)
 
 <br>
 
@@ -109,7 +109,7 @@ are functional. Some areas (e.g. additional edition tools) are still evolving.
 <br>
 
 ## Try It
-No build required — grab a ready-to-run package from the
+No build required — grab a ready-to-run binary from the
 [**Releases**](../../releases/latest) page:
 
 1. Open the [Releases](../../releases/latest) page and download the archive for
@@ -121,37 +121,11 @@ No build required — grab a ready-to-run package from the
    - **Windows** — double-click `landcraft.exe`
    - **Linux** — `./landcraft` (you may need X11 libraries installed)
 
-> Prefer building it yourself? See [Building from Source](#building-from-source).
+> Prefer building it yourself? See [How to build from source](#how-to-build-from-source).
 
 <br>
 
-## Controls
-> Movement keys follow an AZERTY layout (`Z/Q/S/D`).
-
-| Action | Input |
-| --- | --- |
-| Pan camera | Middle-mouse drag, or `Z` / `Q` / `S` / `D` |
-| Zoom | Mouse wheel (to cursor), or `I` / `P` |
-| Orbit (yaw) | Right-mouse drag, or `K` / `M` |
-| Tilt (pitch) | Right-mouse drag, or `O` / `L` |
-| Recenter view | `R` |
-| Switch edition tool | `T` |
-| Toggle selection mode (corner/tile) | `Space` |
-| Brush size | `+` / `-` |
-| Cycle brush shape | `A` / `E` |
-| Select paint texture | `0`–`4` (clear, grass, sand, rock, snow) |
-| Generate terrain / cycle noise | `G` / `N` |
-| Undo / Redo | `Ctrl+Z` / `Ctrl+Y` |
-| Save / Load map | `Ctrl+S` / `Ctrl+O` |
-| Quit (with confirmation) | `Esc` |
-| Toogle help menu visibility | `H` |
-
-When a UI input is focused, navigation keys (`Tab`, arrow keys, `Space`,
-`Enter`, `Esc`) are captured by the UI layer instead of the world.
-
-<br>
-
-## Building from Source
+## How to build from source
 The project ships with **custom build scripts** that bootstrap the whole
 toolchain (check Python/CMake, install Conan locally, resolve dependencies,
 configure CMake and build). Both scripts accept a build type and a runtime
@@ -196,3 +170,30 @@ libraries. Run it with an optional map path:
 > so the produced builds are portable.
 
 To clean build artifacts: `scripts\clean_windows.bat` / `./scripts/clean_linux.sh`.
+
+<br>
+
+## Controls
+> Movement keys follow an AZERTY layout (`Z/Q/S/D`).
+
+| Action | Input |
+| --- | --- |
+| Pan camera | Middle-mouse drag, or `Z` / `Q` / `S` / `D` |
+| Zoom | Mouse wheel (to cursor), or `I` / `P` |
+| Orbit (yaw) | Right-mouse drag, or `K` / `M` |
+| Tilt (pitch) | Right-mouse drag, or `O` / `L` |
+| Recenter view | `R` |
+| Switch edition tool | `T` |
+| Toggle selection mode (corner/tile) | `Space` |
+| Brush size | `+` / `-` |
+| Cycle brush shape | `A` / `E` |
+| Select paint texture | `0`–`4` (clear, grass, sand, rock, snow) |
+| Generate terrain / cycle noise | `G` / `N` |
+| Undo / Redo | `Ctrl+Z` / `Ctrl+Y` |
+| Save / Load map | `Ctrl+S` / `Ctrl+O` |
+| Quit (with confirmation) | `Esc` |
+| Toogle help menu visibility | `H` |
+
+When a UI input is focused, navigation keys (`Tab`, arrow keys, `Space`,
+`Enter`, `Esc`) are captured by the UI layer instead of the world.
+
